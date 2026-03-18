@@ -16,7 +16,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a1929;
+            background: linear-gradient(135deg, #050e1a 0%, #0a1929 50%, #051f2f 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -29,11 +29,12 @@
             height: 100vh;
             height: 100dvh;
             background: #ffffff;
-            box-shadow: 0 20px 50px rgba(0, 40, 70, 0.5);
+            box-shadow: 0 30px 70px rgba(0, 30, 50, 0.6), 0 0 1px rgba(6, 198, 212, 0.1);
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
+            border-radius: 2px;
         }
         
         /* High-quality wallpaper – sharp & crisp */
@@ -65,12 +66,12 @@
 
         /* Header — more polished arrangement */
         .app-header {
-            background: rgba(18, 28, 40, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 0.7rem 1rem 0.6rem;
-            border-bottom: 1px solid rgba(6,198,212,0.25);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(180deg, rgba(12, 22, 32, 0.92) 0%, rgba(18, 28, 40, 0.88) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 0.75rem 1.2rem 0.7rem;
+            border-bottom: 1px solid rgba(6,198,212,0.18);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 0 1px rgba(6,198,212,0.05);
             position: relative;
             z-index: 10;
             flex-shrink: 0;
@@ -79,29 +80,31 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
         }
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-weight: 800;
-            font-size: 1.2rem;
+            gap: 8px;
+            font-weight: 900;
+            font-size: 1.25rem;
             color: white;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            letter-spacing: -0.5px;
-            background: rgba(0,0,0,0.2);
-            padding: 0.2rem 1rem 0.2rem 0.4rem;
-            border-radius: 40px;
-            border: 1px solid rgba(255,255,255,0.1);
+            text-shadow: 0 3px 8px rgba(0,0,0,0.4);
+            letter-spacing: -0.6px;
+            background: linear-gradient(135deg, rgba(6,198,212,0.15), rgba(6,198,212,0.08));
+            padding: 0.3rem 1.1rem 0.3rem 0.5rem;
+            border-radius: 50px;
+            border: 1.5px solid rgba(6,198,212,0.25);
+            backdrop-filter: blur(8px);
         }
         .logo-icon {
-            background: #06c6d4;
+            background: linear-gradient(135deg, #06c6d4 0%, #04b8c4 100%);
             color: white;
-            border-radius: 30px;
-            padding: 6px 12px;
-            font-size: 1rem;
-            box-shadow: 0 4px 10px rgba(6,198,212,0.3);
+            border-radius: 35px;
+            padding: 7px 13px;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 14px rgba(6,198,212,0.35), 0 0 1px rgba(6,198,212,0.2) inset;
+            font-weight: 900;
         }
         .header-actions {
             display: flex;
@@ -109,35 +112,42 @@
             gap: 0.4rem;
         }
         .icon-btn {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(6,198,212,0.3);
+            background: rgba(255,255,255,0.1);
+            border: 1.5px solid rgba(6,198,212,0.28);
             color: #06c6d4;
-            border-radius: 40px;
-            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            padding: 0.45rem 1rem;
             font-size: 0.75rem;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
-            transition: all 0.2s ease;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
+            gap: 5px;
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            font-weight: 700;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
         .icon-btn:hover {
             background: rgba(6,198,212,0.2);
-            border-color: rgba(6,198,212,0.6);
-            transform: translateY(-1px);
+            border-color: rgba(6,198,212,0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(6,198,212,0.2);
+        }
+        .icon-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(6,198,212,0.15);
         }
         .date-badge {
-            background: rgba(6,198,212,0.2);
-            backdrop-filter: blur(4px);
-            padding: 0.3rem 1rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            border: 1px solid rgba(6,198,212,0.4);
+            background: linear-gradient(135deg, rgba(6,198,212,0.15), rgba(6,198,212,0.08));
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 0.35rem 1.1rem;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            border: 1.5px solid rgba(6,198,212,0.32);
             color: white;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
         }
         .brand-user-row {
             display: flex;
@@ -240,12 +250,12 @@
         .main-content {
             flex: 1;
             overflow-y: auto;
-            padding: 1.3rem 1.1rem 1rem;
-            background: rgba(248, 250, 252, 0.9);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            padding: 1.4rem 1.2rem 1.1rem;
+            background: linear-gradient(180deg, #f9fbfd 0%, #f5f8fb 100%);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             scrollbar-width: thin;
-            scrollbar-color: rgba(6,198,212,0.3) transparent;
+            scrollbar-color: rgba(6,198,212,0.35) transparent;
             position: relative;
             z-index: 5;
         }
@@ -257,23 +267,24 @@
             background: transparent;
         }
         .main-content::-webkit-scrollbar-thumb {
-            background: rgba(6,198,212,0.3);
+            background: rgba(6,198,212,0.32);
             border-radius: 3px;
+            transition: all 0.2s ease;
         }
         .main-content::-webkit-scrollbar-thumb:hover {
-            background: rgba(6,198,212,0.5);
+            background: rgba(6,198,212,0.55);
         }
 
         .bottom-nav {
             display: flex;
             justify-content: space-around;
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 0.6rem 0.4rem 0.5rem;
-            border-top: 1px solid rgba(6,198,212,0.15);
-            box-shadow: 0 -12px 30px rgba(6,198,212,0.08);
-            border-radius: 28px 28px 0 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,250,252,0.99) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 0.7rem 0.5rem 0.6rem;
+            border-top: 1.5px solid rgba(6,198,212,0.12);
+            box-shadow: 0 -16px 36px rgba(6,198,212,0.1), 0 0 1px rgba(6,198,212,0.05);
+            border-radius: 30px 30px 0 0;
             flex-shrink: 0;
             z-index: 20;
             position: relative;
@@ -283,14 +294,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 0.7rem;
-            color: #708598;
-            padding: 8px 0;
-            border-radius: 40px;
+            font-size: 0.72rem;
+            color: #7a8fa0;
+            padding: 9px 0;
+            border-radius: 50px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            font-weight: 700;
+            transition: all 0.35s cubic-bezier(0.35, 0.46, 0.3, 0.46);
             animation: slideUp 0.5s ease backwards;
+            border: 2px solid transparent;
         }
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -316,9 +328,10 @@
             transform: scale(1.08);
         }
         .nav-item-mobile.active {
-            background: rgba(6,198,212,0.12);
+            background: linear-gradient(135deg, rgba(6,198,212,0.15), rgba(6,198,212,0.08));
             color: #06c6d4;
-            box-shadow: inset 0 0 0 2px #06c6d4;
+            border-color: rgba(6,198,212,0.3);
+            box-shadow: 0 4px 12px rgba(6,198,212,0.15), inset 0 0 0 1px rgba(6,198,212,0.2);
         }
         .nav-item-mobile.active i {
             color: #06c6d4;
@@ -339,68 +352,114 @@
             margin-top: 1rem;
         }
         .cart-btn {
-            background: #06c6d4;
+            background: linear-gradient(135deg, #06c6d4 0%, #04b8c4 100%);
             color: white;
-            border: 1px solid #06c6d4;
-            border-radius: 80px;
-            padding: 1.1rem 2.4rem;
-            font-size: 1.2rem;
-            font-weight: 700;
-            box-shadow: 0 18px 40px rgba(6,198,212,0.35);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: 90px;
+            padding: 1.15rem 2.65rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            box-shadow: 0 20px 48px rgba(6,198,212,0.38), 0 0 1px rgba(6,198,212,0.2) inset;
             display: inline-flex;
             align-items: center;
-            gap: 14px;
+            gap: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.35s cubic-bezier(0.35, 0.46, 0.3, 0.46);
             pointer-events: auto;
+            letter-spacing: -0.3px;
         }
         .cart-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 22px 50px rgba(6,198,212,0.4);
-            background: #05a8b3;
+            transform: translateY(-4px);
+            box-shadow: 0 26px 56px rgba(6,198,212,0.42), 0 0 1px rgba(6,198,212,0.25) inset;
         }
         .cart-btn:active {
-            transform: scale(0.96) translateY(0);
-            box-shadow: 0 12px 25px rgba(6,198,212,0.25);
+            transform: scale(0.95) translateY(0);
+            box-shadow: 0 12px 28px rgba(6,198,212,0.28);
         }
         .cart-badge {
-            background: #1a2332;
+            background: linear-gradient(135deg, rgba(26,35,50,0.95), rgba(20,28,40,0.95));
             color: #06c6d4;
-            border-radius: 60px;
-            padding: 0.2rem 1rem;
-            font-size: 1.1rem;
+            border-radius: 70px;
+            padding: 0.3rem 1.1rem;
+            font-size: 1.15rem;
+            font-weight: 900;
+            border: 1px solid rgba(6,198,212,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Modal overlays (unchanged) */
+        /* Modal overlays (enhanced) */
         .modal-overlay, .cart-modal-overlay, .auth-overlay, .crop-modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.58);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 300000;
             padding: 1.5rem;
-            animation: fadeScale 0.3s ease;
+            animation: fadeScale 0.35s cubic-bezier(0.35, 0.46, 0.3, 0.46);
         }
         @keyframes fadeScale {
-            0% { opacity: 0; transform: scale(0.95); }
+            0% { opacity: 0; transform: scale(0.92); }
             100% { opacity: 1; transform: scale(1); }
         }
-        .crop-modal-overlay { z-index: 400000; background: rgba(0,0,0,0.8); }
+        .crop-modal-overlay { z-index: 400000; background: rgba(0,0,0,0.82); }
         .cart-modal-card, .modal-card, .crop-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 48px;
-            padding: 2.2rem 1.8rem;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 0.98) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 54px;
+            padding: 2.4rem 2rem;
             width: 100%;
             max-width: 380px;
-            box-shadow: 0 50px 100px rgba(0, 30, 50, 0.5), 0 20px 40px rgba(0, 30, 50, 0.2);
-            border: 1px solid rgba(255,255,240,0.8);
+            box-shadow: 0 54px 108px rgba(0, 20, 40, 0.52), 0 24px 48px rgba(0, 20, 40, 0.22), 0 0 1px rgba(6,198,212,0.08);
+            border: 1.5px solid rgba(6,198,212,0.12);
             max-height: 85vh;
             overflow-y: auto;
+        }
+        .license-modal-overlay {
+            background: rgba(2, 10, 18, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .license-modal-card {
+            background: linear-gradient(160deg, rgba(8, 24, 38, 0.72), rgba(14, 48, 70, 0.62));
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1.5px solid rgba(255,255,255,0.14);
+            box-shadow: 0 48px 108px rgba(0, 8, 18, 0.5), 0 22px 44px rgba(6,198,212,0.2), inset 0 1px 1px rgba(255,255,255,0.12);
+            color: white;
+        }
+        .license-modal-card h3 {
+            color: #ffffff;
+            text-shadow: 0 10px 26px rgba(0,0,0,0.28);
+            font-weight: 900;
+            font-size: 1.8rem;
+            line-height: 1.1;
+        }
+        .license-modal-desc {
+            margin-bottom: 1.6rem;
+            color: rgba(255,255,255,0.82);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .license-modal-card .modal-field {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.16);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        .license-modal-card .modal-field:focus-within {
+            background: rgba(255,255,255,0.16);
+            border-color: rgba(130,239,246,0.72);
+            box-shadow: 0 0 0 4px rgba(130,239,246,0.12);
+        }
+        .license-modal-card .modal-field input {
+            color: #ffffff;
+        }
+        .license-modal-card .modal-field input::placeholder {
+            color: rgba(255,255,255,0.58);
         }
         .crop-card { max-width: 400px; text-align: center; }
         .crop-container { width: 100%; max-height: 50vh; margin: 1rem 0; }
@@ -409,15 +468,15 @@
         /* Auth, product grid etc – keep exactly as before */
         .auth-overlay { background: rgba(0,0,0,0.3); backdrop-filter: blur(12px); }
         .auth-card-modern {
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(30px);
-            border-radius: 56px;
-            padding: 2.5rem 2rem;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.93) 100%);
+            backdrop-filter: blur(36px);
+            border-radius: 62px;
+            padding: 2.7rem 2.2rem;
             width: 100%;
             max-width: 360px;
-            box-shadow: 0 40px 70px rgba(0,10,20,0.4);
-            border: 1px solid rgba(255,255,255,0.7);
-            animation: slideSoft 0.5s;
+            box-shadow: 0 48px 84px rgba(0,8,18,0.46), 0 24px 48px rgba(0,8,18,0.18), 0 0 1px rgba(6,198,212,0.1);
+            border: 1.5px solid rgba(6,198,212,0.14);
+            animation: slideSoft 0.5s cubic-bezier(0.35, 0.46, 0.3, 0.46);
         }
         @keyframes slideSoft {
             0% { opacity: 0; transform: translateY(20px); }
@@ -435,15 +494,22 @@
             background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 70%);
             pointer-events: none;
         }
-        .auth-header h2 { font-size: 2.4rem; font-weight: 700; color: #1a2332; letter-spacing: -0.8px; line-height: 1.2; }
+        .auth-header h2 { font-size: 2.6rem; font-weight: 900; color: #0f1419; letter-spacing: -1px; line-height: 1.1; }
         .auth-field {
-            background: rgba(255,255,255,0.75); backdrop-filter: blur(8px); border-radius: 60px;
-            padding: 0.2rem 1.6rem; margin-bottom: 1.3rem; border: 2px solid rgba(6,198,212,0.2);
-            transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(248,250,252,0.8));
+            backdrop-filter: blur(10px);
+            border-radius: 70px;
+            padding: 0.3rem 1.8rem;
+            margin-bottom: 1.4rem;
+            border: 2px solid rgba(6,198,212,0.18);
+            transition: all 0.35s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06), inset 0 1px 2px rgba(255,255,255,0.5);
         }
         .auth-field:focus-within {
-            border-color: #06c6d4; background: rgba(255,255,255,0.95); transform: scale(1.02);
-            box-shadow: 0 12px 30px rgba(6,198,212,0.15);
+            border-color: #06c6d4;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(6,198,212,0.18), inset 0 1px 2px rgba(255,255,255,0.6);
         }
         .auth-field input, .auth-field select {
             width: 100%; border: none; background: transparent; padding: 1rem 0; font-size: 1rem;
@@ -451,14 +517,33 @@
         }
         .auth-field input::placeholder { color: #93a5b3; }
         .auth-btn {
-            background: #06c6d4; color: white; border: 1px solid #06c6d4; border-radius: 60px;
-            padding: 1.2rem; width: 100%; font-weight: 700; font-size: 1.1rem; cursor: pointer;
-            transition: all 0.3s ease; box-shadow: 0 15px 35px rgba(6,198,212,0.25);
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin: 1.8rem 0 1rem;
+            background: linear-gradient(135deg, #06c6d4 0%, #04b8c4 100%);
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            border-radius: 70px;
+            padding: 1.3rem;
+            width: 100%;
+            font-weight: 800;
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            box-shadow: 0 18px 42px rgba(6,198,212,0.3), 0 0 1px rgba(6,198,212,0.2) inset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+            margin: 2rem 0 1.2rem;
+            letter-spacing: -0.3px;
         }
-        .auth-btn:hover { background: #05a8b3; box-shadow: 0 18px 40px rgba(6,198,212,0.35); transform: translateY(-2px); }
-        .auth-btn:active { transform: scale(0.96) translateY(0); box-shadow: 0 10px 20px rgba(6,198,212,0.2); }
+        .auth-btn:hover {
+            background: linear-gradient(135deg, #05bcc8 0%, #03a0ab 100%);
+            box-shadow: 0 22px 50px rgba(6,198,212,0.38), 0 0 1px rgba(6,198,212,0.25) inset;
+            transform: translateY(-3px);
+        }
+        .auth-btn:active {
+            transform: scale(0.95) translateY(0);
+            box-shadow: 0 12px 28px rgba(6,198,212,0.25);
+        }
         .auth-switch { text-align: center; color: #1a2332; cursor: pointer; font-weight: 500; font-size: 0.95rem; padding: 0.5rem; opacity: 0.9; transition: 0.2s; }
         .auth-switch:hover { opacity: 1; text-decoration: underline; }
         .product-grid-mobile {
@@ -467,15 +552,22 @@
         }
         @keyframes fadeInGrid { from { opacity: 0; } to { opacity: 1; } }
         .product-tile-mobile {
-            position: relative; width: 100%; aspect-ratio: 4/5; cursor: pointer;
-            border-radius: 28px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid rgba(6,198,212,0.1); transition: all 0.25s cubic-bezier(0.35, 0.46, 0.3, 0.46);
-            animation: fadeIn 0.4s ease backwards; background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf2 100%);
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/5;
+            cursor: pointer;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.16), 0 4px 12px rgba(0,0,0,0.12), 0 0 1px rgba(6,198,212,0.08);
+            border: 1.5px solid rgba(6,198,212,0.1);
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            animation: fadeIn 0.4s ease backwards;
+            background: linear-gradient(135deg, #f5f8fa 0%, #eef2f6 100%);
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .product-tile-mobile:hover {
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 8px 16px rgba(6,198,212,0.25), 0 2px 8px rgba(0,0,0,0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 26px 52px rgba(0,0,0,0.22), 0 12px 24px rgba(6,198,212,0.28), 0 0 1px rgba(6,198,212,0.12);
+            transform: translateY(-6px);
             border-color: rgba(6,198,212,0.3);
         }
         .product-tile-mobile:hover .product-image-mobile { transform: scale(1.08); }
@@ -510,55 +602,732 @@
         }
         /* All other styles from original kept intact (chips, payment, etc) */
         .chip {
-            background: rgba(6,198,212,0.12); border-radius: 40px; padding: 0.7rem 1.3rem;
-            cursor: pointer; font-weight: 600; border: 2px solid rgba(6,198,212,0.3);
-            display: inline-block; transition: all 0.25s ease; font-size: 0.85rem; color: #06c6d4;
+            background: linear-gradient(135deg, rgba(6,198,212,0.12), rgba(6,198,212,0.08));
+            border-radius: 50px;
+            padding: 0.75rem 1.45rem;
+            cursor: pointer;
+            font-weight: 700;
+            border: 2px solid rgba(6,198,212,0.28);
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            font-size: 0.87rem;
+            color: #06c6d4;
         }
-        .chip:hover { background: rgba(6,198,212,0.2); border-color: rgba(6,198,212,0.5); transform: translateY(-2px); }
-        .chip:active { transform: scale(0.92); }
-        .chip.active { background: #06c6d4; color: white; border-color: #06c6d4; box-shadow: 0 8px 18px rgba(6,198,212,0.3); }
+        .chip:hover {
+            background: linear-gradient(135deg, rgba(6,198,212,0.18), rgba(6,198,212,0.12));
+            border-color: rgba(6,198,212,0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(6,198,212,0.18);
+        }
+        .chip:active { transform: scale(0.93); }
+        .chip.active {
+            background: linear-gradient(135deg, #06c6d4, #04b8c4);
+            color: white;
+            border-color: #06c6d4;
+            box-shadow: 0 10px 24px rgba(6,198,212,0.35), 0 0 1px rgba(6,198,212,0.2) inset;
+        }
         .payment-option {
-            background: white; border-radius: 40px; padding: 0.8rem 1.3rem; border: 2px solid #c8d4de;
-            cursor: pointer; display: inline-block; transition: all 0.25s ease; font-size: 0.85rem;
-            font-weight: 600; color: #506578;
+            background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,252,0.85));
+            border-radius: 50px;
+            padding: 0.9rem 1.5rem;
+            border: 2px solid #d5dfe5;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #506578;
         }
-        .payment-option:hover { border-color: rgba(6,198,212,0.4); background: rgba(6,198,212,0.05); }
-        .payment-option:active { transform: scale(0.92); }
-        .payment-option.active { background: #06c6d4; color: white; border-color: #06c6d4; box-shadow: 0 8px 18px rgba(6,198,212,0.3); }
+        .payment-option:hover {
+            border-color: rgba(6,198,212,0.35);
+            background: linear-gradient(180deg, rgba(6,198,212,0.06), rgba(6,198,212,0.03));
+            transform: translateY(-1px);
+        }
+        .payment-option:active { transform: scale(0.93); }
+        .payment-option.active {
+            background: linear-gradient(135deg, #06c6d4, #04b8c4);
+            color: white;
+            border-color: #06c6d4;
+            box-shadow: 0 10px 24px rgba(6,198,212,0.32), 0 0 1px rgba(6,198,212,0.15) inset;
+        }
         .btn-small {
-            background: #06c6d4; color: white; border: 1px solid #06c6d4; border-radius: 60px;
-            padding: 0.8rem 1.5rem; font-weight: 700; cursor: pointer; font-size: 0.85rem;
-            transition: all 0.25s ease;
+            background: linear-gradient(135deg, #06c6d4, #04b8c4);
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            border-radius: 70px;
+            padding: 0.9rem 1.7rem;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.88rem;
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            box-shadow: 0 10px 24px rgba(6,198,212,0.28), 0 0 1px rgba(6,198,212,0.15) inset;
+            letter-spacing: -0.2px;
         }
-        .btn-small:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(6,198,212,0.25); background: #05a8b3; }
-        .btn-small:active { transform: scale(0.94) translateY(0); }
+        .btn-small:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 32px rgba(6,198,212,0.32), 0 0 1px rgba(6,198,212,0.2) inset;
+            background: linear-gradient(135deg, #05bcc8, #03a0ab);
+        }
+        .btn-small:active { transform: scale(0.93) translateY(0); box-shadow: 0 6px 16px rgba(6,198,212,0.22); }
+        .sales-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f9fbfd 100%);
+            border-radius: 48px;
+            padding: 1.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06), 0 0 1px rgba(6,198,212,0.08);
+            border: 1px solid rgba(6,198,212,0.08);
+        }
+        .sales-header-row {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+            padding: 1.2rem;
+            border-radius: 36px;
+            background: linear-gradient(135deg, rgba(6,198,212,0.08), rgba(15,66,102,0.04));
+            border: 1.5px solid rgba(6,198,212,0.12);
+            box-shadow: 0 4px 12px rgba(6,198,212,0.08);
+        }
+        .sales-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .sales-title-block {
+            min-width: 0;
+            flex: 1 1 180px;
+        }
+        .sales-title-block h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #0f1419;
+            font-size: 1.15rem;
+            line-height: 1.25;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+        }
+        .sales-header-meta {
+            margin-top: 0.45rem;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #7a8fa0;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .sales-summary-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.52rem 1rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.92));
+            border: 1.5px solid rgba(6,198,212,0.2);
+            color: #06c6d4;
+            font-size: 0.76rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(6,198,212,0.12);
+        }
+        .sales-action-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+        .sales-action-group .btn-small {
+            flex: 1 1 150px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            padding-inline: 1rem;
+            white-space: nowrap;
+        }
+        .sales-clear-btn {
+            background: rgba(211,47,47,0.12);
+            color: #d32f2f;
+            border-color: rgba(211,47,47,0.28);
+        }
+        .sales-clear-btn:hover {
+            background: linear-gradient(135deg, #d32f2f, #c62828);
+            color: white;
+            border-color: #d32f2f;
+            box-shadow: 0 12px 28px rgba(211,47,47,0.3), 0 0 1px rgba(211,47,47,0.2) inset;
+        }
+        @media (max-width: 380px) {
+            .sales-action-group .btn-small {
+                flex-basis: 100%;
+            }
+        }
+        .analytics-page {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .analytics-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,250,252,0.98) 100%);
+            border-radius: 42px;
+            padding: 1.5rem;
+            border: 1.5px solid rgba(6,198,212,0.09);
+            box-shadow: 0 14px 32px rgba(10, 20, 35, 0.07), 0 0 1px rgba(6,198,212,0.05);
+        }
+        .analytics-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #0b2540 0%, #0d4765 58%, #06c6d4 100%);
+            color: white;
+            box-shadow: 0 28px 60px rgba(6,198,212,0.25), 0 0 1px rgba(6,198,212,0.1) inset;
+        }
+        .analytics-hero::before {
+            content: '';
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            right: -84px;
+            top: -94px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+        .analytics-hero::after {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            left: -42px;
+            bottom: -64px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+        .analytics-hero > * {
+            position: relative;
+            z-index: 1;
+        }
+        .analytics-hero-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+        .analytics-hero-copy {
+            flex: 1 1 200px;
+            min-width: 0;
+        }
+        .analytics-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.42rem 0.78rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.14);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+        .analytics-hero-copy h2 {
+            margin-top: 0.8rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.04em;
+        }
+        .analytics-hero-copy p {
+            margin-top: 0.55rem;
+            max-width: 18rem;
+            color: rgba(255,255,255,0.76);
+            line-height: 1.55;
+            font-size: 0.92rem;
+        }
+        .analytics-hero-btn {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            padding-inline: 1rem;
+            background: rgba(255,255,255,0.14);
+            color: white;
+            border-color: rgba(255,255,255,0.18);
+            box-shadow: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .analytics-hero-btn:hover {
+            background: rgba(255,255,255,0.22);
+            color: white;
+            border-color: rgba(255,255,255,0.28);
+            box-shadow: 0 10px 24px rgba(4, 27, 41, 0.18);
+        }
+        .analytics-hero-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+        .analytics-hero-metric {
+            padding: 1rem;
+            border-radius: 26px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.16);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .analytics-hero-label {
+            display: block;
+            margin-bottom: 0.45rem;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.74);
+        }
+        .analytics-hero-metric strong {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .analytics-hero-strip {
+            display: flex;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+            margin-top: 0.95rem;
+        }
+        .analytics-hero-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.55rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: rgba(255,255,255,0.92);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .analytics-section-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .analytics-section-head h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #0f1419;
+            letter-spacing: -0.3px;
+        }
+        .analytics-section-head p {
+            margin-top: 0.4rem;
+            color: #7a8fa0;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .analytics-mini-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(6,198,212,0.08);
+            border: 1px solid rgba(6,198,212,0.18);
+            color: #06c6d4;
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .analytics-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem;
+        }
+        .analytics-kpi-card {
+            position: relative;
+            min-height: 135px;
+            padding: 1.15rem;
+            border-radius: 32px;
+            border: 1.5px solid transparent;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+        .analytics-kpi-card::after {
+            content: '';
+            position: absolute;
+            inset: auto -28px -44px auto;
+            width: 115px;
+            height: 115px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.38);
+            opacity: 0.35;
+        }
+        .analytics-kpi-label {
+            position: relative;
+            z-index: 1;
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .analytics-kpi-value {
+            position: relative;
+            z-index: 1;
+            margin-top: 0.55rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1.15;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .analytics-kpi-note {
+            position: relative;
+            z-index: 1;
+            margin-top: 0.35rem;
+            font-size: 0.76rem;
+            font-weight: 600;
+            opacity: 0.86;
+        }
+        .analytics-kpi-icon {
+            position: absolute;
+            top: 0.9rem;
+            right: 0.95rem;
+            font-size: 1.25rem;
+            opacity: 0.22;
+        }
+        .analytics-kpi-green {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+            border-color: rgba(34,197,94,0.22);
+            color: #166534;
+        }
+        .analytics-kpi-amber {
+            background: linear-gradient(135deg, #fffaeb 0%, #fef08a 100%);
+            border-color: rgba(245,158,11,0.25);
+            color: #92400e;
+        }
+        .analytics-kpi-violet {
+            background: linear-gradient(135deg, #f7f1ff 0%, #ede9fe 100%);
+            border-color: rgba(168,85,247,0.22);
+            color: #6b21a8;
+        }
+        .analytics-kpi-rose {
+            background: linear-gradient(135deg, #fdf0f8 0%, #fce7f3 100%);
+            border-color: rgba(236,72,153,0.22);
+            color: #9f1239;
+        }
+        .analytics-chart-wrap {
+            position: relative;
+            height: 280px;
+        }
+        .analytics-actions {
+            display: flex;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+        .analytics-actions .btn-small {
+            flex: 1 1 150px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            padding-inline: 1rem;
+        }
+        .analytics-ghost-btn {
+            background: linear-gradient(135deg, rgba(6,198,212,0.09), rgba(6,198,212,0.05));
+            color: #06c6d4;
+            border-color: rgba(6,198,212,0.22);
+        }
+        .analytics-ghost-btn:hover {
+            background: linear-gradient(135deg, rgba(6,198,212,0.16), rgba(6,198,212,0.12));
+            color: #06c6d4;
+            border-color: rgba(6,198,212,0.35);
+            box-shadow: 0 10px 24px rgba(6,198,212,0.18);
+        }
+        .analytics-expense-overview {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .analytics-summary-tile {
+            padding: 1.1rem;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #f5f8fa, #eef2f6);
+            border: 1.5px solid rgba(6,198,212,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .analytics-summary-label {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #7a8fa0;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .analytics-summary-value {
+            margin-top: 0.5rem;
+            font-size: 1.55rem;
+            font-weight: 900;
+            line-height: 1.1;
+            color: #06c6d4;
+            word-break: break-word;
+        }
+        .analytics-search {
+            position: relative;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        .analytics-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.92rem;
+        }
+        .analytics-search input {
+            width: 100%;
+            padding: 1rem 1.4rem 1rem 2.9rem;
+            border-radius: 999px;
+            border: 2px solid rgba(6,198,212,0.16);
+            background: linear-gradient(180deg, #fbfdff, #f9fbfd);
+            color: #0f1419;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            outline: none;
+            font-weight: 500;
+        }
+        .analytics-search input:focus {
+            border-color: #06c6d4;
+            box-shadow: 0 0 0 5px rgba(6,198,212,0.14), 0 8px 20px rgba(6,198,212,0.12);
+            background: white;
+        }
+        .analytics-filter-tabs {
+            margin: 0 0 1rem;
+        }
+        .analytics-expense-list {
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-right: 0.1rem;
+        }
+        .analytics-expense-item {
+            background: linear-gradient(180deg, #f9fbfd, #f5f8fa);
+            border: 1.5px solid rgba(6,198,212,0.12);
+            border-left: 5px solid #06c6d4;
+            border-radius: 28px;
+            padding: 1.1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+        }
+        .analytics-expense-item:hover {
+            box-shadow: 0 8px 20px rgba(6,198,212,0.12);
+            background: linear-gradient(180deg, #fafcfd, #f7f9fb);
+        }
+        .analytics-expense-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.9rem;
+        }
+        .analytics-expense-main {
+            flex: 1;
+            min-width: 0;
+        }
+        .analytics-expense-title {
+            font-weight: 800;
+            color: #0f1419;
+            line-height: 1.35;
+            word-break: break-word;
+            font-size: 0.98rem;
+        }
+        .analytics-expense-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+        }
+        .analytics-expense-chip,
+        .analytics-expense-subtle {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+        }
+        .analytics-expense-chip {
+            background: linear-gradient(135deg, rgba(6,198,212,0.14), rgba(6,198,212,0.08));
+            color: #06c6d4;
+            border: 1px solid rgba(6,198,212,0.18);
+        }
+        .analytics-expense-subtle {
+            background: rgba(122,143,160,0.09);
+            color: #7a8fa0;
+        }
+        .analytics-expense-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.7rem;
+        }
+        .analytics-expense-amount {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #06c6d4;
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+        }
+        .analytics-expense-actions {
+            display: flex;
+            gap: 0.45rem;
+        }
+        .analytics-expense-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            font-size: 0.9rem;
+        }
+        .analytics-expense-edit {
+            background: linear-gradient(135deg, rgba(6,198,212,0.14), rgba(6,198,212,0.08));
+            color: #06c6d4;
+            border: 1.5px solid rgba(6,198,212,0.22);
+        }
+        .analytics-expense-edit:hover {
+            background: linear-gradient(135deg, #06c6d4, #04b8c4);
+            color: white;
+            border-color: #06c6d4;
+            box-shadow: 0 6px 16px rgba(6,198,212,0.25);
+        }
+        .analytics-expense-delete {
+            background: linear-gradient(135deg, rgba(211,47,47,0.14), rgba(211,47,47,0.08));
+            color: #d32f2f;
+            border: 1.5px solid rgba(211,47,47,0.22);
+        }
+        .analytics-expense-delete:hover {
+            background: linear-gradient(135deg, #d32f2f, #c62828);
+            color: white;
+            border-color: #d32f2f;
+            box-shadow: 0 6px 16px rgba(211,47,47,0.25);
+        }
+        .analytics-empty-state {
+            padding: 2.2rem 1.2rem;
+            border-radius: 28px;
+            border: 2px dashed rgba(6,198,212,0.2);
+            background: linear-gradient(135deg, #f9fbfd, #f5f8fa);
+            text-align: center;
+            color: #7a8fa0;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .analytics-danger-btn {
+            width: 100%;
+            min-height: 50px;
+            margin-top: 1.3rem;
+            background: linear-gradient(135deg, rgba(211,47,47,0.13), rgba(211,47,47,0.08));
+            color: #d32f2f;
+            border-color: rgba(211,47,47,0.2);
+            font-weight: 800;
+        }
+        .analytics-danger-btn:hover {
+            background: linear-gradient(135deg, #d32f2f, #c62828);
+            color: white;
+            border-color: #d32f2f;
+            box-shadow: 0 14px 32px rgba(211,47,47,0.28), 0 0 1px rgba(211,47,47,0.15) inset;
+        }
+        @media (max-width: 380px) {
+            .analytics-hero-grid,
+            .analytics-kpi-grid,
+            .analytics-expense-overview {
+                grid-template-columns: 1fr;
+            }
+            .analytics-actions .btn-small {
+                flex-basis: 100%;
+            }
+            .analytics-expense-head {
+                flex-direction: column;
+            }
+            .analytics-expense-side {
+                align-items: flex-start;
+                width: 100%;
+            }
+        }
         #toastContainer {
-            position: fixed; bottom: 90px; left: 16px; right: 16px; max-width: 400px;
-            margin: 0 auto; z-index: 999999;
+            position: fixed;
+            bottom: 100px;
+            left: 16px;
+            right: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+            z-index: 999999;
         }
         .toast {
-            background: rgba(26,35,50,0.95); color: white; padding: 15px 24px;
-            border-radius: 60px; font-weight: 600; box-shadow: 0 18px 40px rgba(0,0,0,0.3);
-            border-left: 5px solid #06c6d4; backdrop-filter: blur(12px);
-            display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease;
-            margin-bottom: 8px;
+            background: linear-gradient(180deg, rgba(18, 28, 40, 0.98), rgba(12, 20, 32, 0.95));
+            color: white;
+            padding: 16px 26px;
+            border-radius: 70px;
+            font-weight: 700;
+            box-shadow: 0 20px 48px rgba(0,0,0,0.32), 0 0 1px rgba(6,198,212,0.1) inset;
+            border-left: 5px solid #06c6d4;
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            animation: slideIn 0.4s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            margin-bottom: 10px;
         }
         .toast.error { border-left-color: #d32f2f; }
-        .toast.success { border-left-color: #2ecc71; }
-        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast.success { border-left-color: #22c55e; }
+        @keyframes slideIn { from { transform: translateY(120%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .trial-badge {
-            background: rgba(6,198,212,0.15); color: #06c6d4; border-radius: 40px;
-            padding: 0.4rem 1.3rem; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px;
-            text-transform: uppercase; box-shadow: 0 4px 12px rgba(6,198,212,0.1);
-            border: 1px solid rgba(6,198,212,0.3);
+            background: linear-gradient(135deg, rgba(6,198,212,0.16), rgba(6,198,212,0.08));
+            color: #06c6d4;
+            border-radius: 50px;
+            padding: 0.45rem 1.4rem;
+            font-size: 0.77rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 16px rgba(6,198,212,0.15), 0 0 1px rgba(6,198,212,0.1) inset;
+            border: 1.5px solid rgba(6,198,212,0.28);
         }
         .wallpaper-control {
-            display: flex; align-items: center; gap: 12px; margin: 1.2rem 0;
-            background: linear-gradient(135deg, rgba(6,198,212,0.05), rgba(6,198,212,0.02));
-            border-radius: 60px; padding: 1rem 1.3rem; border: 2px solid rgba(6,198,212,0.2);
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin: 1.3rem 0;
+            background: linear-gradient(135deg, rgba(6,198,212,0.08), rgba(6,198,212,0.03));
+            border-radius: 70px;
+            padding: 1.1rem 1.5rem;
+            border: 2px solid rgba(6,198,212,0.18);
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            box-shadow: 0 6px 16px rgba(6,198,212,0.08);
         }
-        .wallpaper-control:hover { border-color: rgba(6,198,212,0.4); background: linear-gradient(135deg, rgba(6,198,212,0.08), rgba(6,198,212,0.04)); }
+        .wallpaper-control:hover {
+            border-color: rgba(6,198,212,0.35);
+            background: linear-gradient(135deg, rgba(6,198,212,0.12), rgba(6,198,212,0.06));
+            box-shadow: 0 10px 24px rgba(6,198,212,0.12);
+        }
         .wallpaper-control input[type=range] {
             flex: 1; height: 6px; border-radius: 10px;
             background: linear-gradient(90deg, rgba(6,198,212,0.3) 0%, rgba(6,198,212,0.5) 100%);
@@ -570,19 +1339,49 @@
             box-shadow: 0 4px 12px rgba(6,198,212,0.3); border: 2px solid white;
         }
         .wallpaper-upload {
-            background: rgba(6,198,212,0.08); border: 2px dashed rgba(6,198,212,0.3);
-            border-radius: 60px; padding: 1rem 1.2rem; text-align: center; color: #06c6d4;
-            font-weight: 700; cursor: pointer; margin: 1rem 0; display: flex;
-            align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(6,198,212,0.1), rgba(6,198,212,0.05));
+            border: 2px dashed rgba(6,198,212,0.35);
+            border-radius: 70px;
+            padding: 1.15rem 1.35rem;
+            text-align: center;
+            color: #06c6d4;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 1.1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
         }
-        .wallpaper-upload:hover { background: rgba(6,198,212,0.12); border-color: #06c6d4; transform: scale(1.02); }
+        .wallpaper-upload:hover {
+            background: linear-gradient(135deg, rgba(6,198,212,0.14), rgba(6,198,212,0.08));
+            border-color: #06c6d4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6,198,212,0.15);
+        }
         .camera-btn, .upload-btn {
-            background: rgba(6,198,212,0.12); border: 2px solid rgba(6,198,212,0.3);
-            border-radius: 60px; padding: 0.7rem 1.2rem; cursor: pointer; font-weight: 700;
-            margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center;
-            gap: 10px; color: #06c6d4; transition: all 0.3s ease; width: 100%;
+            background: linear-gradient(135deg, rgba(6,198,212,0.12), rgba(6,198,212,0.06));
+            border: 2px solid rgba(6,198,212,0.28);
+            border-radius: 70px;
+            padding: 0.8rem 1.35rem;
+            cursor: pointer;
+            font-weight: 800;
+            margin-bottom: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+            color: #06c6d4;
+            transition: all 0.3s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            width: 100%;
         }
-        .camera-btn:hover, .upload-btn:hover { background: rgba(6,198,212,0.2); border-color: #06c6d4; transform: translateY(-2px); }
+        .camera-btn:hover, .upload-btn:hover {
+            background: linear-gradient(135deg, rgba(6,198,212,0.18), rgba(6,198,212,0.1));
+            border-color: #06c6d4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6,198,212,0.18);
+        }
         .image-preview { width: 70px; height: 70px; border-radius: 20px; object-fit: cover; border: 2px solid #fedb9f; margin: 0 auto 1rem; display: none; background: #f0f5fd; }
         .image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; }
         .modal-field {
@@ -630,18 +1429,247 @@
         .sale-amount { font-weight: 800; font-size: 1.3rem; background: linear-gradient(135deg, #1b4f72, #0b6b96); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; word-break: break-word; }
         .sale-payment { background: linear-gradient(135deg, #d4ecff, #e8f4ff); padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.7rem; font-weight: 700; color: #1b4f72; border: 1px solid #a8d5ff; }
         .splash-loading {
-            position: fixed; inset: 0; background: linear-gradient(135deg, #0f2b44 0%, #1b5a82 100%);
-            display: flex; align-items: center; justify-content: center; z-index: 1000000; flex-direction: column;
+            position: fixed;
+            inset: 0;
+            --splash-progress-duration: 6580ms;
+            --splash-exit-duration: 420ms;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            overflow: hidden;
+            z-index: 1000000;
+            background:
+                radial-gradient(circle at 18% 20%, rgba(6,198,212,0.28), transparent 32%),
+                radial-gradient(circle at 82% 14%, rgba(254,219,159,0.2), transparent 26%),
+                radial-gradient(circle at 50% 100%, rgba(6,198,212,0.16), transparent 44%),
+                linear-gradient(145deg, #05101a 0%, #0a2538 52%, #0f3454 100%);
+            transition: opacity var(--splash-exit-duration) ease, transform var(--splash-exit-duration) ease, visibility var(--splash-exit-duration) ease;
         }
-        .splash-spinner {
-            width: 100px; height: 100px; border: 5px solid rgba(255,255,255,0.1);
-            border-top: 5px solid #fedb9f; border-right: 5px solid rgba(255,215,140,0.5);
-            border-radius: 50%; animation: spin 1.5s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 0 40px rgba(254,219,159,0.4), inset 0 0 20px rgba(254,219,159,0.1);
+        .splash-loading::before {
+            content: '';
+            position: absolute;
+            inset: -35%;
+            background: repeating-linear-gradient(120deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 18px);
+            opacity: 0.1;
+            transform: rotate(8deg);
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .splash-text { margin-top: 2.5rem; color: white; font-size: 2.2rem; font-weight: 700; letter-spacing: 3px; animation: pulse 2.5s infinite ease-in-out; text-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        @keyframes pulse { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1.02); } 100% { opacity: 0.6; transform: scale(0.98); } }
+        .splash-loading::after {
+            content: '';
+            position: absolute;
+            width: min(72vw, 460px);
+            height: min(72vw, 460px);
+            top: -30%;
+            right: -26%;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.09);
+            box-shadow: 0 0 0 18px rgba(255,255,255,0.025), 0 0 0 42px rgba(255,255,255,0.015);
+        }
+        .splash-loading.is-exiting {
+            opacity: 0;
+            transform: scale(1.02);
+            visibility: hidden;
+        }
+        .splash-shell {
+            position: relative;
+            width: min(100%, 390px);
+            padding: 1.5rem;
+            border-radius: 40px;
+            border: 1.5px solid rgba(255,255,255,0.14);
+            background: linear-gradient(160deg, rgba(5, 16, 28, 0.82), rgba(16, 50, 74, 0.95));
+            box-shadow: 0 28px 90px rgba(0,0,0,0.42), 0 0 1px rgba(6,198,212,0.1) inset;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            overflow: hidden;
+            color: white;
+        }
+        .splash-shell::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: 39px;
+            background: linear-gradient(140deg, rgba(255,255,255,0.14), transparent 28%, transparent 72%, rgba(255,255,255,0.07));
+            pointer-events: none;
+        }
+        .splash-shell > * {
+            position: relative;
+            z-index: 1;
+        }
+        .splash-topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .splash-badge {
+            padding: 0.4rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        .splash-live {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #fedb9f;
+        }
+        .splash-live::before {
+            content: '';
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 50%;
+            background: #21e6a7;
+            box-shadow: 0 0 0 0 rgba(33,230,167,0.42);
+            animation: splashBeacon 1.7s infinite;
+        }
+        @keyframes splashBeacon {
+            0% { box-shadow: 0 0 0 0 rgba(33,230,167,0.45); }
+            70% { box-shadow: 0 0 0 10px rgba(33,230,167,0); }
+            100% { box-shadow: 0 0 0 0 rgba(33,230,167,0); }
+        }
+        .splash-brand-mark {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1.5rem;
+            border-radius: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(6,198,212,0.24), rgba(254,219,159,0.14));
+            border: 1.5px solid rgba(255,255,255,0.16);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.16), 0 20px 48px rgba(0,0,0,0.32), 0 0 0 1px rgba(6,198,212,0.08) inset;
+            overflow: hidden;
+        }
+        .splash-brand-mark::before {
+            content: '';
+            position: absolute;
+            inset: 15% 20%;
+            border-radius: 24px;
+            background: radial-gradient(circle, rgba(255,255,255,0.24) 0%, transparent 70%);
+            filter: blur(2px);
+        }
+        .splash-brand-mark i {
+            position: relative;
+            z-index: 1;
+            font-size: 2.35rem;
+            color: white;
+            text-shadow: 0 10px 22px rgba(6,198,212,0.32);
+            animation: splashLift 3s ease-in-out infinite;
+        }
+        @keyframes splashLift {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .splash-kicker {
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #8de7ef;
+            margin-bottom: 0.35rem;
+        }
+        .splash-text {
+            color: white;
+            font-size: 2.55rem;
+            font-weight: 800;
+            letter-spacing: -0.06em;
+            line-height: 0.95;
+            text-shadow: 0 8px 30px rgba(0,0,0,0.24);
+        }
+        .splash-subtext {
+            margin-top: 0.8rem;
+            color: rgba(255,255,255,0.74);
+            font-size: 0.95rem;
+            line-height: 1.55;
+            max-width: 18rem;
+        }
+        .splash-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 1.25rem 0 1.4rem;
+        }
+        .splash-pill {
+            padding: 0.48rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.86);
+        }
+        .splash-progress-track {
+            width: 100%;
+            height: 9px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.12);
+            overflow: hidden;
+            margin-bottom: 1.4rem;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .splash-progress-bar {
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #06c6d4 0%, #82eff6 46%, #fedb9f 100%);
+            box-shadow: 0 0 12px rgba(6,198,212,0.45), 0 0 1px rgba(6,198,212,0.3) inset;
+            animation: splashProgress var(--splash-progress-duration) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes splashProgress {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        .splash-status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.84rem;
+            color: rgba(255,255,255,0.75);
+        }
+        .splash-status {
+            min-height: 1.2em;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .splash-percent {
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: rgba(254,219,159,0.95);
+            font-size: 0.88rem;
+        }
+        @media (max-width: 480px) {
+            .splash-loading { padding: 1rem; }
+            .splash-shell {
+                padding: 1.2rem;
+                border-radius: 28px;
+            }
+            .splash-shell::before { border-radius: 27px; }
+            .splash-text { font-size: 2.15rem; }
+            .splash-subtext { max-width: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .splash-loading,
+            .splash-live::before,
+            .splash-brand-mark i,
+            .splash-progress-bar {
+                animation: none;
+                transition: none;
+            }
+            .splash-progress-bar { width: 100%; }
+        }
         :root { --wallpaper-opacity: 0.3; }
         @keyframes cartBump { 0% { transform: scale(1); } 30% { transform: scale(1.3); } 60% { transform: scale(0.95); } 100% { transform: scale(1); } }
         .cart-bump { animation: cartBump 0.4s ease; }
@@ -658,8 +1686,30 @@
     
     <!-- Splash loading screen -->
     <div id="splashLoading" class="splash-loading">
-        <div class="splash-spinner"></div>
-        <div class="splash-text">Profit Point</div>
+        <div class="splash-shell">
+            <div class="splash-topline">
+                <span class="splash-badge">Mobile POS</span>
+                <span class="splash-live">Live sync</span>
+            </div>
+            <div class="splash-brand-mark">
+                <i class="fas fa-store"></i>
+            </div>
+            <div class="splash-kicker">Retail command center</div>
+            <div class="splash-text">Profit Point</div>
+            <p class="splash-subtext">Checkout, stock, and reporting tools are being prepared for the next transaction.</p>
+            <div class="splash-pills">
+                <span class="splash-pill">Sales</span>
+                <span class="splash-pill">Inventory</span>
+                <span class="splash-pill">Reports</span>
+            </div>
+            <div class="splash-progress-track">
+                <div class="splash-progress-bar"></div>
+            </div>
+            <div class="splash-status-row">
+                <span id="splashStatus" class="splash-status" aria-live="polite">Starting workspace</span>
+                <span id="splashPercent" class="splash-percent">0%</span>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -667,6 +1717,46 @@
             // ==================== INITIALIZATION ====================
             const toastContainer = document.getElementById('toastContainer');
             const splash = document.getElementById('splashLoading');
+            const splashStatus = document.getElementById('splashStatus');
+            const splashPercent = document.getElementById('splashPercent');
+            const splashLocale = localStorage.getItem('profitpoint_lang') || 'sw';
+            const SPLASH_DURATION = 7000;
+            const SPLASH_EXIT_DURATION = 420;
+            const SPLASH_ACTIVE_DURATION = SPLASH_DURATION - SPLASH_EXIT_DURATION;
+            const splashSteps = {
+                en: [
+                    { label: 'Checking license', percent: '24%' },
+                    { label: 'Syncing products', percent: '58%' },
+                    { label: 'Preparing checkout', percent: '86%' },
+                    { label: 'Ready to launch', percent: '100%' }
+                ],
+                sw: [
+                    { label: 'Inaangalia leseni', percent: '24%' },
+                    { label: 'Inapakia bidhaa', percent: '58%' },
+                    { label: 'Inaandaa mauzo', percent: '86%' },
+                    { label: 'Tayari kuanza', percent: '100%' }
+                ]
+            };
+
+            if (splash) {
+                splash.style.setProperty('--splash-progress-duration', `${SPLASH_ACTIVE_DURATION}ms`);
+                splash.style.setProperty('--splash-exit-duration', `${SPLASH_EXIT_DURATION}ms`);
+            }
+
+            function startSplashSequence() {
+                const steps = splashSteps[splashLocale] || splashSteps.en;
+                if (!steps.length) return;
+                const stepDelay = Math.max(1, Math.floor(SPLASH_ACTIVE_DURATION / steps.length));
+                steps.forEach((step, index) => {
+                    setTimeout(() => {
+                        if (!splash || splash.style.display === 'none') return;
+                        if (splashStatus) splashStatus.textContent = step.label;
+                        if (splashPercent) splashPercent.textContent = step.percent;
+                    }, stepDelay * (index + 1));
+                });
+            }
+
+            startSplashSequence();
 
             // ==================== GLOBAL STATE ====================
             let currentSalesFilter = 'all'; // Track current sales filter
@@ -1119,15 +2209,15 @@
             // ==================== PRODUCT KEY MODAL ====================
             function showProductKeyModal(isLocked = false) {
                 const overlay = document.createElement('div');
-                overlay.className = 'modal-overlay';
+                overlay.className = 'modal-overlay license-modal-overlay';
                 const cancelBtn = isLocked ? '' : `<button class="modal-btn secondary" id="cancelKey">Cancel</button>`;
                 const heading = isLocked ? '⏱️ Trial Expired' : '🔑 Enter License Key';
                 const desc = isLocked ? 'Your trial has expired. Enter a product key to continue.' : 'Enter product key for 30-day access';
                 
                 overlay.innerHTML = `
-                    <div class="modal-card">
+                    <div class="modal-card license-modal-card">
                         <h3 style="font-size:1.4rem; margin-bottom:0.5rem;">${heading}</h3>
-                        <p style="margin-bottom:1.5rem; color:#64748b;">${desc}</p>
+                        <p class="license-modal-desc">${desc}</p>
                         <div class="modal-field">
                             <input type="text" id="productKeyInput" placeholder="Product key" value="" autofocus>
                         </div>
@@ -1865,6 +2955,10 @@
                 
                 let transactionCount = sales.length;
                 let avgOrderValue = transactionCount > 0 ? (totalRevenue / transactionCount).toFixed(0) : 0;
+                let averageExpenseValue = expenses.length > 0 ? Math.round(totalExpenses / expenses.length) : 0;
+                let profitMarginDisplay = `${Number(profitMargin) > 0 ? '+' : ''}${profitMargin}%`;
+                let topProductName = topProduct.qty > 0 ? topProduct.name : 'No sales yet';
+                let topProductNote = topProduct.qty > 0 ? `${topProduct.qty} sold` : '0 sold';
                 
                 let last7Days = [];
                 let dailyRevenue = [];
@@ -1881,149 +2975,120 @@
                 }
 
                 let html = `
-                    <!-- Hero Summary Card -->
-                    <div style="background:linear-gradient(135deg, #06c6d4 0%, #0a9ab3 100%); border-radius:40px; padding:1.8rem; margin-bottom:1.5rem; box-shadow:0 20px 50px rgba(6,198,212,0.25); color:white; position:relative; overflow:hidden;">
-                        <div style="position:absolute; top:-50px; right:-50px; width:250px; height:250px; background:rgba(255,255,255,0.08); border-radius:50%;"></div>
-                        <div style="position:absolute; bottom:-30px; left:-30px; width:150px; height:150px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
-                        
-                        <div style="position:relative; z-index:2;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.3rem; gap:1rem;">
-                                <div>
-                                    <div style="font-size:0.8rem; font-weight:700; opacity:0.9; margin-bottom:0.2rem; letter-spacing:0.5px;">📊 ${__('analysis')}</div>
-                                    <h2 style="font-size:1.8rem; font-weight:800; margin:0;">Dashboard</h2>
+                    <div class="analytics-page">
+                        <section class="analytics-card analytics-hero">
+                            <div class="analytics-hero-top">
+                                <div class="analytics-hero-copy">
+                                    <span class="analytics-eyebrow">${__('analysis')}</span>
+                                    <h2>${__('analysis')}</h2>
+                                    <p>${__('revenue')} · ${__('profit')} · ${__('expenses')}</p>
                                 </div>
-                                <button class="btn-small" id="pdfAnalyticsBtn" style="background:rgba(255,255,255,0.25); color:white; padding:0.6rem 1.2rem; border:1.5px solid rgba(255,255,255,0.4); backdrop-filter:blur(10px);"><i class="fas fa-file-pdf"></i></button>
+                                <button class="btn-small analytics-hero-btn" id="pdfAnalyticsBtn"><i class="fas fa-file-pdf"></i> ${__('pdfAnalytics')}</button>
                             </div>
-                            
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.3rem;">
-                                <div style="background:rgba(255,255,255,0.12); border-radius:24px; padding:1.2rem; border:1px solid rgba(255,255,255,0.2);">
-                                    <div style="font-size:0.75rem; font-weight:600; opacity:0.85; margin-bottom:0.6rem; text-transform:uppercase; letter-spacing:0.4px;">💰 Revenue</div>
-                                    <div style="font-size:max(1.3rem, min(1.8rem, 3.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">TSh ${totalRevenue.toLocaleString()}</div>
+                            <div class="analytics-hero-grid">
+                                <div class="analytics-hero-metric">
+                                    <span class="analytics-hero-label">${__('revenue')}</span>
+                                    <strong>TSh ${totalRevenue.toLocaleString()}</strong>
                                 </div>
-                                <div style="background:rgba(255,255,255,0.12); border-radius:24px; padding:1.2rem; border:1px solid rgba(255,255,255,0.2);">
-                                    <div style="font-size:0.75rem; font-weight:600; opacity:0.85; margin-bottom:0.6rem; text-transform:uppercase; letter-spacing:0.4px;">📈 Profit</div>
-                                    <div style="font-size:max(1.3rem, min(1.8rem, 3.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">${netProfit < 0 ? '-' : ''}TSh ${Math.abs(netProfit).toLocaleString()}</div>
+                                <div class="analytics-hero-metric">
+                                    <span class="analytics-hero-label">${__('profit')}</span>
+                                    <strong>${netProfit < 0 ? '-' : ''}TSh ${Math.abs(netProfit).toLocaleString()}</strong>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                            <div class="analytics-hero-strip">
+                                <span class="analytics-hero-chip"><i class="fas fa-receipt"></i> ${transactionCount} ${__('transactions')}</span>
+                                <span class="analytics-hero-chip"><i class="fas fa-percent"></i> ${profitMarginDisplay}</span>
+                            </div>
+                        </section>
 
-                    <!-- Key Metrics Grid -->
-                    <div style="background:white; border-radius:40px; padding:1.4rem; margin-bottom:1.2rem; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
-                        <h4 style="margin:0 0 1.3rem 0; font-size:0.95rem; font-weight:700; color:#1a2332; letter-spacing:0.3px;">📊 KEY METRICS</h4>
-                        
-                        <div class="stats-grid" style="gap:1rem;">
-                            <!-- Profit Margin Card -->
-                            <div class="stat-card" style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left:4px solid #22c55e; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(34,197,94,0.1);">
-                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
-                                    <div style="flex:1; min-width:0;">
-                                        <div class="stat-label" style="color:#15803d; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Margin</div>
-                                        <div class="stat-value" style="color:#22c55e; font-size:max(1.5rem, min(1.9rem, 4.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">+${profitMargin}%</div>
-                                    </div>
-                                    <div style="font-size:2.2rem; opacity:0.25; flex-shrink:0;">📈</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Transactions Card -->
-                            <div class="stat-card" style="background:linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left:4px solid #f59e0b; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(245,158,11,0.1);">
-                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
-                                    <div style="flex:1; min-width:0;">
-                                        <div class="stat-label" style="color:#92400e; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Sales</div>
-                                        <div class="stat-value" style="color:#d97706; font-size:max(1.5rem, min(1.9rem, 4.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">${transactionCount}</div>
-                                    </div>
-                                    <div style="font-size:2.2rem; opacity:0.25; flex-shrink:0;">🛍️</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Average Order Card -->
-                            <div class="stat-card" style="background:linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-left:4px solid #a855f7; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(168,85,247,0.1);">
-                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
-                                    <div style="flex:1; min-width:0;">
-                                        <div class="stat-label" style="color:#6b21a8; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Avg Order</div>
-                                        <div class="stat-value" style="color:#a855f7; font-size:max(1.3rem, min(1.7rem, 3.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">TSh ${avgOrderValue}</div>
-                                    </div>
-                                    <div style="font-size:2.2rem; opacity:0.25; flex-shrink:0;">💳</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Top Product Card -->
-                            <div class="stat-card" style="background:linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-left:4px solid #ec4899; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(236,72,153,0.1);">
-                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
-                                    <div style="flex:1; min-width:0;">
-                                        <div class="stat-label" style="color:#831843; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Top Product</div>
-                                        <div class="stat-value" style="color:#ec4899; font-size:max(1.1rem, min(1.4rem, 3vw)); line-height:1.2; word-break:break-all; overflow-wrap:break-word; font-weight:700;">${topProduct.name}</div>
-                                        <div style="font-size:0.75rem; color:#831843; margin-top:0.4rem; opacity:0.8; font-weight:600;">${topProduct.qty} sold</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Revenue Chart -->
-                    <div style="background:white; border-radius:40px; padding:1.4rem; margin-bottom:1.2rem; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
-                        <h4 style="margin:0 0 1.3rem 0; font-size:0.95rem; font-weight:700; color:#1a2332; letter-spacing:0.3px;">📈 REVENUE TREND (7 DAYS)</h4>
-                        <div class="chart-container" style="position:relative; height:280px;">
-                            <canvas id="revenueChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div style="background:white; border-radius:40px; padding:1.4rem; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.3rem; flex-wrap:wrap; gap:0.8rem;">
-                            <h4 style="margin:0; font-size:0.95rem; font-weight:700; color:#1a2332; letter-spacing:0.3px;">💼 EXPENSES</h4>
-                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                                <button class="btn-small" id="pdfExpensesBtn" style="padding:0.5rem 1rem; font-size:0.85rem;">
-                                    <i class="fas fa-file-pdf"></i> PDF
-                                </button>
-                                <button class="btn-small" id="addExpenseBtn" style="padding:0.5rem 1rem; font-size:0.85rem;">
-                                    <i class="fas fa-plus"></i> Add
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Total Expenses Display -->
-                        <div style="background:linear-gradient(135deg, #e8f4ff 0%, #d4ecff 100%); border-radius:28px; padding:1.2rem; margin-bottom:1rem; border:2px solid #a8d5ff;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
                                 <div>
-                                    <div style="font-size:0.85rem; color:#1b4f72; font-weight:600; margin-bottom:0.3rem;">${__('totalExpenses')}</div>
-                                    <div style="font-size:1.8rem; font-weight:800; color:#06c6d4;">TSh ${expenses.reduce((a,e)=>a+(e.amount||0),0).toLocaleString()}</div>
-                                </div>
-                                <div style="text-align:right;">
-                                    <div style="font-size:0.85rem; color:#1b4f72; font-weight:600; margin-bottom:0.3rem;">${__('averageExpense')}</div>
-                                    <div style="font-size:1.4rem; font-weight:700; color:#1b4f72;">TSh ${expenses.length > 0 ? Math.round(expenses.reduce((a,e)=>a+(e.amount||0),0) / expenses.length).toLocaleString() : '0'}</div>
+                                    <h4><i class="fas fa-layer-group" style="color:#06c6d4;"></i> ${__('analysis')}</h4>
+                                    <p>${__('averageOrder')} · ${__('topProduct')} · ${__('transactions')}</p>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Search Box -->
-                        <div style="margin-bottom:1rem;">
-                            <input type="text" id="expenseSearchInput" placeholder="${__('searchExpense')}" 
-                                style="width:100%; padding:0.8rem 1.2rem; border-radius:40px; border:2px solid rgba(6,198,212,0.2); 
-                                        font-size:0.9rem; transition:all 0.3s ease;"
-                                onfocus="this.style.borderColor='#06c6d4'; this.style.boxShadow='0 0 0 3px rgba(6,198,212,0.1)'"
-                                onblur="this.style.borderColor='rgba(6,198,212,0.2)'; this.style.boxShadow='none'">
-                        </div>
-                        
-                        <!-- Filter Tabs -->
-                        <div class="filter-tabs" style="margin:1rem 0;">
-                            <span class="filter-tab active" data-expense-filter="all">${__('all')}</span>
-                            <span class="filter-tab" data-expense-filter="today">${__('today')}</span>
-                            <span class="filter-tab" data-expense-filter="week">${__('week')}</span>
-                            <span class="filter-tab" data-expense-filter="month">${__('month')}</span>
-                        </div>
-                        
-                        <!-- Expenses List -->
-                        <div id="expensesListContainer" style="max-height:400px; overflow-y:auto;">
-                            ${expenses.length === 0 ? 
-                                `<p style="text-align:center; color:#64748b; padding:2rem; font-style:italic;">${__('noExpenses')}</p>` : 
-                                ''}
-                        </div>
-                        
-                        <!-- Clear All Button -->
-                        ${expenses.length > 0 ? `
-                            <button class="btn-small" id="clearExpensesBtn" style="width:100%; margin-top:1.2rem; background:#ff4757; padding:0.7rem; font-weight:600;">
-                                <i class="fas fa-trash"></i> ${__('clearExpenses')}
-                            </button>
-                        ` : ''}
+                            <div class="analytics-kpi-grid">
+                                <article class="analytics-kpi-card analytics-kpi-green">
+                                    <i class="fas fa-chart-line analytics-kpi-icon"></i>
+                                    <div class="analytics-kpi-label">${__('profitMargin')}</div>
+                                    <div class="analytics-kpi-value">${profitMarginDisplay}</div>
+                                    <div class="analytics-kpi-note">${netProfit < 0 ? '-' : ''}TSh ${Math.abs(netProfit).toLocaleString()}</div>
+                                </article>
+                                <article class="analytics-kpi-card analytics-kpi-amber">
+                                    <i class="fas fa-bag-shopping analytics-kpi-icon"></i>
+                                    <div class="analytics-kpi-label">${__('transactions')}</div>
+                                    <div class="analytics-kpi-value">${transactionCount}</div>
+                                    <div class="analytics-kpi-note">${__('salesHistory')}</div>
+                                </article>
+                                <article class="analytics-kpi-card analytics-kpi-violet">
+                                    <i class="fas fa-credit-card analytics-kpi-icon"></i>
+                                    <div class="analytics-kpi-label">${__('averageOrder')}</div>
+                                    <div class="analytics-kpi-value">TSh ${Number(avgOrderValue).toLocaleString()}</div>
+                                    <div class="analytics-kpi-note">${__('revenue')}</div>
+                                </article>
+                                <article class="analytics-kpi-card analytics-kpi-rose">
+                                    <i class="fas fa-star analytics-kpi-icon"></i>
+                                    <div class="analytics-kpi-label">${__('topProduct')}</div>
+                                    <div class="analytics-kpi-value">${topProductName}</div>
+                                    <div class="analytics-kpi-note">${topProductNote}</div>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-chart-area" style="color:#06c6d4;"></i> ${__('revenue')}</h4>
+                                    <p>Last 7 days</p>
+                                </div>
+                                <span class="analytics-mini-chip">7 Days</span>
+                            </div>
+                            <div class="analytics-chart-wrap">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-wallet" style="color:#06c6d4;"></i> ${__('expenses')}</h4>
+                                    <p>${__('expenseHistory')}</p>
+                                </div>
+                                <div class="analytics-actions">
+                                    <button class="btn-small analytics-ghost-btn" id="pdfExpensesBtn"><i class="fas fa-file-pdf"></i> ${__('pdfExpenses')}</button>
+                                    <button class="btn-small" id="addExpenseBtn"><i class="fas fa-plus"></i> ${__('addExpense')}</button>
+                                </div>
+                            </div>
+                            <div class="analytics-expense-overview">
+                                <div class="analytics-summary-tile">
+                                    <div class="analytics-summary-label">${__('totalExpenses')}</div>
+                                    <div class="analytics-summary-value">TSh ${totalExpenses.toLocaleString()}</div>
+                                </div>
+                                <div class="analytics-summary-tile">
+                                    <div class="analytics-summary-label">${__('averageExpense')}</div>
+                                    <div class="analytics-summary-value">TSh ${averageExpenseValue.toLocaleString()}</div>
+                                </div>
+                            </div>
+                            <label class="analytics-search">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="expenseSearchInput" placeholder="${__('searchExpense')}">
+                            </label>
+                            <div class="filter-tabs analytics-filter-tabs">
+                                <span class="filter-tab active" data-expense-filter="all">${__('all')}</span>
+                                <span class="filter-tab" data-expense-filter="today">${__('today')}</span>
+                                <span class="filter-tab" data-expense-filter="week">${__('week')}</span>
+                                <span class="filter-tab" data-expense-filter="month">${__('month')}</span>
+                            </div>
+                            <div id="expensesListContainer" class="analytics-expense-list">
+                                ${expenses.length === 0 ? `<div class="analytics-empty-state">${__('noExpenses')}</div>` : ''}
+                            </div>
+                            ${expenses.length > 0 ? `
+                                <button class="btn-small analytics-danger-btn" id="clearExpensesBtn">
+                                    <i class="fas fa-trash"></i> ${__('clearExpenses')}
+                                </button>
+                            ` : ''}
+                        </section>
                     </div>
                 `;
                 
@@ -2099,7 +3164,7 @@
                     if (!container) return;
                     
                     if (filtered.length === 0) {
-                        container.innerHTML = `<p style="text-align:center; color:#64748b; padding:2rem; font-style:italic;">${__('noExpenses')}</p>`;
+                        container.innerHTML = `<div class="analytics-empty-state">${__('noExpenses')}</div>`;
                         return;
                     }
                     
@@ -2111,27 +3176,23 @@
                         const catLabel = expenseCategories.find(c => c.value === e.category)?.label || e.category || __('other');
                         
                         html += `
-                            <div style="background:#f8fafc; border-radius:20px; padding:1rem; margin-bottom:0.8rem; border-left:4px solid #06c6d4;">
-                                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
-                                    <div style="flex:1;">
-                                        <div style="font-weight:700; color:#1a2332; margin-bottom:0.3rem;">${e.desc || 'Expense'}</div>
-                                        <div style="display:flex; gap:0.6rem; flex-wrap:wrap; font-size:0.75rem; align-items:center;">
-                                            <span style="background:rgba(6,198,212,0.1); color:#06c6d4; padding:0.2rem 0.8rem; border-radius:40px; font-weight:600;">${catLabel}</span>
-                                            <span style="color:#64748b;">${dateStr} ${timeStr}</span>
-                                            <span style="background:rgba(100,100,100,0.1); color:#64748b; padding:0.2rem 0.8rem; border-radius:40px; font-weight:600; font-size:0.7rem;"><i class="fas fa-user"></i> ${e.userName || 'Unknown'}</span>
+                            <div class="analytics-expense-item">
+                                <div class="analytics-expense-head">
+                                    <div class="analytics-expense-main">
+                                        <div class="analytics-expense-title">${e.desc || 'Expense'}</div>
+                                        <div class="analytics-expense-meta">
+                                            <span class="analytics-expense-chip">${catLabel}</span>
+                                            <span class="analytics-expense-subtle"><i class="far fa-calendar"></i> ${dateStr} ${timeStr}</span>
+                                            <span class="analytics-expense-subtle"><i class="fas fa-user"></i> ${e.userName || 'Unknown'}</span>
                                         </div>
                                     </div>
-                                    <div style="display:flex; gap:0.5rem; align-items:center;">
-                                        <div style="text-align:right;">
-                                            <div style="font-weight:800; color:#06c6d4; font-size:1.1rem;">TSh ${e.amount}</div>
-                                        </div>
-                                        <div style="display:flex; gap:0.4rem;">
-                                            <button class="edit-expense-btn" data-expense-id="${e.id}" 
-                                                style="background:#06c6d4; color:white; border:none; border-radius:20px; padding:0.4rem 0.8rem; cursor:pointer; font-size:0.75rem; font-weight:600; transition:all 0.2s;">
+                                    <div class="analytics-expense-side">
+                                        <div class="analytics-expense-amount">TSh ${Number(e.amount || 0).toLocaleString()}</div>
+                                        <div class="analytics-expense-actions">
+                                            <button class="analytics-expense-btn analytics-expense-edit edit-expense-btn" data-expense-id="${e.id}">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="delete-expense-btn" data-expense-id="${e.id}" 
-                                                style="background:#d32f2f; color:white; border:none; border-radius:20px; padding:0.4rem 0.8rem; cursor:pointer; font-size:0.75rem; font-weight:600; transition:all 0.2s;">
+                                            <button class="analytics-expense-btn analytics-expense-delete delete-expense-btn" data-expense-id="${e.id}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -2224,7 +3285,6 @@
                 });
                 
                 // Filter functionality
-                const expFilterMode_var = expenseFilterMode; // local reference
                 document.querySelectorAll('[data-expense-filter]').forEach(tab => {
                     tab.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -2356,14 +3416,21 @@
                 const renderSalesContent = () => {
                     const displaySales = filterSales();
                     const totalAmount = displaySales.reduce((sum, s) => sum + s.finalTotal, 0);
+                    const filterLabel = filter === 'all' ? __('all') : __(filter);
                     
                     let html = `
-                        <div style="background:white; border-radius:40px; padding:1.4rem;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                                <h3><i class="fas fa-history" style="color:#06c6d4;"></i> ${__('salesHistory')}</h3>
-                                <div>
-                                    <button class="btn-small" id="pdfSalesBtn" style="margin-right:6px;"><i class="fas fa-file-pdf"></i> ${__('pdfSales')}</button>
-                                    <button class="btn-small" id="clearSalesBtn"><i class="fas fa-trash"></i> ${__('clearSales')}</button>
+                        <div class="sales-card">
+                            <div class="sales-header-row">
+                                <div class="sales-title-row">
+                                    <div class="sales-title-block">
+                                        <h3><i class="fas fa-history" style="color:#06c6d4;"></i> ${__('salesHistory')}</h3>
+                                        <div class="sales-header-meta">${displaySales.length} ${__('transactions')}</div>
+                                    </div>
+                                    <span class="sales-summary-chip">${filterLabel}</span>
+                                </div>
+                                <div class="sales-action-group">
+                                    <button class="btn-small" id="pdfSalesBtn"><i class="fas fa-file-pdf"></i> ${__('pdfSales')}</button>
+                                    <button class="btn-small sales-clear-btn" id="clearSalesBtn"><i class="fas fa-trash"></i> ${__('clearSales')}</button>
                                 </div>
                             </div>
                             
@@ -2636,9 +3703,6 @@
                                 <span class="icon-btn" id="fullscreenBtn">
                                     <i class="fas fa-expand"></i> <span id="fsText">${__('fullscreen')}</span>
                                 </span>
-                                <span class="date-badge">
-                                    ${new Date().toLocaleDateString(currentLang === 'sw' ? 'sw-TZ' : 'en', { day: 'numeric', month: 'short' })}
-                                </span>
                             </div>
                         </div>
                         
@@ -2720,9 +3784,7 @@
             }
 
             // ==================== START APP ====================
-            setTimeout(() => {
-                splash.style.display = 'none';
-                
+            function completeStartup() {
                 if (!getLicense()) {
                     saveLicense({ type: 'trial', start: Date.now(), duration: TRIAL_DURATION });
                 }
@@ -2737,7 +3799,19 @@
                     renderPhoneApp();
                     startLicenseMonitoring();
                 }
-            }, 1200);
+            }
+
+            setTimeout(() => {
+                if (!splash) {
+                    completeStartup();
+                    return;
+                }
+                splash.classList.add('is-exiting');
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    completeStartup();
+                }, SPLASH_EXIT_DURATION);
+            }, SPLASH_ACTIVE_DURATION);
         })();
     </script>
 </body>
