@@ -668,6 +668,9 @@
             const toastContainer = document.getElementById('toastContainer');
             const splash = document.getElementById('splashLoading');
 
+            // ==================== GLOBAL STATE ====================
+            let currentSalesFilter = 'all'; // Track current sales filter
+
             // ==================== LICENSING SYSTEM ====================
             const LICENSE_KEY = 'profitpoint_license';
             const TRIAL_DURATION = 60 * 1000; // 1 minute trial
@@ -1405,19 +1408,51 @@
             // ==================== PDF GENERATORS ====================
             function generateSalesPDF() {
                 const { jsPDF } = window.jspdf;
+                let filteredSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Apply filter based on currentSalesFilter
+                if (currentSalesFilter !== 'all') {
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    const monthAgo = new Date(today);
+                    monthAgo.setMonth(monthAgo.getMonth() - 1);
+                    
+                    if (currentSalesFilter === 'today') {
+                        filteredSales = filteredSales.filter(s => new Date(s.date) >= today);
+                    } else if (currentSalesFilter === 'week') {
+                        filteredSales = filteredSales.filter(s => new Date(s.date) >= weekAgo);
+                    } else if (currentSalesFilter === 'month') {
+                        filteredSales = filteredSales.filter(s => new Date(s.date) >= monthAgo);
+                    }
+                }
+                
+                // Get filter label for filename and title
+                let filterLabel = '';
+                if (currentSalesFilter === 'today') filterLabel = ' - Today';
+                else if (currentSalesFilter === 'week') filterLabel = ' - This Week';
+                else if (currentSalesFilter === 'month') filterLabel = ' - This Month';
+                
+                const totalAmount = filteredSales.reduce((sum, s) => sum + s.finalTotal, 0);
+                
                 const doc = new jsPDF();
-                doc.text("Sales Report - Profit Point", 14, 20);
+                doc.text("Sales Report - Profit Point" + filterLabel, 14, 20);
+                doc.setFontSize(10);
+                doc.text(`Total Sales (${filteredSales.length}): TSh ${totalAmount.toLocaleString()}`, 14, 28);
+                doc.setFontSize(12);
+                
                 doc.autoTable({ 
                     head: [['Date', 'Items', 'Total', 'Payment']],
-                    body: sales.map(s => [
+                    body: filteredSales.map(s => [
                         new Date(s.date).toLocaleString(), 
                         s.items.map(i=>i.name).join(', ').substring(0,30), 
                         'TSh '+s.finalTotal,
                         s.payment
                     ]),
-                    startY: 30
+                    startY: 38
                 });
-                doc.save('sales.pdf');
+                doc.save('sales' + (filterLabel ? filterLabel.split(' - ')[1].toLowerCase() : '') + '.pdf');
                 showToast('Sales PDF saved');
             }
             function generateAnalyticsPDF() {
@@ -2295,7 +2330,7 @@
 
             // ==================== SALES PAGE ====================
             function renderSalesMobile() {
-                let filter = 'all';
+                let filter = currentSalesFilter || 'all';
                 let filteredSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date));
                 
                 const filterSales = () => {
@@ -2370,6 +2405,7 @@
                         tab.addEventListener('click', (e) => {
                             e.preventDefault();
                             filter = tab.dataset.filter;
+                            currentSalesFilter = tab.dataset.filter;
                             renderSalesContent();
                         });
                     });
