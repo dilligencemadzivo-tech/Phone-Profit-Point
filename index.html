@@ -1055,6 +1055,20 @@
             border-color: rgba(6,198,212,0.35);
             box-shadow: 0 10px 24px rgba(6,198,212,0.18);
         }
+        .product-rank-list { display: flex; flex-direction: column; gap: 0.65rem; }
+        .product-rank-item { display: flex; align-items: center; gap: 0.75rem; }
+        .product-rank-pos { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 900; flex-shrink: 0; }
+        .product-rank-pos.top { background: linear-gradient(135deg,#06c6d4,#04a8b5); color: white; }
+        .product-rank-pos.cold { background: rgba(100,116,139,0.12); color: #64748b; }
+        .product-rank-info { flex: 1; min-width: 0; }
+        .product-rank-name { font-size: 0.88rem; font-weight: 700; color: #0f1419; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-rank-bar-wrap { height: 6px; background: rgba(6,198,212,0.1); border-radius: 99px; margin-top: 4px; }
+        .product-rank-bar { height: 6px; border-radius: 99px; }
+        .product-rank-bar.top { background: linear-gradient(90deg,#06c6d4,#04b8c4); }
+        .product-rank-bar.cold { background: rgba(100,116,139,0.35); }
+        .product-rank-qty { font-size: 0.78rem; font-weight: 800; color: #64748b; flex-shrink: 0; white-space: nowrap; }
+        .product-rank-never { display: flex; align-items: center; gap: 0.55rem; padding: 0.5rem 0.9rem; background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.14); border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: #991b1b; }
+        .product-rank-divider { height: 1px; background: rgba(6,198,212,0.1); margin: 0.9rem 0; }
         .analytics-expense-overview {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3001,6 +3015,28 @@
                 let profitMarginDisplay = `${Number(profitMargin) > 0 ? '+' : ''}${profitMargin}%`;
                 let topProductName = topProduct.qty > 0 ? topProduct.name : 'No sales yet';
                 let topProductNote = topProduct.qty > 0 ? `${topProduct.qty} sold` : '0 sold';
+
+                // Build most / least / never sold lists
+                const soldEntries = Object.entries(productSales)
+                    .map(([id, d]) => ({ id, name: d.name, qty: d.qty }))
+                    .sort((a, b) => b.qty - a.qty);
+                const maxQtySold = soldEntries.length > 0 ? soldEntries[0].qty : 1;
+                const mostSold = soldEntries.slice(0, 5);
+                const leastSold = soldEntries.length > 1
+                    ? [...soldEntries].reverse().slice(0, 3).filter(e => e.qty < soldEntries[0].qty)
+                    : [];
+                const soldIds = new Set(Object.keys(productSales).map(String));
+                const neverSold = products.filter(p => !soldIds.has(String(p.id)));
+
+                const buildRankRows = (list, cls) => list.map((p, i) => `
+                    <div class="product-rank-item">
+                        <div class="product-rank-pos ${cls}">${i + 1}</div>
+                        <div class="product-rank-info">
+                            <div class="product-rank-name">${p.name}</div>
+                            <div class="product-rank-bar-wrap"><div class="product-rank-bar ${cls}" style="width:${Math.round((p.qty/maxQtySold)*100)}%"></div></div>
+                        </div>
+                        <div class="product-rank-qty" style="${cls==='cold'?'color:#94a3b8;':''}">${p.qty} sold</div>
+                    </div>`).join('');
                 
                 let last7Days = [];
                 let dailyRevenue = [];
@@ -3076,6 +3112,28 @@
                                     <div class="analytics-kpi-note">${topProductNote}</div>
                                 </article>
                             </div>
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-trophy" style="color:#06c6d4;"></i> Product Performance</h4>
+                                    <p>Most sold · least sold · never sold</p>
+                                </div>
+                            </div>
+                            ${soldEntries.length === 0 && neverSold.length === 0 ? `<div style="text-align:center;color:#94a3b8;padding:1rem;font-size:0.9rem;">No product data yet</div>` : `
+                                ${mostSold.length > 0 ? `
+                                <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:#06c6d4;margin-bottom:0.7rem;">&#127942; Most Sold</div>
+                                <div class="product-rank-list">${buildRankRows(mostSold, 'top')}</div>` : ''}
+                                ${leastSold.length > 0 ? `
+                                <div class="product-rank-divider"></div>
+                                <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:0.7rem;">&#128201; Least Sold</div>
+                                <div class="product-rank-list">${buildRankRows(leastSold, 'cold')}</div>` : ''}
+                                ${neverSold.length > 0 ? `
+                                <div class="product-rank-divider"></div>
+                                <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:#ef4444;margin-bottom:0.7rem;">&#128683; Never Sold</div>
+                                <div style="display:flex;flex-direction:column;gap:0.45rem;">${neverSold.map(p => `<div class="product-rank-never"><i class="fas fa-box"></i> ${p.name}</div>`).join('')}</div>` : ''}
+                            `}
                         </section>
 
                         <section class="analytics-card">
