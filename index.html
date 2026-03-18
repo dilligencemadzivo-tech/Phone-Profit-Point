@@ -2524,12 +2524,369 @@
             }
 
             // ==================== PDF GENERATORS ====================
-            function generateSalesPDF() {
+            function formatPdfCurrency(value) {
+                return `TSh ${Number(value || 0).toLocaleString()}`;
+            }
+
+            function getPdfLogoPayload() {
+                const logo = shopBrand?.logo;
+                if (typeof logo === 'string' && logo.startsWith('data:image/')) {
+                    const match = logo.match(/^data:image\/(png|jpeg|jpg);/i);
+                    if (match) {
+                        const format = match[1].toLowerCase() === 'png' ? 'PNG' : 'JPEG';
+                        return { type: 'image', src: logo, format };
+                    }
+                }
+                const fallbackText = (shopBrand?.name || 'Profit Point').trim().charAt(0).toUpperCase() || 'P';
+                return { type: 'text', text: fallbackText };
+            }
+
+            function drawModernPdfHeader(doc, meta) {
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const logo = getPdfLogoPayload();
+                const logoX = 14;
+                const logoY = 6;
+                const logoSize = 16;
+
+                doc.setFillColor(11, 37, 64);
+                doc.rect(0, 0, pageWidth, 30, 'F');
+                doc.setFillColor(6, 198, 212);
+                doc.rect(0, 30, pageWidth, 2, 'F');
+
+                doc.setFillColor(255, 255, 255);
+                doc.roundedRect(logoX, logoY, logoSize, logoSize, 3, 3, 'F');
+                if (logo.type === 'image') {
+                    try {
+                        doc.addImage(logo.src, logo.format, logoX + 1, logoY + 1, logoSize - 2, logoSize - 2);
+                    } catch (err) {
+                        doc.setTextColor(11, 37, 64);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(12);
+                        doc.text((shopBrand?.name || 'P').charAt(0).toUpperCase(), logoX + (logoSize / 2), logoY + 10.8, { align: 'center' });
+                    }
+                } else {
+                    doc.setTextColor(11, 37, 64);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(12);
+                    doc.text(logo.text, logoX + (logoSize / 2), logoY + 10.8, { align: 'center' });
+                }
+
+                doc.setTextColor(255, 255, 255);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(16);
+                doc.text(meta.title, 34, 13);
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9.5);
+                doc.setTextColor(219, 236, 245);
+                if (meta.subtitle) {
+                    doc.text(meta.subtitle, 34, 20);
+                }
+
+                doc.setTextColor(210, 234, 245);
+                doc.setFontSize(8.7);
+                doc.text(meta.generatedAt, pageWidth - 14, 20, { align: 'right' });
+                doc.setTextColor(17, 24, 39);
+            }
+
+            function drawModernPdfFooter(doc, pageNumber, pageCount) {
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                doc.setDrawColor(226, 232, 240);
+                doc.setLineWidth(0.25);
+                doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 116, 139);
+                doc.text(shopBrand?.name || 'Profit Point', 14, pageHeight - 7);
+                doc.text(`Page ${pageNumber} of ${pageCount}`, pageWidth - 14, pageHeight - 7, { align: 'right' });
+            }
+
+            function finalizeModernPdfDoc(doc, meta) {
+                const totalPages = doc.internal.getNumberOfPages();
+                for (let page = 1; page <= totalPages; page++) {
+                    doc.setPage(page);
+                    drawModernPdfHeader(doc, meta);
+                    drawModernPdfFooter(doc, page, totalPages);
+                }
+                doc.setPage(totalPages);
+            }
+
+            function createModernPdfDoc(title, subtitle) {
                 const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.getWidth();
+
+                const meta = {
+                    title: title || 'Report',
+                    subtitle: subtitle || '',
+                    generatedAt: `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                };
+
+                drawModernPdfHeader(doc, meta);
+                return { doc, pageWidth, pageHeight: doc.internal.pageSize.getHeight(), startY: 40, meta };
+            }
+
+            function ensurePdfSpace(doc, cursorY, neededHeight) {
+                const pageHeight = doc.internal.pageSize.getHeight();
+                if (cursorY + neededHeight > pageHeight - 14) {
+                    doc.addPage();
+                    return 40;
+                }
+                return cursorY;
+            }
+
+            function drawPdfMetricCards(doc, startY, cards) {
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const marginX = 14;
+                const gapX = 4;
+                const gapY = 4;
+                const cols = 3;
+                const cardHeight = 21;
+                const cardWidth = (pageWidth - (marginX * 2) - (gapX * (cols - 1))) / cols;
+
+                cards.forEach((card, index) => {
+                    const row = Math.floor(index / cols);
+                    const col = index % cols;
+                    const x = marginX + (col * (cardWidth + gapX));
+                    const y = startY + (row * (cardHeight + gapY));
+                    const fill = card.color || [245, 248, 252];
+                    const border = card.border || [220, 229, 238];
+                    const valueColor = card.valueColor || [17, 24, 39];
+
+                    doc.setFillColor(fill[0], fill[1], fill[2]);
+                    doc.setDrawColor(border[0], border[1], border[2]);
+                    doc.setLineWidth(0.3);
+                    doc.roundedRect(x, y, cardWidth, cardHeight, 3, 3, 'FD');
+
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text(String(card.label || ''), x + 2.8, y + 5.7, { maxWidth: cardWidth - 5.6 });
+
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(10.5);
+                    doc.setTextColor(valueColor[0], valueColor[1], valueColor[2]);
+                    doc.text(String(card.value || '-'), x + 2.8, y + 12.4, { maxWidth: cardWidth - 5.6 });
+
+                    if (card.note) {
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(7.2);
+                        doc.setTextColor(120, 134, 151);
+                        doc.text(String(card.note), x + 2.8, y + 17.6, { maxWidth: cardWidth - 5.6 });
+                    }
+                });
+
+                const rows = Math.ceil(cards.length / cols) || 1;
+                return startY + (rows * cardHeight) + ((rows - 1) * gapY) + 6;
+            }
+
+            function drawStyledPdfTable(doc, config) {
+                const defaults = {
+                    startY: 20,
+                    margin: { left: 14, right: 14, top: 40, bottom: 14 },
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [11, 37, 64],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        fontSize: 9
+                    },
+                    styles: {
+                        font: 'helvetica',
+                        fontSize: 8.5,
+                        cellPadding: 2.2,
+                        textColor: [31, 41, 55],
+                        lineColor: [226, 232, 240],
+                        lineWidth: 0.2
+                    },
+                    alternateRowStyles: { fillColor: [247, 250, 252] }
+                };
+
+                const tableConfig = {
+                    ...defaults,
+                    ...config,
+                    headStyles: { ...defaults.headStyles, ...(config.headStyles || {}) },
+                    styles: { ...defaults.styles, ...(config.styles || {}) },
+                    alternateRowStyles: { ...defaults.alternateRowStyles, ...(config.alternateRowStyles || {}) }
+                };
+
+                doc.autoTable(tableConfig);
+                return doc.lastAutoTable ? doc.lastAutoTable.finalY : tableConfig.startY;
+            }
+
+            function createAnalyticsLineChartImage(labels, values) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 900;
+                canvas.height = 360;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return null;
+
+                const left = 70;
+                const right = 860;
+                const top = 35;
+                const bottom = 300;
+                const width = right - left;
+                const height = bottom - top;
+                const maxValue = Math.max(...values, 1);
+                const toShort = (num) => {
+                    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+                    if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
+                    return `${Math.round(num)}`;
+                };
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 4; i++) {
+                    const y = top + (height / 4) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(left, y);
+                    ctx.lineTo(right, y);
+                    ctx.stroke();
+
+                    const value = Math.round(maxValue * (1 - (i / 4)));
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = '12px Inter, Arial';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(toShort(value), left - 10, y + 4);
+                }
+
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.beginPath();
+                ctx.moveTo(left, bottom);
+                ctx.lineTo(right, bottom);
+                ctx.stroke();
+
+                const stepX = values.length > 1 ? width / (values.length - 1) : width;
+                const points = values.map((v, i) => ({
+                    x: left + (i * stepX),
+                    y: bottom - ((v / maxValue) * height)
+                }));
+
+                const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+                gradient.addColorStop(0, 'rgba(6,198,212,0.35)');
+                gradient.addColorStop(1, 'rgba(6,198,212,0.02)');
+
+                ctx.beginPath();
+                points.forEach((p, i) => {
+                    if (i === 0) ctx.moveTo(p.x, p.y);
+                    else ctx.lineTo(p.x, p.y);
+                });
+                ctx.lineTo(points[points.length - 1].x, bottom);
+                ctx.lineTo(points[0].x, bottom);
+                ctx.closePath();
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                ctx.beginPath();
+                points.forEach((p, i) => {
+                    if (i === 0) ctx.moveTo(p.x, p.y);
+                    else ctx.lineTo(p.x, p.y);
+                });
+                ctx.strokeStyle = '#06c6d4';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                points.forEach((p, i) => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fill();
+                    ctx.strokeStyle = '#0d4765';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#334155';
+                    ctx.font = '12px Inter, Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(labels[i] || '', p.x, bottom + 18);
+                });
+
+                return canvas.toDataURL('image/png');
+            }
+
+            function createAnalyticsPieChartImage(series) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 900;
+                canvas.height = 360;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return null;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const colors = ['#06c6d4', '#0d4765', '#f59e0b', '#8b5cf6', '#ef4444', '#22c55e'];
+                const pieCenterX = 190;
+                const pieCenterY = 180;
+                const radius = 112;
+                const donutHole = 58;
+                const data = Array.isArray(series) ? series.slice(0, 6) : [];
+                const total = data.reduce((sum, item) => sum + (item.qty || 0), 0);
+
+                if (total <= 0) {
+                    ctx.beginPath();
+                    ctx.arc(pieCenterX, pieCenterY, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.fill();
+                } else {
+                    let angle = -Math.PI / 2;
+                    data.forEach((item, index) => {
+                        const slice = ((item.qty || 0) / total) * Math.PI * 2;
+                        ctx.beginPath();
+                        ctx.moveTo(pieCenterX, pieCenterY);
+                        ctx.arc(pieCenterX, pieCenterY, radius, angle, angle + slice);
+                        ctx.closePath();
+                        ctx.fillStyle = colors[index % colors.length];
+                        ctx.fill();
+                        angle += slice;
+                    });
+                }
+
+                ctx.beginPath();
+                ctx.arc(pieCenterX, pieCenterY, donutHole, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 24px Inter, Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(total > 0 ? `${total}` : '0', pieCenterX, pieCenterY - 4);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px Inter, Arial';
+                ctx.fillText('units sold', pieCenterX, pieCenterY + 16);
+
+                const legendData = total > 0 ? data : [{ name: 'No sales data', qty: 0 }];
+                legendData.forEach((item, index) => {
+                    const legendY = 80 + (index * 36);
+                    const color = total > 0 ? colors[index % colors.length] : '#94a3b8';
+                    const pct = total > 0 ? (((item.qty || 0) / total) * 100).toFixed(1) : '0.0';
+                    const label = total > 0
+                        ? `${item.name} (${item.qty} | ${pct}%)`
+                        : `${item.name}`;
+
+                    ctx.fillStyle = color;
+                    ctx.fillRect(390, legendY, 16, 16);
+
+                    ctx.fillStyle = '#1e293b';
+                    ctx.font = '13px Inter, Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(label.substring(0, 46), 416, legendY + 13);
+                });
+
+                return canvas.toDataURL('image/png');
+            }
+
+            function generateSalesPDF() {
+                const activeFilter = currentSalesFilter || 'all';
                 let filteredSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date));
                 
                 // Apply filter based on currentSalesFilter
-                if (currentSalesFilter !== 'all') {
+                if (activeFilter !== 'all') {
                     const now = new Date();
                     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                     const weekAgo = new Date(today);
@@ -2537,58 +2894,228 @@
                     const monthAgo = new Date(today);
                     monthAgo.setMonth(monthAgo.getMonth() - 1);
                     
-                    if (currentSalesFilter === 'today') {
+                    if (activeFilter === 'today') {
                         filteredSales = filteredSales.filter(s => new Date(s.date) >= today);
-                    } else if (currentSalesFilter === 'week') {
+                    } else if (activeFilter === 'week') {
                         filteredSales = filteredSales.filter(s => new Date(s.date) >= weekAgo);
-                    } else if (currentSalesFilter === 'month') {
+                    } else if (activeFilter === 'month') {
                         filteredSales = filteredSales.filter(s => new Date(s.date) >= monthAgo);
                     }
                 }
                 
-                // Get filter label for filename and title
-                let filterLabel = '';
-                if (currentSalesFilter === 'today') filterLabel = ' - Today';
-                else if (currentSalesFilter === 'week') filterLabel = ' - This Week';
-                else if (currentSalesFilter === 'month') filterLabel = ' - This Month';
+                let filterLabel = 'All Time';
+                if (activeFilter === 'today') filterLabel = 'Today';
+                else if (activeFilter === 'week') filterLabel = 'This Week';
+                else if (activeFilter === 'month') filterLabel = 'This Month';
                 
-                const totalAmount = filteredSales.reduce((sum, s) => sum + s.finalTotal, 0);
-                
-                const doc = new jsPDF();
-                doc.text("Sales Report - Profit Point" + filterLabel, 14, 20);
-                doc.setFontSize(10);
-                doc.text(`Total Sales (${filteredSales.length}): TSh ${totalAmount.toLocaleString()}`, 14, 28);
+                const totalAmount = filteredSales.reduce((sum, s) => sum + (s.finalTotal || 0), 0);
+                const avgOrder = filteredSales.length ? Math.round(totalAmount / filteredSales.length) : 0;
+                const paymentCount = filteredSales.reduce((acc, sale) => {
+                    const key = sale.payment || 'N/A';
+                    acc[key] = (acc[key] || 0) + 1;
+                    return acc;
+                }, {});
+                const topPayment = Object.entries(paymentCount).sort((a, b) => b[1] - a[1])[0];
+
+                const { doc, pageWidth, startY, meta } = createModernPdfDoc('Sales Report', `Profit Point | ${filterLabel}`);
+                let cursorY = drawPdfMetricCards(doc, startY, [
+                    {
+                        label: 'Transactions',
+                        value: `${filteredSales.length}`,
+                        note: 'Sales entries',
+                        color: [240, 249, 255],
+                        border: [186, 230, 253],
+                        valueColor: [12, 74, 110]
+                    },
+                    {
+                        label: 'Total Amount',
+                        value: formatPdfCurrency(totalAmount),
+                        note: `Avg ${formatPdfCurrency(avgOrder)}`,
+                        color: [236, 253, 245],
+                        border: [167, 243, 208],
+                        valueColor: [6, 95, 70]
+                    },
+                    {
+                        label: 'Top Payment',
+                        value: topPayment ? topPayment[0] : 'N/A',
+                        note: topPayment ? `${topPayment[1]} sales` : 'No payments',
+                        color: [255, 251, 235],
+                        border: [253, 230, 138],
+                        valueColor: [146, 64, 14]
+                    }
+                ]);
+
+                if (filteredSales.length === 0) {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(12);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text('No sales found for this period.', 14, cursorY + 4);
+                    const emptyName = `sales-report-${activeFilter}-${new Date().toISOString().slice(0, 10)}.pdf`;
+                    finalizeModernPdfDoc(doc, meta);
+                    doc.save(emptyName);
+                    showToast('Sales PDF saved');
+                    return;
+                }
+
+                cursorY = ensurePdfSpace(doc, cursorY, 18);
+                doc.setFont('helvetica', 'bold');
                 doc.setFontSize(12);
-                
-                doc.autoTable({ 
+                doc.setTextColor(17, 24, 39);
+                doc.text('Sales Entries', 14, cursorY);
+
+                const salesTableRows = filteredSales.map(s => [
+                    new Date(s.date).toLocaleString(),
+                    (s.items || []).map(i => i.name).join(', ').substring(0, 38),
+                    formatPdfCurrency(s.finalTotal),
+                    s.payment || 'N/A',
+                    s.userName || 'Unknown'
+                ]);
+
+                const tableEndY = drawStyledPdfTable(doc, {
                     head: [['Date', 'Items', 'Total', 'Payment', 'User']],
-                    body: filteredSales.map(s => [
-                        new Date(s.date).toLocaleString(), 
-                        s.items.map(i=>i.name).join(', ').substring(0,30), 
-                        'TSh '+s.finalTotal,
-                        s.payment,
-                        s.userName || 'Unknown'
-                    ]),
-                    startY: 38
+                    body: salesTableRows,
+                    startY: cursorY + 2,
+                    columnStyles: {
+                        2: { halign: 'right' }
+                    }
                 });
-                doc.save('sales' + (filterLabel ? filterLabel.split(' - ')[1].toLowerCase() : '') + '.pdf');
+
+                const noteY = ensurePdfSpace(doc, tableEndY + 8, 10);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(100, 116, 139);
+                doc.text(`Filter: ${filterLabel}`, 14, noteY);
+                doc.text(`Total exported amount: ${formatPdfCurrency(totalAmount)}`, pageWidth - 14, noteY, { align: 'right' });
+                
+                const salesFile = `sales-report-${activeFilter}-${new Date().toISOString().slice(0, 10)}.pdf`;
+                finalizeModernPdfDoc(doc, meta);
+                doc.save(salesFile);
                 showToast('Sales PDF saved');
             }
+
             function generateAnalyticsPDF() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.text("Analytics - Profit Point", 14, 20);
-                let totalRevenue = sales.reduce((a,s)=>a+s.finalTotal,0);
+                let totalRevenue = sales.reduce((a, s) => a + (s.finalTotal || 0), 0);
                 let totalCost = 0;
-                sales.forEach(s => s.items.forEach(itm => {
-                    let p = products.find(p=>p.id===itm.productId);
-                    if(p) totalCost += p.buyPrice * itm.qty;
-                }));
-                let totalExpenses = expenses.reduce((a,e)=>a+e.amount,0);
+                let productSales = {};
+
+                sales.forEach(s => {
+                    (s.items || []).forEach(itm => {
+                        const qty = Number(itm.qty || 0);
+                        const p = products.find(prod => String(prod.id) === String(itm.productId));
+                        totalCost += (Number(p?.buyPrice || 0) * qty);
+
+                        const key = String(itm.productId ?? itm.name ?? 'unknown');
+                        if (!productSales[key]) {
+                            productSales[key] = {
+                                name: itm.name || p?.name || 'Unknown Product',
+                                qty: 0,
+                                revenue: 0
+                            };
+                        }
+                        productSales[key].qty += qty;
+                        productSales[key].revenue += Number((itm.price || 0) * qty);
+                    });
+                });
+
+                let totalExpenses = expenses.reduce((a, e) => a + (e.amount || 0), 0);
                 let netProfit = totalRevenue - totalCost - totalExpenses;
-                doc.text(`Revenue: TSh ${totalRevenue}`, 14, 30);
-                doc.text(`Expenses: TSh ${totalExpenses}`, 14, 38);
-                doc.text(`Net profit: TSh ${netProfit}`, 14, 46);
+                let transactionCount = sales.length;
+                let margin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : '0.0';
+
+                const last7Days = [];
+                const dailyRevenue = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    last7Days.push(date.toLocaleDateString('en', { weekday: 'short' }));
+                    const dayTotal = sales
+                        .filter(s => new Date(s.date).toDateString() === date.toDateString())
+                        .reduce((sum, s) => sum + (s.finalTotal || 0), 0);
+                    dailyRevenue.push(dayTotal);
+                }
+
+                const topProducts = Object.values(productSales)
+                    .sort((a, b) => b.qty - a.qty)
+                    .slice(0, 6);
+
+                const { doc, pageWidth, startY, meta } = createModernPdfDoc('Analytics Report', 'Profit Point | Revenue, costs, and product insights');
+                let cursorY = drawPdfMetricCards(doc, startY, [
+                    {
+                        label: 'Revenue',
+                        value: formatPdfCurrency(totalRevenue),
+                        note: `${transactionCount} transactions`,
+                        color: [240, 249, 255],
+                        border: [186, 230, 253],
+                        valueColor: [12, 74, 110]
+                    },
+                    {
+                        label: 'Expenses',
+                        value: formatPdfCurrency(totalExpenses),
+                        note: `Cost ${formatPdfCurrency(totalCost)}`,
+                        color: [255, 241, 242],
+                        border: [254, 205, 211],
+                        valueColor: [159, 18, 57]
+                    },
+                    {
+                        label: 'Net Profit',
+                        value: formatPdfCurrency(netProfit),
+                        note: `${margin}% margin`,
+                        color: netProfit >= 0 ? [236, 253, 245] : [254, 242, 242],
+                        border: netProfit >= 0 ? [167, 243, 208] : [254, 202, 202],
+                        valueColor: netProfit >= 0 ? [6, 95, 70] : [153, 27, 27]
+                    }
+                ]);
+
+                cursorY = ensurePdfSpace(doc, cursorY, 72);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(17, 24, 39);
+                doc.text('Revenue Trend (Last 7 Days)', 14, cursorY);
+                const lineChartImage = createAnalyticsLineChartImage(last7Days, dailyRevenue);
+                if (lineChartImage) {
+                    doc.addImage(lineChartImage, 'PNG', 14, cursorY + 2, pageWidth - 28, 62);
+                }
+                cursorY += 68;
+
+                cursorY = ensurePdfSpace(doc, cursorY, 72);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(17, 24, 39);
+                doc.text('Product Distribution (Top Sellers)', 14, cursorY);
+                const pieSeries = topProducts.map(p => ({ name: p.name, qty: p.qty }));
+                const pieChartImage = createAnalyticsPieChartImage(pieSeries);
+                if (pieChartImage) {
+                    doc.addImage(pieChartImage, 'PNG', 14, cursorY + 2, pageWidth - 28, 62);
+                }
+                cursorY += 68;
+
+                const productRows = topProducts.map((p, idx) => [
+                    `${idx + 1}`,
+                    p.name,
+                    `${p.qty}`,
+                    formatPdfCurrency(p.revenue)
+                ]);
+
+                if (productRows.length > 0) {
+                    cursorY = ensurePdfSpace(doc, cursorY, 24);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(12);
+                    doc.setTextColor(17, 24, 39);
+                    doc.text('Top Selling Products', 14, cursorY);
+
+                    drawStyledPdfTable(doc, {
+                        head: [['#', 'Product', 'Units Sold', 'Revenue']],
+                        body: productRows,
+                        startY: cursorY + 2,
+                        columnStyles: {
+                            0: { halign: 'center', cellWidth: 12 },
+                            2: { halign: 'right', cellWidth: 30 },
+                            3: { halign: 'right', cellWidth: 40 }
+                        }
+                    });
+                }
+
+                finalizeModernPdfDoc(doc, meta);
                 doc.save('analytics.pdf');
                 showToast('Analytics PDF saved');
             }
@@ -3415,8 +3942,6 @@
                 // PDF Export (respects current filter)
                 document.getElementById('pdfExpensesBtn')?.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
                     
                     // Apply same filtering logic as renderExpensesList
                     const now = new Date();
@@ -3457,35 +3982,74 @@
                         'month': 'This Month\'s Expenses'
                     };
                     const filterLabel = filterLabels[expenseFilterMode] || 'Expense Report';
-                    
-                    doc.setFontSize(16);
-                    doc.text(filterLabel, 14, 15);
-                    doc.setFontSize(10);
-                    doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}`, 14, 23);
+
+                    const { doc, pageWidth, startY, meta } = createModernPdfDoc(filterLabel, 'Profit Point | Expense breakdown');
+                    let cursorY = startY;
+
                     if (expenseSearchTerm) {
-                        doc.text(`Search: ${expenseSearchTerm}`, 14, 29);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(9);
+                        doc.setTextColor(71, 85, 105);
+                        doc.text(`Search filter: ${expenseSearchTerm}`, 14, cursorY - 2);
                     }
-                    
-                    const tableData = [['Date', 'Description', 'Category', 'Amount', 'User']];
-                    
-                    filteredExpenses.forEach(e => {
+
+                    cursorY = drawPdfMetricCards(doc, cursorY, [
+                        {
+                            label: 'Total Expenses',
+                            value: formatPdfCurrency(totalExp),
+                            note: `${filteredExpenses.length} records`,
+                            color: [255, 241, 242],
+                            border: [254, 205, 211],
+                            valueColor: [159, 18, 57]
+                        },
+                        {
+                            label: 'Average Expense',
+                            value: formatPdfCurrency(avgExp),
+                            note: 'Per entry',
+                            color: [255, 251, 235],
+                            border: [253, 230, 138],
+                            valueColor: [146, 64, 14]
+                        },
+                        {
+                            label: 'Period',
+                            value: filterLabel,
+                            note: expenseSearchTerm ? 'Search applied' : 'No search filter',
+                            color: [240, 249, 255],
+                            border: [186, 230, 253],
+                            valueColor: [12, 74, 110]
+                        }
+                    ]);
+
+                    cursorY = ensurePdfSpace(doc, cursorY, 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(12);
+                    doc.setTextColor(17, 24, 39);
+                    doc.text('Expense Entries', 14, cursorY);
+
+                    const expenseRows = filteredExpenses.map(e => {
                         const date = new Date(e.date).toLocaleDateString();
                         const cat = expenseCategories.find(c => c.value === e.category)?.label || e.category || 'Other';
-                        tableData.push([date, e.desc || '-', cat, `TSh ${e.amount}`, e.userName || 'Unknown']);
+                        return [date, e.desc || '-', cat, formatPdfCurrency(e.amount), e.userName || 'Unknown'];
                     });
-                    
-                    doc.autoTable({
-                        head: [tableData[0]],
-                        body: tableData.slice(1),
-                        startY: expenseSearchTerm ? 35 : 30
+
+                    const finalY = drawStyledPdfTable(doc, {
+                        head: [['Date', 'Description', 'Category', 'Amount', 'User']],
+                        body: expenseRows,
+                        startY: cursorY + 2,
+                        columnStyles: {
+                            3: { halign: 'right', cellWidth: 34 }
+                        }
                     });
-                    
-                    doc.setFontSize(10);
-                    doc.text(`Total Expenses: TSh ${totalExp.toLocaleString()}`, 14, doc.lastAutoTable.finalY + 10);
-                    doc.text(`Average Expense: TSh ${avgExp.toLocaleString()}`, 14, doc.lastAutoTable.finalY + 17);
-                    doc.text(`Expenses Exported: ${filteredExpenses.length}`, 14, doc.lastAutoTable.finalY + 24);
+
+                    const noteY = ensurePdfSpace(doc, finalY + 8, 10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(9);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text(`Total exported: ${formatPdfCurrency(totalExp)}`, 14, noteY);
+                    doc.text(`Average: ${formatPdfCurrency(avgExp)}`, pageWidth - 14, noteY, { align: 'right' });
                     
                     const fileName = `expenses-${expenseFilterMode}-${new Date().toISOString().slice(0, 10)}.pdf`;
+                    finalizeModernPdfDoc(doc, meta);
                     doc.save(fileName);
                     showToast('Expense report exported');
                 });
