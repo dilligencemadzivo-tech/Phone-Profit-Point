@@ -467,32 +467,46 @@
         }
         @keyframes fadeInGrid { from { opacity: 0; } to { opacity: 1; } }
         .product-tile-mobile {
-            background: rgba(255,255,255,0.98); border-radius: 28px; padding: 1.1rem 0.4rem;
-            text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            border: 1px solid rgba(6,198,212,0.1); cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.35, 0.46, 0.3, 0.46);
-            animation: fadeIn 0.4s ease backwards; word-break: break-word;
+            position: relative; width: 100%; aspect-ratio: 4/5; cursor: pointer;
+            border-radius: 28px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid rgba(6,198,212,0.1); transition: all 0.25s cubic-bezier(0.35, 0.46, 0.3, 0.46);
+            animation: fadeIn 0.4s ease backwards; background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf2 100%);
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .product-tile-mobile:hover {
-            box-shadow: 0 12px 28px rgba(6,198,212,0.15); transform: translateY(-3px);
-            border-color: rgba(6,198,212,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 8px 16px rgba(6,198,212,0.25), 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+            border-color: rgba(6,198,212,0.3);
+        }
+        .product-tile-mobile:hover .product-image-mobile { transform: scale(1.08); }
+        .product-tile-mobile::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.6) 100%);
+            pointer-events: none; z-index: 2;
         }
         .product-image-mobile {
-            width: 85px; height: 85px; border-radius: 24px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;
             background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf2 100%);
-            margin: 0 auto 0.6rem; border: 2px solid #06c6d4; overflow: hidden;
-            box-shadow: 0 8px 18px rgba(6,198,212,0.15); transition: all 0.25s ease;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
         }
-        .product-image-mobile:hover { transform: scale(1.05); box-shadow: 0 12px 28px rgba(6,198,212,0.25); }
         .product-image-mobile img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .product-price-mobile { font-weight: 900; color: #06c6d4; font-size: 1.1rem; letter-spacing: -0.3px; word-break: break-word; line-height: 1.3; }
-        .product-name-mobile { font-weight: 700; font-size: 0.85rem; margin: 0.3rem 0; color: #1a2332; line-height: 1.2; word-break: break-word; }
+        .product-name-mobile {
+            position: absolute; bottom: 3.2rem; left: 0.8rem; right: 0.8rem; z-index: 3;
+            font-weight: 700; font-size: 0.9rem; color: white; line-height: 1.2; word-break: break-word;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .product-price-mobile {
+            position: absolute; bottom: 1.8rem; left: 0.8rem; right: 0.8rem; z-index: 3;
+            font-weight: 900; color: #fedb9f; font-size: 1.15rem; letter-spacing: -0.3px; word-break: break-word;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
         .stock-badge-mobile {
-            background: rgba(6,198,212,0.12); border-radius: 50px; padding: 0.3rem 0.8rem;
-            font-size: 0.65rem; display: inline-block; font-weight: 700; color: #06c6d4;
-            border: 1px solid rgba(6,198,212,0.3); max-width: 100%; white-space: normal; word-break: break-word;
+            position: absolute; bottom: 0.6rem; left: 0.8rem; right: 0.8rem; z-index: 3;
+            background: rgba(6,198,212,0.95); border-radius: 20px; padding: 0.4rem 0.8rem;
+            font-size: 0.7rem; display: inline-block; font-weight: 700; color: white;
+            border: none; max-width: 100%; white-space: normal; word-break: break-word;
+            box-shadow: 0 8px 20px rgba(6,198,212,0.4), 0 2px 8px rgba(0,0,0,0.15);
         }
         /* All other styles from original kept intact (chips, payment, etc) */
         .chip {
@@ -633,6 +647,9 @@
         .cart-bump { animation: cartBump 0.4s ease; }
         .camera-preview-video { width: 100%; max-width: 300px; border-radius: 28px; margin: 0 auto 1rem; border: 3px solid #06c6d4; box-shadow: 0 10px 25px rgba(0,0,0,0.2); background: #000; object-fit: cover; }
         .camera-modal-video { width: 100%; border-radius: 28px; }
+        .otp-card { background: rgba(255,255,255,0.98); backdrop-filter: blur(30px); border-radius: 48px; padding: 2.2rem 2rem; width: 100%; max-width: 380px; box-shadow: 0 40px 80px rgba(0,0,0,0.3); border: 1px solid rgba(6,198,212,0.2); animation: slideUp 0.4s ease; }
+        .otp-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; text-align: center; }
+
     </style>
 </head>
 <body>
@@ -733,6 +750,13 @@
                     analysis: "Analytics", profit: "Profit", expenses: "Expenses", revenue: "Revenue",
                     shopName: "Shop name", uploadLogo: "Upload logo", addExpense: "Add expense",
                     desc: "Description", amount: "Amount", productImage: "Product image",
+                    expenseCategory: "Category", utilities: "Utilities", rent: "Rent", salary: "Salary", 
+                    marketing: "Marketing", maintenance: "Maintenance", supplies: "Supplies", other: "Other",
+                    totalExpenses: "Total Expenses", filterExpenses: "Filter", expenseDate: "Date",
+                    editExpense: "Edit Expense", deleteExpense: "Delete", searchExpense: "Search expenses...",
+                    expenseStats: "Expense Statistics", averageExpense: "Average Expense", highestExpense: "Highest",
+                    expensesByCategory: "By Category", noExpenses: "No expenses recorded", clearExpenses: "Clear Expenses",
+                    pdfExpenses: "Export PDF", expenseHistory: "Expense History",
                     editProduct: "Edit product", editUser: "Edit user", deleteUser: "Delete user",
                     confirmDelete: "Are you sure?", phoneNumber: "Phone number",
                     signIn: "Sign In", signUp: "Sign Up", camera: "Camera",
@@ -747,7 +771,7 @@
                     clearSales: "Clear sales",
                     pdfSales: "Sales PDF",
                     pdfAnalytics: "Analytics PDF",
-                    fullscreen: "Fullscreen"
+                    fullscreen: "Fullscreen",
                 },
                 sw: {
                     pos: "POS", products: "Bidhaa", sales: "Mauzo", alerts: "Tahadhari", users: "Watumiaji",
@@ -764,6 +788,13 @@
                     analysis: "Uchambuzi", profit: "Faida", expenses: "Matumizi", revenue: "Mapato",
                     shopName: "Jina la duka", uploadLogo: "Pakia nembo", addExpense: "Ongeza matumizi",
                     desc: "Maelezo", amount: "Kiasi", productImage: "Picha ya bidhaa",
+                    expenseCategory: "Aina", utilities: "Huduma", rent: "Kodi", salary: "Mshahara", 
+                    marketing: "Uuzaji", maintenance: "Matengenezo", supplies: "Vifaa", other: "Nyingine",
+                    totalExpenses: "Jumla ya Matumizi", filterExpenses: "Chuja", expenseDate: "Tarehe",
+                    editExpense: "Hariri Matumizi", deleteExpense: "Futa", searchExpense: "Tafuta matumizi...",
+                    expenseStats: "Takwimu za Matumizi", averageExpense: "Wastani", highestExpense: "Juu Zaidi",
+                    expensesByCategory: "Kwa Aina", noExpenses: "Hakuna matumizi", clearExpenses: "Futa Matumizi",
+                    pdfExpenses: "Export PDF", expenseHistory: "Historia ya Matumizi",
                     editProduct: "Hariri bidhaa", editUser: "Hariri mtumiaji", deleteUser: "Futa mtumiaji",
                     confirmDelete: "Una uhakika?", phoneNumber: "Namba ya simu",
                     signIn: "Ingia", signUp: "Jisajili", camera: "Kamera",
@@ -778,7 +809,22 @@
                     clearSales: "Futa mauzo",
                     pdfSales: "PDF ya mauzo",
                     pdfAnalytics: "PDF ya uchambuzi",
-                    fullscreen: "Skrini nzima"
+                    fullscreen: "Skrini nzima",
+                    emailOTP: "Uthibitisho wa OTP kwa Email",
+                    enterEmail: "Ingiza barua pepe yako",
+                    sendOTP: "Tuma OTP",
+                    enterOTP: "Ingiza OTP ya tarakamu 6",
+                    verifyOTP: "Thibitisha OTP",
+                    resendOTP: "Tuma OTP Tena",
+                    expiresIn: "Inatoka limeweza katika",
+                    seconds: "sekunde",
+                    attemptsLeft: "Uzoefu uliobaki",
+                    otpSent: "OTP ilitumwa kwa barua pepe yako",
+                    otpExpired: "OTP imekataa. Tafadhali omba mpya",
+                    otpInvalid: "OTP si sahihi. Jaribu tena",
+                    maxAttemptsExceeded: "Uzoefu wa kiwango cha juu. Tafadhali omba OTP mpya",
+                    resendAvailableIn: "Tuma tena inayopatikana katika",
+                    invalidEmail: "Tafadhali ingiza anwani halali ya barua pepe"
                 }
             };
             let currentLang = localStorage.getItem('profitpoint_lang') || 'sw';
@@ -810,7 +856,7 @@
             let products = JSON.parse(localStorage.getItem(STORAGE_PROD)) || [];
             let sales = JSON.parse(localStorage.getItem('profitpoint_sales')) || [];
             let expenses = JSON.parse(localStorage.getItem('profitpoint_expenses')) || [];
-            let customers = JSON.parse(localStorage.getItem('profitpoint_customers')) || [{ id: 'c1', name: 'Walk-in', phone: '' }];
+            let customers = JSON.parse(localStorage.getItem('profitpoint_customers')) || [];
             let shopBrand = JSON.parse(localStorage.getItem('profitpoint_brand')) || { name: 'Profit Point', logo: '💎' };
             let cart = JSON.parse(localStorage.getItem('profitpoint_cart')) || [];
             let selectedPayment = 'Cash';
@@ -1526,6 +1572,9 @@
                 const renderPosContent = () => {
                     const filtered = filterProducts();
                     
+                    // Get all unique categories from products
+                    const uniqueCategories = [...new Set(products.map(p => p.category).filter(c => c))];
+                    
                     let productGridHtml = filtered.map(p => {
                         let imgHtml = p.image ? 
                             `<img src="${p.image}" style="width:100%; height:100%; object-fit:cover;">` : 
@@ -1541,6 +1590,17 @@
                         `;
                     }).join('');
                     
+                    // Build category chips dynamically from unique categories
+                    let categoryChipsHtml = `<span class="chip ${activeCat === 'all' ? 'active' : ''}" data-cat="all">
+                        <i class="fas fa-border-all"></i> ${__('all')}
+                    </span>`;
+                    
+                    uniqueCategories.forEach(cat => {
+                        categoryChipsHtml += `<span class="chip ${activeCat === cat ? 'active' : ''}" data-cat="${cat}">
+                            <i class="fas fa-tag"></i> ${cat}
+                        </span>`;
+                    });
+                    
                     let html = `
                         <div style="display:flex; background:#ecf5fe; border-radius:60px; padding:0.2rem 1.2rem; margin-bottom:0.5rem;">
                             <i class="fas fa-search" style="color:#0b4b7a;"></i>
@@ -1549,18 +1609,7 @@
                         </div>
                         
                         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.5rem 0;">
-                            <span class="chip ${activeCat === 'all' ? 'active' : ''}" data-cat="all">
-                                <i class="fas fa-border-all"></i> ${__('all')}
-                            </span>
-                            <span class="chip ${activeCat === 'Food' ? 'active' : ''}" data-cat="Food">
-                                <i class="fas fa-utensils"></i> ${__('food')}
-                            </span>
-                            <span class="chip ${activeCat === 'Drinks' ? 'active' : ''}" data-cat="Drinks">
-                                <i class="fas fa-mug-hot"></i> ${__('drinks')}
-                            </span>
-                            <span class="chip ${activeCat === 'Staple' ? 'active' : ''}" data-cat="Staple">
-                                <i class="fas fa-wheat"></i> ${__('staple')}
-                            </span>
+                            ${categoryChipsHtml}
                         </div>
                         
                         <div class="product-grid-mobile" id="mobileProductGrid">
@@ -1794,63 +1843,149 @@
                 }
 
                 let html = `
-                    <div style="background:white; border-radius:40px; padding:1.4rem; margin-bottom:1rem;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                            <h3><i class="fas fa-chart-line" style="color:#06c6d4;"></i> ${__('analysis')}</h3>
-                            <button class="btn-small" id="pdfAnalyticsBtn"><i class="fas fa-file-pdf"></i> ${__('pdfAnalytics')}</button>
-                        </div>
+                    <!-- Hero Summary Card -->
+                    <div style="background:linear-gradient(135deg, #06c6d4 0%, #0a9ab3 100%); border-radius:40px; padding:1.8rem; margin-bottom:1.5rem; box-shadow:0 20px 50px rgba(6,198,212,0.25); color:white; position:relative; overflow:hidden;">
+                        <div style="position:absolute; top:-50px; right:-50px; width:250px; height:250px; background:rgba(255,255,255,0.08); border-radius:50%;"></div>
+                        <div style="position:absolute; bottom:-30px; left:-30px; width:150px; height:150px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
                         
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value">TSh ${totalRevenue.toLocaleString()}</div>
-                                <div class="stat-label">${__('revenue')}</div>
+                        <div style="position:relative; z-index:2;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.3rem; gap:1rem;">
+                                <div>
+                                    <div style="font-size:0.8rem; font-weight:700; opacity:0.9; margin-bottom:0.2rem; letter-spacing:0.5px;">📊 ${__('analysis')}</div>
+                                    <h2 style="font-size:1.8rem; font-weight:800; margin:0;">Dashboard</h2>
+                                </div>
+                                <button class="btn-small" id="pdfAnalyticsBtn" style="background:rgba(255,255,255,0.25); color:white; padding:0.6rem 1.2rem; border:1.5px solid rgba(255,255,255,0.4); backdrop-filter:blur(10px);"><i class="fas fa-file-pdf"></i></button>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-value">TSh ${netProfit.toLocaleString()}</div>
-                                <div class="stat-label">${__('profit')}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${profitMargin}%</div>
-                                <div class="stat-label">${__('profitMargin')}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${transactionCount}</div>
-                                <div class="stat-label">${__('transactions')}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value">TSh ${avgOrderValue}</div>
-                                <div class="stat-label">${__('averageOrder')}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${topProduct.name}</div>
-                                <div class="stat-label">${__('topProduct')} (${topProduct.qty} pcs)</div>
+                            
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.3rem;">
+                                <div style="background:rgba(255,255,255,0.12); border-radius:24px; padding:1.2rem; border:1px solid rgba(255,255,255,0.2);">
+                                    <div style="font-size:0.75rem; font-weight:600; opacity:0.85; margin-bottom:0.6rem; text-transform:uppercase; letter-spacing:0.4px;">💰 Revenue</div>
+                                    <div style="font-size:max(1.3rem, min(1.8rem, 3.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">TSh ${totalRevenue.toLocaleString()}</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.12); border-radius:24px; padding:1.2rem; border:1px solid rgba(255,255,255,0.2);">
+                                    <div style="font-size:0.75rem; font-weight:600; opacity:0.85; margin-bottom:0.6rem; text-transform:uppercase; letter-spacing:0.4px;">📈 Profit</div>
+                                    <div style="font-size:max(1.3rem, min(1.8rem, 3.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">${netProfit < 0 ? '-' : ''}TSh ${Math.abs(netProfit).toLocaleString()}</div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Key Metrics Grid -->
+                    <div style="background:white; border-radius:40px; padding:1.4rem; margin-bottom:1.2rem; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+                        <h4 style="margin:0 0 1.3rem 0; font-size:0.95rem; font-weight:700; color:#1a2332; letter-spacing:0.3px;">📊 KEY METRICS</h4>
                         
-                        <div class="chart-container">
+                        <div class="stats-grid" style="gap:1rem;">
+                            <!-- Profit Margin Card -->
+                            <div class="stat-card" style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left:4px solid #22c55e; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(34,197,94,0.1);">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
+                                    <div style="flex:1; min-width:0;">
+                                        <div class="stat-label" style="color:#15803d; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Margin</div>
+                                        <div class="stat-value" style="color:#22c55e; font-size:max(1.5rem, min(1.9rem, 4.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">+${profitMargin}%</div>
+                                    </div>
+                                    <div style="font-size:2.2rem; opacity:0.25; flex-shrink:0;">📈</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Transactions Card -->
+                            <div class="stat-card" style="background:linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left:4px solid #f59e0b; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(245,158,11,0.1);">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
+                                    <div style="flex:1; min-width:0;">
+                                        <div class="stat-label" style="color:#92400e; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Sales</div>
+                                        <div class="stat-value" style="color:#d97706; font-size:max(1.5rem, min(1.9rem, 4.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">${transactionCount}</div>
+                                    </div>
+                                    <div style="font-size:2.2rem; opacity:0.25; flex-shrink:0;">🛍️</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Average Order Card -->
+                            <div class="stat-card" style="background:linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-left:4px solid #a855f7; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(168,85,247,0.1);">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
+                                    <div style="flex:1; min-width:0;">
+                                        <div class="stat-label" style="color:#6b21a8; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Avg Order</div>
+                                        <div class="stat-value" style="color:#a855f7; font-size:max(1.3rem, min(1.7rem, 3.5vw)); font-weight:800; word-break:break-word; overflow-wrap:break-word; line-height:1.15;">TSh ${avgOrderValue}</div>
+                                    </div>
+                                    <div style="font-size:2.2rem; opacity:0.25; flex-shrink:0;">💳</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Top Product Card -->
+                            <div class="stat-card" style="background:linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-left:4px solid #ec4899; min-width:0; border-radius:24px; padding:1.2rem; box-shadow:0 2px 8px rgba(236,72,153,0.1);">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; min-width:0; gap:0.8rem;">
+                                    <div style="flex:1; min-width:0;">
+                                        <div class="stat-label" style="color:#831843; font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Top Product</div>
+                                        <div class="stat-value" style="color:#ec4899; font-size:max(1.1rem, min(1.4rem, 3vw)); line-height:1.2; word-break:break-all; overflow-wrap:break-word; font-weight:700;">${topProduct.name}</div>
+                                        <div style="font-size:0.75rem; color:#831843; margin-top:0.4rem; opacity:0.8; font-weight:600;">${topProduct.qty} sold</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Chart -->
+                    <div style="background:white; border-radius:40px; padding:1.4rem; margin-bottom:1.2rem; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+                        <h4 style="margin:0 0 1.3rem 0; font-size:0.95rem; font-weight:700; color:#1a2332; letter-spacing:0.3px;">📈 REVENUE TREND (7 DAYS)</h4>
+                        <div class="chart-container" style="position:relative; height:280px;">
                             <canvas id="revenueChart"></canvas>
                         </div>
                     </div>
                     
-                    <div style="background:white; border-radius:40px; padding:1.4rem;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                            <h4><i class="fas fa-wallet"></i> ${__('expenses')}</h4>
-                            <button class="btn-small" id="addExpenseBtn" style="padding:0.4rem 1.2rem;">
-                                <i class="fas fa-plus"></i> ${__('addExpense')}
-                            </button>
+                    <div style="background:white; border-radius:40px; padding:1.4rem; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.3rem; flex-wrap:wrap; gap:0.8rem;">
+                            <h4 style="margin:0; font-size:0.95rem; font-weight:700; color:#1a2332; letter-spacing:0.3px;">💼 EXPENSES</h4>
+                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                                <button class="btn-small" id="pdfExpensesBtn" style="padding:0.5rem 1rem; font-size:0.85rem;">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </button>
+                                <button class="btn-small" id="addExpenseBtn" style="padding:0.5rem 1rem; font-size:0.85rem;">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
                         </div>
                         
-                        ${expenses.length === 0 ? 
-                            `<p style="text-align:center; color:#64748b; padding:1rem;">No expenses recorded</p>` : 
-                            expenses.map(e => `
-                                <div style="display:flex; justify-content:space-between; align-items:center; padding:0.8rem 0; border-bottom:1px solid #eef2f6;">
-                                    <span>${e.desc || '-'}</span>
-                                    <span style="font-weight:600;">TSh ${e.amount}</span>
+                        <!-- Total Expenses Display -->
+                        <div style="background:linear-gradient(135deg, #e8f4ff 0%, #d4ecff 100%); border-radius:28px; padding:1.2rem; margin-bottom:1rem; border:2px solid #a8d5ff;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="font-size:0.85rem; color:#1b4f72; font-weight:600; margin-bottom:0.3rem;">${__('totalExpenses')}</div>
+                                    <div style="font-size:1.8rem; font-weight:800; color:#06c6d4;">TSh ${expenses.reduce((a,e)=>a+(e.amount||0),0).toLocaleString()}</div>
                                 </div>
-                            `).join('')}
+                                <div style="text-align:right;">
+                                    <div style="font-size:0.85rem; color:#1b4f72; font-weight:600; margin-bottom:0.3rem;">${__('averageExpense')}</div>
+                                    <div style="font-size:1.4rem; font-weight:700; color:#1b4f72;">TSh ${expenses.length > 0 ? Math.round(expenses.reduce((a,e)=>a+(e.amount||0),0) / expenses.length).toLocaleString() : '0'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div style="margin-bottom:1rem;">
+                            <input type="text" id="expenseSearchInput" placeholder="${__('searchExpense')}" 
+                                style="width:100%; padding:0.8rem 1.2rem; border-radius:40px; border:2px solid rgba(6,198,212,0.2); 
+                                        font-size:0.9rem; transition:all 0.3s ease;"
+                                onfocus="this.style.borderColor='#06c6d4'; this.style.boxShadow='0 0 0 3px rgba(6,198,212,0.1)'"
+                                onblur="this.style.borderColor='rgba(6,198,212,0.2)'; this.style.boxShadow='none'">
+                        </div>
+                        
+                        <!-- Filter Tabs -->
+                        <div class="filter-tabs" style="margin:1rem 0;">
+                            <span class="filter-tab active" data-expense-filter="all">${__('all')}</span>
+                            <span class="filter-tab" data-expense-filter="today">${__('today')}</span>
+                            <span class="filter-tab" data-expense-filter="week">${__('week')}</span>
+                            <span class="filter-tab" data-expense-filter="month">${__('month')}</span>
+                        </div>
+                        
+                        <!-- Expenses List -->
+                        <div id="expensesListContainer" style="max-height:400px; overflow-y:auto;">
+                            ${expenses.length === 0 ? 
+                                `<p style="text-align:center; color:#64748b; padding:2rem; font-style:italic;">${__('noExpenses')}</p>` : 
+                                ''}
+                        </div>
+                        
+                        <!-- Clear All Button -->
+                        ${expenses.length > 0 ? `
+                            <button class="btn-small" id="clearExpensesBtn" style="width:100%; margin-top:1.2rem; background:#ff4757; padding:0.7rem; font-weight:600;">
+                                <i class="fas fa-trash"></i> ${__('clearExpenses')}
+                            </button>
+                        ` : ''}
                     </div>
                 `;
                 
@@ -1884,28 +2019,278 @@
                 }
 
                 document.getElementById('pdfAnalyticsBtn')?.addEventListener('click', generateAnalyticsPDF);
+                
+                // Enhanced Expenses Functionality
+                const expenseCategories = [
+                    { value: 'utilities', label: __('utilities') },
+                    { value: 'rent', label: __('rent') },
+                    { value: 'salary', label: __('salary') },
+                    { value: 'marketing', label: __('marketing') },
+                    { value: 'maintenance', label: __('maintenance') },
+                    { value: 'supplies', label: __('supplies') },
+                    { value: 'other', label: __('other') }
+                ];
+                
+                let expenseFilterMode = 'all';
+                let expenseSearchTerm = '';
+                
+                const renderExpensesList = () => {
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    const monthAgo = new Date(today);
+                    monthAgo.setMonth(monthAgo.getMonth() - 1);
+                    
+                    let filtered = expenses.filter(e => {
+                        const expDate = new Date(e.date);
+                        let passDateFilter = true;
+                        
+                        if (expenseFilterMode === 'today') passDateFilter = expDate >= today;
+                        else if (expenseFilterMode === 'week') passDateFilter = expDate >= weekAgo;
+                        else if (expenseFilterMode === 'month') passDateFilter = expDate >= monthAgo;
+                        
+                        const passSearch = !expenseSearchTerm || 
+                            e.desc?.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
+                            (e.category && e.category.toLowerCase().includes(expenseSearchTerm.toLowerCase()));
+                        
+                        return passDateFilter && passSearch;
+                    }).sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                    const container = document.getElementById('expensesListContainer');
+                    if (!container) return;
+                    
+                    if (filtered.length === 0) {
+                        container.innerHTML = `<p style="text-align:center; color:#64748b; padding:2rem; font-style:italic;">${__('noExpenses')}</p>`;
+                        return;
+                    }
+                    
+                    let html = '';
+                    filtered.forEach(e => {
+                        const expDate = new Date(e.date);
+                        const dateStr = expDate.toLocaleDateString();
+                        const timeStr = expDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const catLabel = expenseCategories.find(c => c.value === e.category)?.label || e.category || __('other');
+                        
+                        html += `
+                            <div style="background:#f8fafc; border-radius:20px; padding:1rem; margin-bottom:0.8rem; border-left:4px solid #06c6d4;">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
+                                    <div style="flex:1;">
+                                        <div style="font-weight:700; color:#1a2332; margin-bottom:0.3rem;">${e.desc || 'Expense'}</div>
+                                        <div style="display:flex; gap:0.6rem; flex-wrap:wrap; font-size:0.75rem;">
+                                            <span style="background:rgba(6,198,212,0.1); color:#06c6d4; padding:0.2rem 0.8rem; border-radius:40px; font-weight:600;">${catLabel}</span>
+                                            <span style="color:#64748b;">${dateStr} ${timeStr}</span>
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                                        <div style="text-align:right;">
+                                            <div style="font-weight:800; color:#06c6d4; font-size:1.1rem;">TSh ${e.amount}</div>
+                                        </div>
+                                        <div style="display:flex; gap:0.4rem;">
+                                            <button class="edit-expense-btn" data-expense-id="${e.id}" 
+                                                style="background:#06c6d4; color:white; border:none; border-radius:20px; padding:0.4rem 0.8rem; cursor:pointer; font-size:0.75rem; font-weight:600; transition:all 0.2s;">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="delete-expense-btn" data-expense-id="${e.id}" 
+                                                style="background:#d32f2f; color:white; border:none; border-radius:20px; padding:0.4rem 0.8rem; cursor:pointer; font-size:0.75rem; font-weight:600; transition:all 0.2s;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                    
+                    // Attach event listeners
+                    document.querySelectorAll('.edit-expense-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const expId = parseInt(btn.getAttribute('data-expense-id'));
+                            const exp = expenses.find(e => e.id === expId);
+                            if (exp) showEditExpenseModal(exp);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const expId = parseInt(btn.getAttribute('data-expense-id'));
+                            if (confirm(__('confirmDelete'))) {
+                                expenses = expenses.filter(e => e.id !== expId);
+                                saveExpenses();
+                                renderAnalysisMobile();
+                            }
+                        });
+                    });
+                };
+                
+                const showEditExpenseModal = (exp) => {
+                    showEnhancedModal({
+                        title: __('editExpense'),
+                        fields: [
+                            { name: 'desc', placeholder: __('desc'), type: 'text', value: exp.desc },
+                            { name: 'amount', placeholder: __('amount'), type: 'number', value: exp.amount },
+                            { name: 'category', type: 'select', options: expenseCategories, value: exp.category || 'other' }
+                        ],
+                        onConfirm: (data) => {
+                            exp.desc = data.desc || 'Expense';
+                            exp.amount = parseFloat(data.amount) || 0;
+                            exp.category = data.category || 'other';
+                            saveExpenses();
+                            renderAnalysisMobile();
+                            showToast(__('expenses') + ' ' + __('save').toLowerCase());
+                        },
+                        onDelete: () => {
+                            expenses = expenses.filter(e => e.id !== exp.id);
+                            saveExpenses();
+                            renderAnalysisMobile();
+                            showToast(__('expenses') + ' deleted');
+                        },
+                        showDelete: true
+                    });
+                };
+                
                 document.getElementById('addExpenseBtn')?.addEventListener('click', (e) => {
                     e.preventDefault();
                     showEnhancedModal({
                         title: __('addExpense'),
                         fields: [
-                            { name: 'desc', placeholder: __('desc') },
-                            { name: 'amount', placeholder: __('amount'), type: 'number' }
+                            { name: 'desc', placeholder: __('desc'), type: 'text' },
+                            { name: 'amount', placeholder: __('amount'), type: 'number' },
+                            { name: 'category', type: 'select', options: expenseCategories, value: 'other' }
                         ],
                         onConfirm: (data) => {
                             let amt = parseFloat(data.amount) || 0;
                             expenses.push({
                                 id: Date.now(),
-                                desc: data.desc || 'expense',
+                                desc: data.desc || 'Expense',
                                 amount: amt,
+                                category: data.category || 'other',
                                 date: new Date().toISOString()
                             });
                             saveExpenses();
                             renderAnalysisMobile();
-                            showToast('Expense added');
+                            showToast(__('addExpense') + ' ' + __('save').toLowerCase());
+                            expenseSearchTerm = '';
+                            expenseFilterMode = 'all';
+                            document.getElementById('expenseSearchInput').value = '';
+                            renderExpensesList();
                         }
                     });
                 });
+                
+                // Filter functionality
+                const expFilterMode_var = expenseFilterMode; // local reference
+                document.querySelectorAll('[data-expense-filter]').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.querySelectorAll('[data-expense-filter]').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        expenseFilterMode = tab.getAttribute('data-expense-filter');
+                        renderExpensesList();
+                    });
+                });
+                
+                // Search functionality
+                document.getElementById('expenseSearchInput')?.addEventListener('input', (e) => {
+                    expenseSearchTerm = e.target.value;
+                    renderExpensesList();
+                });
+                
+                // Clear all expenses
+                document.getElementById('clearExpensesBtn')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to clear all expenses?')) {
+                        expenses = [];
+                        saveExpenses();
+                        renderAnalysisMobile();
+                        showToast(__('clearExpenses') + ' completed');
+                    }
+                });
+                
+                // PDF Export (respects current filter)
+                document.getElementById('pdfExpensesBtn')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    // Apply same filtering logic as renderExpensesList
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    const monthAgo = new Date(today);
+                    monthAgo.setMonth(monthAgo.getMonth() - 1);
+                    
+                    let filteredExpenses = expenses.filter(e => {
+                        const expDate = new Date(e.date);
+                        let passDateFilter = true;
+                        
+                        if (expenseFilterMode === 'today') passDateFilter = expDate >= today;
+                        else if (expenseFilterMode === 'week') passDateFilter = expDate >= weekAgo;
+                        else if (expenseFilterMode === 'month') passDateFilter = expDate >= monthAgo;
+                        
+                        const passSearch = !expenseSearchTerm || 
+                            e.desc?.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
+                            (e.category && e.category.toLowerCase().includes(expenseSearchTerm.toLowerCase()));
+                        
+                        return passDateFilter && passSearch;
+                    }).sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                    if (filteredExpenses.length === 0) {
+                        showToast('No expenses to export in this filter', 'error');
+                        return;
+                    }
+                    
+                    const totalExp = filteredExpenses.reduce((a, e) => a + (e.amount || 0), 0);
+                    const avgExp = filteredExpenses.length > 0 ? Math.round(totalExp / filteredExpenses.length) : 0;
+                    
+                    // Get filter label
+                    const filterLabels = {
+                        'all': 'All Expenses',
+                        'today': 'Today\'s Expenses',
+                        'week': 'This Week\'s Expenses',
+                        'month': 'This Month\'s Expenses'
+                    };
+                    const filterLabel = filterLabels[expenseFilterMode] || 'Expense Report';
+                    
+                    doc.setFontSize(16);
+                    doc.text(filterLabel, 14, 15);
+                    doc.setFontSize(10);
+                    doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}`, 14, 23);
+                    if (expenseSearchTerm) {
+                        doc.text(`Search: ${expenseSearchTerm}`, 14, 29);
+                    }
+                    
+                    const tableData = [['Date', 'Description', 'Category', 'Amount']];
+                    
+                    filteredExpenses.forEach(e => {
+                        const date = new Date(e.date).toLocaleDateString();
+                        const cat = expenseCategories.find(c => c.value === e.category)?.label || e.category || 'Other';
+                        tableData.push([date, e.desc || '-', cat, `TSh ${e.amount}`]);
+                    });
+                    
+                    doc.autoTable({
+                        head: [tableData[0]],
+                        body: tableData.slice(1),
+                        startY: expenseSearchTerm ? 35 : 30
+                    });
+                    
+                    doc.setFontSize(10);
+                    doc.text(`Total Expenses: TSh ${totalExp.toLocaleString()}`, 14, doc.lastAutoTable.finalY + 10);
+                    doc.text(`Average Expense: TSh ${avgExp.toLocaleString()}`, 14, doc.lastAutoTable.finalY + 17);
+                    doc.text(`Expenses Exported: ${filteredExpenses.length}`, 14, doc.lastAutoTable.finalY + 24);
+                    
+                    const fileName = `expenses-${expenseFilterMode}-${new Date().toISOString().slice(0, 10)}.pdf`;
+                    doc.save(fileName);
+                    showToast('Expense report exported');
+                });
+                
+                // Initial render
+                renderExpensesList();
             }
 
             // ==================== SALES PAGE ====================
