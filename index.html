@@ -1981,7 +1981,8 @@
             let shopBrand = JSON.parse(localStorage.getItem('profitpoint_brand')) || { name: 'Profit Point', logo: '💎' };
             let cart = JSON.parse(localStorage.getItem('profitpoint_cart')) || [];
             let selectedPayment = 'Cash';
-            let selectedCustomer = customers[0]?.id || 'c1';
+            let receiptWhatsAppPhone = localStorage.getItem('profitpoint_receipt_phone') || '';
+            let autoSendReceiptWhatsApp = localStorage.getItem('profitpoint_receipt_auto') === '1';
 
             // Wallpaper with higher default opacity
             let wallpaperOpacity = parseFloat(localStorage.getItem('profitpoint_wallpaper_opacity')) || 0.3; // increased from 0.25
@@ -3120,6 +3121,115 @@
                 showToast('Analytics PDF saved');
             }
 
+            function buildReceiptPDF(sale) {
+                const receiptNo = `RCPT-${sale.id}`;
+                const saleDate = new Date(sale.date);
+                const itemCount = (sale.items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
+                const { doc, pageWidth, startY, meta } = createModernPdfDoc('Sales Receipt', `${shopBrand?.name || 'Profit Point'} | ${receiptNo}`);
+
+                let cursorY = drawPdfMetricCards(doc, startY, [
+                    {
+                        label: 'Receipt',
+                        value: receiptNo,
+                        note: saleDate.toLocaleString(),
+                        color: [240, 249, 255],
+                        border: [186, 230, 253],
+                        valueColor: [12, 74, 110]
+                    },
+                    {
+                        label: 'Payment',
+                        value: sale.payment || 'N/A',
+                        note: `Cashier: ${sale.userName || 'Unknown'}`,
+                        color: [236, 253, 245],
+                        border: [167, 243, 208],
+                        valueColor: [6, 95, 70]
+                    },
+                    {
+                        label: 'Total',
+                        value: formatPdfCurrency(sale.finalTotal),
+                        note: `${itemCount} item(s)`,
+                        color: [255, 251, 235],
+                        border: [253, 230, 138],
+                        valueColor: [146, 64, 14]
+                    }
+                ]);
+
+                cursorY = ensurePdfSpace(doc, cursorY, 20);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(17, 24, 39);
+                doc.text('Purchased Items', 14, cursorY);
+
+                const rows = (sale.items || []).map(item => {
+                    const qty = Number(item.qty || 0);
+                    const unitPrice = Number(item.price || 0);
+                    return [
+                        item.name || '-',
+                        `${qty}`,
+                        formatPdfCurrency(unitPrice),
+                        formatPdfCurrency(unitPrice * qty)
+                    ];
+                });
+
+                const finalY = drawStyledPdfTable(doc, {
+                    head: [['Item', 'Qty', 'Unit Price', 'Line Total']],
+                    body: rows,
+                    startY: cursorY + 2,
+                    columnStyles: {
+                        1: { halign: 'right', cellWidth: 16 },
+                        2: { halign: 'right', cellWidth: 33 },
+                        3: { halign: 'right', cellWidth: 33 }
+                    }
+                });
+
+                const totalY = ensurePdfSpace(doc, finalY + 8, 16);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(17, 24, 39);
+                doc.text(`Grand Total: ${formatPdfCurrency(sale.finalTotal)}`, pageWidth - 14, totalY, { align: 'right' });
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(100, 116, 139);
+                doc.text('Thank you for your purchase.', 14, totalY);
+
+                finalizeModernPdfDoc(doc, meta);
+                return doc;
+            }
+
+            async function sendReceiptOnWhatsApp(sale, phoneRaw) {
+                const phone = String(phoneRaw || '').replace(/\D/g, '');
+                if (!phone) {
+                    showToast('Enter a WhatsApp number to send receipt', 'error');
+                    return;
+                }
+
+                const doc = buildReceiptPDF(sale);
+                const fileName = `receipt-${sale.id}.pdf`;
+                const message = `Hello, here is your receipt ${`RCPT-${sale.id}`} from ${shopBrand?.name || 'Profit Point'} for ${formatPdfCurrency(sale.finalTotal)}.`;
+
+                try {
+                    const blob = doc.output('blob');
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'Sales Receipt',
+                            text: message,
+                            files: [file]
+                        });
+                        showToast('Receipt sent');
+                        return;
+                    }
+                } catch (err) {
+                    // Fallback below handles unsupported share or cancellation.
+                }
+
+                doc.save(fileName);
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`${message} PDF downloaded, please attach it from your files.`)}`, '_blank');
+                showToast('PDF downloaded. Attach it in WhatsApp chat.');
+            }
+
             // ==================== CART MODAL ====================
             function showCartModal() {
                 const overlay = document.createElement('div');
@@ -3142,11 +3252,13 @@
                                 </div>
                             `).join('') : `<p style="text-align:center; color:#64748b; padding:1rem;">${__('emptyCart')}</p>`}
                         </div>
-                        
-                        <div style="margin:1rem 0;">
-                            <select id="modalCustomerSelect" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5;">
-                                ${customers.map(c => `<option value="${c.id}" ${c.id === selectedCustomer ? 'selected' : ''}>${c.name}</option>`).join('')}
-                            </select>
+
+                        <div style="margin:1rem 0; display:flex; flex-direction:column; gap:0.55rem;">
+                            <input type="tel" id="receiptPhoneInput" placeholder="WhatsApp number (e.g. 2557...)" value="${receiptWhatsAppPhone}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                            <label style="display:flex; align-items:center; gap:0.45rem; font-size:0.85rem; color:#475569; font-weight:600;">
+                                <input type="checkbox" id="sendReceiptWhatsApp" ${autoSendReceiptWhatsApp ? 'checked' : ''}>
+                                Send receipt PDF on WhatsApp after complete sale
+                            </label>
                         </div>
                         
                         <div style="display:flex; gap:0.5rem; margin:1rem 0; flex-wrap:wrap;">
@@ -3181,12 +3293,19 @@
 
                 overlay.querySelector('#closeCartModal').addEventListener('click', () => overlay.remove());
 
-                overlay.querySelector('#modalCompleteSale').addEventListener('click', () => {
+                overlay.querySelector('#modalCompleteSale').addEventListener('click', async () => {
                     if (cart.length === 0) {
                         showToast(__('emptyCart'), 'error');
                         overlay.remove();
                         return;
                     }
+
+                    const phoneInput = (overlay.querySelector('#receiptPhoneInput')?.value || '').trim();
+                    const shouldSendReceipt = !!overlay.querySelector('#sendReceiptWhatsApp')?.checked;
+                    receiptWhatsAppPhone = phoneInput;
+                    autoSendReceiptWhatsApp = shouldSendReceipt;
+                    localStorage.setItem('profitpoint_receipt_phone', receiptWhatsAppPhone);
+                    localStorage.setItem('profitpoint_receipt_auto', autoSendReceiptWhatsApp ? '1' : '0');
                     
                     let finalTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
                     let saleItems = cart.map(i => ({
@@ -3201,17 +3320,19 @@
                         if (prod) prod.stock -= si.qty;
                     });
                     saveProducts();
-                    
-                    sales.push({
+
+                    const createdSale = {
                         id: Date.now(),
                         items: saleItems,
                         finalTotal: finalTotal,
                         payment: selectedPayment,
-                        customerId: selectedCustomer,
+                        customerId: null,
                         userId: currentUser?.id || null,
                         userName: currentUser?.name || 'Unknown User',
                         date: new Date().toISOString()
-                    });
+                    };
+
+                    sales.push(createdSale);
                     saveSales();
                     
                     cart = [];
@@ -3220,6 +3341,10 @@
                     overlay.remove();
                     showToast('Sale completed');
                     renderPosMobile();
+
+                    if (shouldSendReceipt) {
+                        await sendReceiptOnWhatsApp(createdSale, phoneInput);
+                    }
                 });
 
                 overlay.querySelectorAll('.fa-trash').forEach(icon => {
@@ -3235,9 +3360,6 @@
                     });
                 });
 
-                overlay.querySelector('#modalCustomerSelect')?.addEventListener('change', (e) => {
-                    selectedCustomer = e.target.value;
-                });
             }
 
             // ==================== POS PAGE ====================
