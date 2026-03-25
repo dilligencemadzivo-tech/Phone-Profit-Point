@@ -272,6 +272,23 @@
             white-space: nowrap;
         }
 
+        .three-dot-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s;
+        }
+        .three-dot-item:hover { background: #f1f5f9; }
+
         /* Scrollable main content */
         .main-content {
             flex: 1;
@@ -6687,7 +6704,10 @@
                                     <h4><i class="fas fa-message icon-one"></i> Notifications</h4>
                                     <p>System and workflow events</p>
                                 </div>
-                                <button class="btn-small analytics-ghost-btn" id="markNotificationsReadBtn" style="padding:0.55rem 0.9rem; min-height:auto;">Mark all read</button>
+                                <div style="display:flex;gap:0.4rem;">
+                                    <button class="btn-small analytics-ghost-btn" id="markNotificationsReadBtn" style="padding:0.55rem 0.9rem; min-height:auto;">Mark all read</button>
+                                    ${notifications.length > 0 ? `<button class="btn-small" id="clearNotificationsBtn" style="padding:0.55rem 0.9rem; min-height:auto; background:#ef4444; color:#fff; border-color:#ef4444;"><i class="fas fa-trash"></i> Clear all</button>` : ''}
+                                </div>
                             </div>
                             ${notifications.length === 0 ? `<div class="analytics-empty-state">No notifications yet.</div>` : notifications.slice(0, 10).map(item => `
                                 <div class="analytics-expense-item">
@@ -6777,6 +6797,14 @@
 
                 document.getElementById('markNotificationsReadBtn')?.addEventListener('click', () => {
                     markNotificationsRead();
+                    renderAlertsMobile();
+                });
+
+                document.getElementById('clearNotificationsBtn')?.addEventListener('click', () => {
+                    if (!confirm('Clear all notifications?')) return;
+                    notifications = [];
+                    saveNotifications();
+                    showToast('Notifications cleared');
                     renderAlertsMobile();
                 });
 
@@ -7030,15 +7058,18 @@
                     <div class="app-header">
                         <div class="header-top-row">
                             <div class="header-actions" style="margin-left:auto;">
-                                <span class="icon-btn" id="langToggle" title="Change language" aria-label="Change language">
-                                    <i class="fas fa-globe icon-one"></i> ${currentLang === 'sw' ? 'Sw' : 'En'}
-                                </span>
-                                <span class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
-                                    <i class="fas fa-cog icon-one"></i> Settings
-                                </span>
-                                <span class="icon-btn" id="fullscreenBtn" title="Fullscreen" aria-label="Toggle fullscreen">
-                                    <i class="fas fa-expand icon-one"></i> <span id="fsText">${__('fullscreen')}</span>
-                                </span>
+                                <div class="three-dot-menu-wrap" style="position:relative;">
+                                    <button class="icon-btn" id="threeDotMenuBtn" aria-label="More options" style="font-size:1.3rem;padding:0.3rem 0.6rem;">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <div id="threeDotDropdown" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.14);min-width:180px;z-index:9999;overflow:hidden;">
+                                        <button class="three-dot-item" id="tdLangToggle"><i class="fas fa-globe icon-one"></i> Language (${currentLang === 'sw' ? 'Kiswahili' : 'English'})</button>
+                                        <button class="three-dot-item" id="tdSettingsBtn"><i class="fas fa-cog icon-one"></i> Settings</button>
+                                        <button class="three-dot-item" id="tdFullscreenBtn"><i class="fas fa-expand icon-one"></i> <span id="fsText">${document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen'}</span></button>
+                                        <div style="height:1px;background:#e2e8f0;margin:0.2rem 0;"></div>
+                                        <button class="three-dot-item" id="tdLogoutBtn" style="color:#dc2626;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -7053,7 +7084,6 @@
                                     <span class="user-avatar-mini" id="headerAvatarBtn" title="View profile" aria-label="View profile">${userAvatarHtml}</span>
                                     <span>${currentUser.name.split(' ')[0]}</span>
                                 </div>
-                                <a href="#" id="logoutLinkMobile" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt icon-one"></i> Logout</a>
                             </div>
                         </div>
                     </div>
@@ -7070,38 +7100,45 @@
                     </div>
                 `;
                 
-                document.getElementById('logoutLinkMobile').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    logout();
-                });
-
                 document.getElementById('headerAvatarBtn').addEventListener('click', showUserProfileModal);
-                
-                document.getElementById('langToggle').addEventListener('click', () => {
+
+                // 3-dot menu
+                const threeDotBtn = document.getElementById('threeDotMenuBtn');
+                const threeDotDropdown = document.getElementById('threeDotDropdown');
+                const closeDropdown = () => { threeDotDropdown.style.display = 'none'; };
+                threeDotBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = threeDotDropdown.style.display === 'block';
+                    threeDotDropdown.style.display = isOpen ? 'none' : 'block';
+                });
+                document.addEventListener('click', closeDropdown);
+
+                document.getElementById('tdLangToggle').addEventListener('click', () => {
+                    closeDropdown();
                     currentLang = currentLang === 'sw' ? 'en' : 'sw';
                     localStorage.setItem('profitpoint_lang', currentLang);
                     renderPhoneApp();
                 });
-                
-                document.getElementById('settingsBtn').addEventListener('click', showSettingsModal);
-                
-                // Fullscreen toggle button
-                const fsBtn = document.getElementById('fullscreenBtn');
-                const fsText = document.getElementById('fsText');
-                const updateFsText = () => {
-                    const isSmall = window.innerWidth < 480;
-                    if (document.fullscreenElement) {
-                        fsText.innerText = isSmall ? 'Exit' : 'Exit';
-                    } else {
-                        fsText.innerText = isSmall ? 'Full' : (currentLang === 'sw' ? 'Skrini nzima' : 'Fullscreen');
-                    }
-                };
-                fsBtn.addEventListener('click', () => {
-                    toggleFullscreen();
-                    setTimeout(updateFsText, 50);
+                document.getElementById('tdSettingsBtn').addEventListener('click', () => {
+                    closeDropdown();
+                    showSettingsModal();
                 });
-                document.addEventListener('fullscreenchange', updateFsText);
-                updateFsText();
+                document.getElementById('tdFullscreenBtn').addEventListener('click', () => {
+                    closeDropdown();
+                    toggleFullscreen();
+                    setTimeout(() => {
+                        const fsText = document.getElementById('fsText');
+                        if (fsText) fsText.innerText = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+                    }, 50);
+                });
+                document.addEventListener('fullscreenchange', () => {
+                    const fsText = document.getElementById('fsText');
+                    if (fsText) fsText.innerText = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+                });
+                document.getElementById('tdLogoutBtn').addEventListener('click', () => {
+                    closeDropdown();
+                    logout();
+                });
                 bindAutoFullscreen();
                 requestAppFullscreen();
                 
