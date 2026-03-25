@@ -2473,13 +2473,29 @@
             const SUPPORT_WHATSAPP = '255654307174';
             const PRODUCT_KEY_REQUEST_MESSAGE = 'Hello, I would like to request a Profit Point product key.';
             const VALID_PRODUCT_KEYS = ['12345ABCDE', 'ABCDE12345'];
-            const NORMALIZED_PRODUCT_KEYS = new Set(VALID_PRODUCT_KEYS.map(normalizeProductKey));
             let licenseCheckInterval = null;
             let trialExpiredNotified = false;
             let lastLicenseWarningDate = null;
 
             function normalizeProductKey(value) {
                 return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            }
+
+            function getValidProductKeys() {
+                const defaults = VALID_PRODUCT_KEYS.map(normalizeProductKey).filter(Boolean);
+                let extra = [];
+                try {
+                    const raw = localStorage.getItem('profitpoint_valid_product_keys');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed)) {
+                            extra = parsed.map(normalizeProductKey).filter(Boolean);
+                        }
+                    }
+                } catch {
+                    // Ignore malformed key list in storage.
+                }
+                return new Set([...defaults, ...extra]);
             }
 
             function getLicense() {
@@ -3887,7 +3903,7 @@
                         </div>
                         <div class="modal-actions">
                             ${cancelBtn}
-                            <button class="modal-btn" id="submitKey" onclick="handleActivateKey()">Activate</button>
+                            <button class="modal-btn" id="submitKey">Activate</button>
                         </div>
                         <div style="margin-top:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
                             <a href="https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(PRODUCT_KEY_REQUEST_MESSAGE)}" target="_blank" rel="noopener" class="btn-small" style="text-decoration:none; min-height:auto; padding:0.55rem 0.8rem; background:#16a34a; color:#fff; border-color:#16a34a;"><i class="fab fa-whatsapp"></i> Request key on WhatsApp</a>
@@ -3901,7 +3917,8 @@
                     const inp = document.getElementById('productKeyInput');
                     const rawKey = inp ? inp.value : '';
                     const key = normalizeProductKey(rawKey);
-                    if (key && NORMALIZED_PRODUCT_KEYS.has(key)) {
+                    const validKeys = getValidProductKeys();
+                    if (key && validKeys.has(key)) {
                         saveLicense({ type: 'full', start: Date.now(), duration: MONTH_DURATION });
                         trialExpiredNotified = false;
                         overlay.remove();
@@ -3915,7 +3932,16 @@
                         if (inp) inp.focus();
                     }
                 };
-                window.handleActivateKey = handleActivate;
+                document.getElementById('submitKey')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    handleActivate();
+                });
+                document.getElementById('productKeyInput')?.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleActivate();
+                    }
+                });
                 setTimeout(() => {
                     if (!isLocked) {
                         const cancel = document.getElementById('cancelKey');
