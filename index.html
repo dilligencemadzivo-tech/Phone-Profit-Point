@@ -5494,12 +5494,12 @@
                                 <div><small>B: TSh ${p.buyPrice}</small></div>
                                 <div><strong>S: TSh ${p.sellPrice}</strong> <span style="color:#27ae60;">+${profit}</span></div>
                                 <div style="font-size:0.8rem;">Stock: ${p.stock} · Min ${p.minStock || 0}</div>
-                                <div style="display:flex; gap:0.35rem; justify-content:flex-end; margin-top:0.45rem;">
-                                    <button class="analytics-ghost-btn btn-small stock-intake-btn" data-id="${p.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-plus"></i></button>
-                                    <button class="analytics-ghost-btn btn-small create-po-btn" data-id="${p.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-file-invoice"></i></button>
+                                <div style="display:flex; gap:0.35rem; justify-content:flex-end; margin-top:0.45rem; flex-wrap:wrap;">
+                                    <button class="analytics-ghost-btn btn-small stock-intake-btn" data-id="${p.id}" style="padding:0.45rem 0.8rem; min-height:auto;" aria-label="Add stock for ${p.name}"><i class="fas fa-plus"></i> Stock</button>
+                                    <button class="analytics-ghost-btn btn-small create-po-btn" data-id="${p.id}" style="padding:0.45rem 0.8rem; min-height:auto;" aria-label="Create purchase order for ${p.name}"><i class="fas fa-file-invoice"></i> PO</button>
                                 </div>
                             </div>
-                            <i class="fas fa-edit" data-id="${p.id}" style="color:#06c6d4; font-size:1.2rem; cursor:pointer; margin-left:8px;"></i>
+                            <button class="analytics-ghost-btn btn-small product-edit-btn" data-id="${p.id}" style="margin-left:8px; min-height:auto; padding:0.45rem 0.8rem;" aria-label="Edit ${p.name}"><i class="fas fa-edit"></i> Edit</button>
                         </div>
                     `;
                 });
@@ -5610,9 +5610,9 @@
                     });
                 });
                 
-                document.querySelectorAll('.fa-edit').forEach(ic => {
-                    ic.addEventListener('click', () => {
-                        let pid = ic.dataset.id;
+                document.querySelectorAll('.product-edit-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        let pid = button.dataset.id;
                         let p = products.find(p => p.id === pid);
                         if (!p) return;
                         
