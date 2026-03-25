@@ -1309,16 +1309,20 @@
             gap: 0.45rem;
         }
         .analytics-expense-btn {
-            width: 40px;
-            height: 40px;
+              min-width: 40px;
+              min-height: 40px;
             border: none;
             border-radius: 20px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+              gap: 0.4rem;
+              padding: 0.65rem 0.9rem;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.35, 0.46, 0.3, 0.46);
-            font-size: 0.9rem;
+              font-size: 0.82rem;
+              font-weight: 800;
+              white-space: nowrap;
         }
         .analytics-expense-edit {
             background: linear-gradient(135deg, rgba(6,198,212,0.14), rgba(6,198,212,0.08));
@@ -6055,11 +6059,11 @@
                                     <div class="analytics-expense-side">
                                         <div class="analytics-expense-amount">TSh ${Number(e.amount || 0).toLocaleString()}</div>
                                         <div class="analytics-expense-actions">
-                                            <button class="analytics-expense-btn analytics-expense-edit edit-expense-btn" data-expense-id="${e.id}">
-                                                <i class="fas fa-edit"></i>
+                                            <button class="analytics-expense-btn analytics-expense-edit edit-expense-btn" data-expense-id="${e.id}" aria-label="${__('editExpense')}">
+                                                <i class="fas fa-edit"></i> Edit
                                             </button>
-                                            <button class="analytics-expense-btn analytics-expense-delete delete-expense-btn" data-expense-id="${e.id}">
-                                                <i class="fas fa-trash"></i>
+                                            <button class="analytics-expense-btn analytics-expense-delete delete-expense-btn" data-expense-id="${e.id}" aria-label="${__('deleteExpense')}">
+                                                <i class="fas fa-trash"></i> ${__('deleteExpense')}
                                             </button>
                                         </div>
                                     </div>
