@@ -5414,14 +5414,6 @@
                                 <i class="fas fa-barcode" style="color:#fff;"></i> Scan
                             </button>
                         </div>
-
-                        ${(favorites.length || recent.length || topSelling.length) ? `
-                            <div style="background:white; border-radius:30px; padding:1rem; margin:0.6rem 0 1rem; box-shadow:0 8px 20px rgba(0,0,0,0.05);">
-                                ${favorites.length ? `<div style="margin-bottom:0.7rem;"><div style="font-size:0.75rem; font-weight:900; color:#06c6d4; text-transform:uppercase; margin-bottom:0.5rem;">Favorites</div><div style="display:flex; flex-wrap:wrap; gap:0.45rem;">${favorites.map(product => `<span class="chip quick-pick" data-id="${product.id}"><i class="fas fa-star"></i> ${product.name}</span>`).join('')}</div></div>` : ''}
-                                ${recent.length ? `<div style="margin-bottom:0.7rem;"><div style="font-size:0.75rem; font-weight:900; color:#64748b; text-transform:uppercase; margin-bottom:0.5rem;">Recent</div><div style="display:flex; flex-wrap:wrap; gap:0.45rem;">${recent.map(product => `<span class="chip quick-pick" data-id="${product.id}"><i class="fas fa-clock"></i> ${product.name}</span>`).join('')}</div></div>` : ''}
-                                ${topSelling.length ? `<div><div style="font-size:0.75rem; font-weight:900; color:#0f172a; text-transform:uppercase; margin-bottom:0.5rem;">Top sellers</div><div style="display:flex; flex-wrap:wrap; gap:0.45rem;">${topSelling.map(item => `<span class="chip quick-pick" data-id="${item.product.id}"><i class="fas fa-fire"></i> ${item.product.name}</span>`).join('')}</div></div>` : ''}
-                            </div>
-                        ` : ''}
                         
                         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.5rem 0;">
                             ${categoryChipsHtml}
