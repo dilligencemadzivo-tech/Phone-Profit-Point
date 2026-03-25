@@ -237,9 +237,9 @@
             white-space: nowrap;
         }
         .user-avatar-mini {
-            width: 32px;
-            height: 32px;
-            border-radius: 32px;
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
             background: #06c6d4;
             display: flex;
             align-items: center;
@@ -2172,7 +2172,7 @@
             .shop-logo-preview { width: 44px; height: 44px; font-size: 1.6rem; }
             .user-greeting-modern { max-width: 44%; }
             .user-info-left { font-size: 0.8rem; }
-            .user-avatar-mini { width: 34px; height: 34px; }
+            .user-avatar-mini { width: 44px; height: 44px; border-radius: 44px; }
 
             /* ── Product grid — 3 columns ── */
             .product-grid-mobile {
@@ -3340,19 +3340,39 @@
 
             async function scanBarcode(onDetected) {
                 const fallbackManual = () => {
-                    showEnhancedModal({
-                        title: 'Enter barcode',
-                        fields: [
-                            { name: 'barcode', placeholder: 'Type or paste barcode' }
-                        ],
-                        onConfirm: data => {
-                            const value = String(data.barcode || '').trim();
-                            if (!value) {
-                                showToast('Barcode is required', 'error');
-                                return;
-                            }
-                            onDetected(value);
+                    const overlay = document.createElement('div');
+                    overlay.className = 'modal-overlay';
+                    overlay.innerHTML = `
+                        <div class="modal-card" style="max-width:340px;">
+                            <h3 style="margin-bottom:1rem;"><i class="fas fa-barcode icon-one"></i> Enter barcode</h3>
+                            <input type="text" id="manualBarcodeInput" placeholder="Type or paste barcode" style="width:100%;padding:0.8rem 1rem;border:1px solid #e2e8f0;border-radius:12px;font-size:1rem;outline:none;margin-bottom:1rem;">
+                            <div class="modal-actions">
+                                <button class="modal-btn secondary" id="manualBarcodeCancel">Cancel</button>
+                                <button class="modal-btn" id="manualBarcodeConfirm">Confirm</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(overlay);
+                    
+                    const input = overlay.querySelector('#manualBarcodeInput');
+                    const confirmBtn = overlay.querySelector('#manualBarcodeConfirm');
+                    const cancelBtn = overlay.querySelector('#manualBarcodeCancel');
+                    
+                    input.focus();
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') confirmBtn.click();
+                    });
+                    
+                    cancelBtn.addEventListener('click', () => overlay.remove());
+                    confirmBtn.addEventListener('click', () => {
+                        const value = String(input.value || '').trim();
+                        if (!value) {
+                            showToast('Barcode is required', 'error');
+                            input.focus();
+                            return;
                         }
+                        overlay.remove();
+                        onDetected(value);
                     });
                 };
 
