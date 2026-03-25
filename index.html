@@ -230,6 +230,12 @@
             border: 2px solid white;
             box-shadow: 0 4px 10px rgba(6,198,212,0.2);
             flex-shrink: 0;
+            cursor: pointer;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .user-avatar-mini:hover {
+            box-shadow: 0 6px 18px rgba(6,198,212,0.45);
+            transform: scale(1.08);
         }
         .user-avatar-mini img {
             width: 100%;
@@ -1407,6 +1413,27 @@
         }
         .modal-field:focus-within { background: rgba(6,198,212,0.08); border-color: #06c6d4; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02), 0 0 0 3px rgba(6,198,212,0.1); }
         .modal-field input, .modal-field select { width: 100%; border: none; background: transparent; padding: 1rem 0; font-size: 0.95rem; outline: none; font-weight: 500; color: #1a2332; }
+        .modal-field.select-field {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-right: 1rem;
+        }
+        .modal-field.select-field select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 0.25rem;
+        }
+        .select-field-icon {
+            flex-shrink: 0;
+            font-size: 0.95rem;
+        }
+        .select-field-caret {
+            margin-left: auto;
+            color: #7a8fa0;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
         .modal-actions { display: flex; gap: 1.2rem; margin-top: 2.2rem; }
         .modal-btn {
             flex: 1; padding: 1.1rem; border-radius: 60px; border: 1px solid rgba(6,198,212,0.3);
@@ -1419,6 +1446,59 @@
         .modal-btn.danger { background: #d32f2f; color: white; border-color: #d32f2f; }
         .icon-one { color: #06c6d4 !important; }
         .icon-danger { color: #c0392b !important; }
+        .action-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.5rem 0.9rem;
+            min-height: auto;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+        .action-chip i {
+            font-size: 0.82rem;
+        }
+        .alert-card-warn {
+            border-left-color: #f59e0b !important;
+            background: linear-gradient(180deg, #fffaf0, #fff7ed);
+        }
+        .alert-card-danger {
+            border-left-color: #ef4444 !important;
+            background: linear-gradient(180deg, #fff5f5, #fff1f2);
+        }
+        .user-action-btn {
+            height: 36px;
+            padding: 0 0.75rem;
+            border: none;
+            border-radius: 99px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #06c6d4;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: linear-gradient(135deg, rgba(6,198,212,0.12), rgba(6,198,212,0.06));
+            border: 1.5px solid rgba(6,198,212,0.25);
+            white-space: nowrap;
+        }
+        .user-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(6,198,212,0.18);
+            background: rgba(6,198,212,0.18);
+        }
+        .user-action-btn.danger {
+            color: #c0392b;
+            background: linear-gradient(135deg, rgba(211,47,47,0.12), rgba(211,47,47,0.06));
+            border-color: rgba(211,47,47,0.25);
+        }
+        .user-action-btn.danger:hover {
+            box-shadow: 0 8px 18px rgba(211,47,47,0.18);
+            background: rgba(211,47,47,0.16);
+        }
         .user-row {
             display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0.8rem;
             border-bottom: 1px solid #e8eef5; border-radius: 12px; transition: all 0.25s ease;
@@ -2311,6 +2391,69 @@
                 setTimeout(() => t.remove(), 4000);
             }
 
+            function inferButtonLabel(el) {
+                if (!el) return '';
+                const explicit = el.getAttribute('aria-label') || el.getAttribute('title') || el.dataset.label;
+                if (explicit) return explicit.trim();
+
+                const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+                if (text) return text;
+
+                const id = el.id || '';
+                const dataPage = el.dataset.page || '';
+                const iconClass = el.querySelector('i')?.className || el.className || '';
+
+                if (dataPage) return dataPage.charAt(0).toUpperCase() + dataPage.slice(1);
+                if (/settings/i.test(id) || /fa-cog/.test(iconClass)) return 'Settings';
+                if (/fullscreen/i.test(id) || /fa-expand|fa-compress/.test(iconClass)) return 'Toggle fullscreen';
+                if (/logout/i.test(id) || /fa-sign-out-alt/.test(iconClass)) return 'Logout';
+                if (/lang/i.test(id) || /fa-globe/.test(iconClass)) return 'Change language';
+                if (/cart/i.test(id) || /fa-shopping-cart/.test(iconClass)) return 'Cart';
+                if (/camera/i.test(id) || /fa-camera/.test(iconClass)) return 'Camera';
+                if (/upload/i.test(id) || /fa-cloud-upload-alt|fa-upload/.test(iconClass)) return 'Upload';
+                if (/barcode/i.test(id) || /fa-barcode/.test(iconClass)) return 'Scan barcode';
+                if (/receipt/i.test(id) || /fa-receipt/.test(iconClass)) return 'Receipt';
+                if (/refund/i.test(id) || /fa-rotate-left/.test(iconClass)) return 'Refund';
+                if (/delete|trash/i.test(id) || /fa-trash/.test(iconClass)) return 'Delete';
+                if (/edit/i.test(id) || /fa-edit/.test(iconClass)) return 'Edit';
+
+                return 'Action';
+            }
+
+            function applyButtonLabels(root = document) {
+                const targets = root.querySelectorAll('button, .icon-btn, .nav-item-mobile, a, .payment-option, .chip, .upload-btn, .camera-btn');
+                targets.forEach(el => {
+                    const label = inferButtonLabel(el);
+                    if (!label) return;
+                    if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', label);
+                    if (!el.getAttribute('title')) el.setAttribute('title', label);
+
+                    const isNativeButton = el.tagName === 'BUTTON';
+                    const isAnchor = el.tagName === 'A';
+                    if (!isNativeButton && !isAnchor && !el.getAttribute('role')) {
+                        el.setAttribute('role', 'button');
+                    }
+                });
+            }
+
+            let buttonLabelObserver = null;
+
+            function ensureButtonLabelObserver() {
+                if (buttonLabelObserver) return;
+                buttonLabelObserver = new MutationObserver(mutations => {
+                    mutations.forEach(mutation => {
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeType !== 1) return;
+                            applyButtonLabels(node);
+                            if (node.matches?.('button, .icon-btn, .nav-item-mobile, a, .payment-option, .chip, .upload-btn, .camera-btn')) {
+                                applyButtonLabels(node.parentElement || document);
+                            }
+                        });
+                    });
+                });
+                buttonLabelObserver.observe(document.body, { childList: true, subtree: true });
+            }
+
             // ==================== TRANSLATIONS ====================
             const translations = {
                 en: {
@@ -2429,6 +2572,11 @@
             }
 
             let currentUser = JSON.parse(localStorage.getItem(AUTH_KEY)) || null;
+            // Freshen currentUser from users array so profile image / role changes are reflected
+            if (currentUser) {
+                const fresh = users.find(u => u.id === currentUser.id);
+                if (fresh) { currentUser = fresh; localStorage.setItem(AUTH_KEY, JSON.stringify(fresh)); }
+            }
 
             const STORAGE_PROD = 'profitpoint_products';
             let products = JSON.parse(localStorage.getItem(STORAGE_PROD)) || [];
@@ -3063,11 +3211,11 @@
                     overlay.className = 'crop-modal-overlay';
                     overlay.innerHTML = `
                         <div class="crop-card">
-                            <h3 style="margin-bottom:1rem;">Scan barcode</h3>
+                            <h3 style="margin-bottom:1rem;"><i class="fas fa-barcode icon-one"></i> Scan barcode</h3>
                             <video id="barcodeVideo" autoplay playsinline style="width:100%; border-radius:24px; background:#0f172a;"></video>
                             <div class="modal-actions">
-                                <button class="modal-btn secondary" id="barcodeManual">Manual</button>
-                                <button class="modal-btn secondary" id="barcodeCancel">Cancel</button>
+                                <button class="modal-btn secondary" id="barcodeManual"><i class="fas fa-keyboard"></i> Manual</button>
+                                <button class="modal-btn secondary" id="barcodeCancel"><i class="fas fa-times"></i> Cancel</button>
                             </div>
                         </div>
                     `;
@@ -3147,11 +3295,11 @@
                         overlay.style.background = 'rgba(0,0,0,0.9)';
                         overlay.innerHTML = `
                             <div class="crop-card" style="background:#111; color:white; text-align:center;">
-                                <h3 style="color:#06c6d4; margin-bottom:1rem;">📸 Camera preview</h3>
+                                <h3 style="color:#06c6d4; margin-bottom:1rem;"><i class="fas fa-camera icon-one"></i> Camera preview</h3>
                                 <video id="cameraPreviewVideo" autoplay playsinline class="camera-preview-video" style="width:100%; max-width:300px; border-radius:24px;"></video>
                                 <div style="display:flex; gap:1rem; margin-top:1.5rem; justify-content:center;">
-                                    <button class="modal-btn secondary" id="cancelCamera">Cancel</button>
-                                    <button class="modal-btn" id="captureCamera">Capture</button>
+                                    <button class="modal-btn secondary" id="cancelCamera"><i class="fas fa-times"></i> Cancel</button>
+                                    <button class="modal-btn" id="captureCamera"><i class="fas fa-camera"></i> Capture</button>
                                 </div>
                             </div>
                         `;
@@ -3268,6 +3416,71 @@
                 }
             }
 
+            // ==================== USER PROFILE MODAL ====================
+            function showUserProfileModal() {
+                const u = currentUser;
+                const avatarHtml = u.profileImage
+                    ? `<img src="${u.profileImage}" style="width:100%;height:100%;object-fit:cover;">`
+                    : `<i class="fas fa-user-circle" style="font-size:3rem;color:#06c6d4;"></i>`;
+                const joined = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—';
+                const roleColor = u.role === 'manager' ? '#06c6d4' : '#64748b';
+                const roleIcon  = u.role === 'manager' ? 'fa-crown' : 'fa-cash-register';
+                const roleLabel = u.role === 'manager' ? 'Manager' : 'Teller';
+
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML = `
+                    <div class="modal-card" style="max-width:320px;text-align:center;">
+                        <div style="width:96px;height:96px;border-radius:50%;background:#e8f9fb;border:3px solid #06c6d4;display:flex;align-items:center;justify-content:center;overflow:hidden;margin:0 auto 0.75rem;box-shadow:0 6px 20px rgba(6,198,212,0.28);">
+                            ${avatarHtml}
+                        </div>
+                        <h3 style="margin:0 0 0.3rem;font-size:1.15rem;">${u.name}</h3>
+                        <span style="display:inline-block;background:${roleColor};color:white;padding:2px 12px;border-radius:99px;font-size:0.72rem;font-weight:700;margin-bottom:0.9rem;">
+                            <i class="fas ${roleIcon}"></i> ${roleLabel}
+                        </span>
+                        <div style="text-align:left;background:#f8fafc;border-radius:12px;padding:0.85rem 1rem;font-size:0.83rem;color:#334155;display:flex;flex-direction:column;gap:0.55rem;">
+                            <div><i class="fas fa-user icon-one" style="width:18px;"></i> <b>Username:</b> ${u.username}</div>
+                            ${u.phone ? `<div><i class="fas fa-phone icon-one" style="width:18px;"></i> <b>Phone:</b> ${u.phone}</div>` : ''}
+                            <div><i class="fas fa-calendar-alt icon-one" style="width:18px;"></i> <b>Joined:</b> ${joined}</div>
+                        </div>
+                        <div class="modal-actions" style="margin-top:1rem;">
+                            <button class="modal-btn secondary" id="profileClose"><i class="fas fa-times"></i> Close</button>
+                            <button class="modal-btn" id="profileEdit"><i class="fas fa-pen"></i> Edit Profile</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(overlay);
+
+                overlay.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+                overlay.querySelector('#profileEdit').addEventListener('click', () => {
+                    overlay.remove();
+                    const user = users.find(x => x.id === u.id);
+                    if (!user) return;
+                    showEnhancedModal({
+                        title: 'Edit My Profile',
+                        withImage: true,
+                        imageLabel: __('profileImage'),
+                        fields: [
+                            { name: 'fullName',  value: user.name,         placeholder: __('fullName') },
+                            { name: 'phone',     value: user.phone || '',  placeholder: __('phoneNumber') },
+                            { name: 'password',  type: 'password', value: user.password, placeholder: __('password') }
+                        ],
+                        onConfirm: (data) => {
+                            if (data.fullName) user.name = data.fullName;
+                            user.phone = data.phone || user.phone;
+                            if (data.password) user.password = data.password;
+                            if (data.image)    user.profileImage = data.image;
+                            saveUsers();
+                            currentUser = { ...currentUser, ...user };
+                            localStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+                            renderPhoneApp();
+                            showToast('Profile updated');
+                        }
+                    });
+                });
+            }
+
             // ==================== MODAL WITH CROP ====================
             function showEnhancedModal(options) {
                 const { title, fields, onConfirm, withImage = false, imageLabel = 'Upload', showDelete = false, onDelete, extraContent = '', onExtraInit } = options;
@@ -3275,7 +3488,7 @@
                 overlay.className = 'modal-overlay';
                 let imageData = null;
                 
-                let html = `<div class="modal-card"><h3><i class="fas fa-pen-alt"></i> ${title}</h3>`;
+                let html = `<div class="modal-card"><h3><i class="fas fa-pen-alt icon-one"></i> ${title}</h3>`;
                 
                 if (withImage) {
                     html += `<div class="image-preview" id="modalImagePreview"></div>
@@ -3286,7 +3499,7 @@
                 
                 fields.forEach(f => {
                     if (f.type === 'select') {
-                        html += `<div class="modal-field"><select id="modal-${f.name}">${f.options.map(opt => `<option value="${opt.value}" ${f.value === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}</select></div>`;
+                        html += `<div class="modal-field select-field"><i class="fas fa-sliders-h icon-one select-field-icon"></i><select id="modal-${f.name}">${f.options.map(opt => `<option value="${opt.value}" ${f.value === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}</select><i class="fas fa-chevron-down select-field-caret"></i></div>`;
                     } else {
                         html += `<div class="modal-field"><input type="${f.type || 'text'}" id="modal-${f.name}" placeholder="${f.placeholder}" value="${f.value || ''}"></div>`;
                     }
@@ -3455,28 +3668,28 @@
                     ],
                     extraContent: `
                         <div style="background:#eef5ff; border-radius:40px; padding:1rem; margin:1rem 0; display:flex; justify-content:space-between; align-items:center;">
-                            <span><i class="fas fa-key"></i> ${__('license')}</span>
+                            <span><i class="fas fa-key icon-one"></i> ${__('license')}</span>
                             <span class="trial-badge">${formatRemaining(getRemainingMs())}</span>
                         </div>
                         <div class="wallpaper-upload" id="wallpaperUploadBtn">
-                            <i class="fas fa-cloud-upload-alt"></i> ${__('uploadWallpaper')}
+                            <i class="fas fa-cloud-upload-alt icon-one"></i> ${__('uploadWallpaper')}
                         </div>
                         <input type="file" id="wallpaperFileInput" accept="image/*" style="display:none;">
                         <div class="wallpaper-control">
-                            <i class="fas fa-image"></i>
+                            <i class="fas fa-image icon-one"></i>
                             <input type="range" id="wallpaperOpacitySlider" min="0.05" max="0.8" step="0.01" value="${wallpaperOpacity}">
                             <span id="opacityValue">${Math.round(wallpaperOpacity * 100)}%</span>
                         </div>
                         <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.7rem; margin-top:1rem;">
-                            <button class="btn-small" id="backupExportBtn" type="button"><i class="fas fa-download"></i> Backup</button>
-                            <button class="btn-small analytics-ghost-btn" id="backupImportBtn" type="button"><i class="fas fa-upload"></i> Restore</button>
+                            <button class="btn-small" id="backupExportBtn" type="button"><i class="fas fa-download icon-one"></i> Backup</button>
+                            <button class="btn-small analytics-ghost-btn" id="backupImportBtn" type="button"><i class="fas fa-upload icon-one"></i> Restore</button>
                         </div>
                         <input type="file" id="backupImportInput" accept="application/json" style="display:none;">
                         <button class="btn-small" id="installAppBtn" style="width:100%; margin-top:0.8rem;">
-                            <i class="fas fa-mobile-screen-button"></i> Install App
+                            <i class="fas fa-mobile-screen-button icon-one"></i> Install App
                         </button>
                         <button class="btn-small" id="enterKeyBtn" style="width:100%; margin-top:0.5rem;">
-                            <i class="fas fa-key"></i> ${__('enterKey')}
+                            <i class="fas fa-key icon-one"></i> ${__('enterKey')}
                         </button>
                     `,
                     onConfirm: (data) => {
@@ -3610,7 +3823,7 @@
                                         <option value="manager" selected>${__('manager')}</option>
                                     </select>
                                 </div>
-                                <button class="auth-btn" id="signupBtn"><i class="fas fa-user-plus"></i> ${__('signUp')}</button>
+                                <button class="auth-btn" id="signupBtn"><i class="fas fa-user-plus icon-one"></i> ${__('signUp')}</button>
                                 <div class="auth-switch" id="switchToSignIn">${__('alreadyHaveAccount')} ${__('signIn')}</div>
                             </div>
                         `;
@@ -3625,7 +3838,7 @@
                                 </div>
                                 <div class="auth-field"><input type="text" id="loginUsername" placeholder="${__('username')}" value="manager"></div>
                                 <div class="auth-field"><input type="password" id="loginPassword" placeholder="${__('password')}" value="man123"></div>
-                                <button class="auth-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> ${__('signIn')}</button>
+                                <button class="auth-btn" id="loginBtn"><i class="fas fa-sign-in-alt icon-one"></i> ${__('signIn')}</button>
                                 <div class="auth-switch" id="switchToSignUp">${__('needAccount')} ${__('signUp')}</div>
                             </div>
                         `;
@@ -4315,6 +4528,130 @@
                 showToast('Analytics PDF saved');
             }
 
+            // ==================== RECEIPT PREVIEW MODAL ====================
+            function showReceiptModal(sale) {
+                const receiptNo = sale.receiptNumber || `RCPT-${sale.id}`;
+                const saleDate  = new Date(sale.date).toLocaleString();
+                const logoHtml  = shopBrand.logo?.startsWith('data:image')
+                    ? `<img src="${shopBrand.logo}" style="width:52px;height:52px;object-fit:cover;border-radius:50%;">`
+                    : `<span style="font-size:2.2rem;line-height:1;">${shopBrand.logo || '💎'}</span>`;
+
+                const statusColor = { paid:'#16a34a', layaway:'#d97706', credit:'#dc2626', partial:'#9333ea' };
+                const status = (sale.paymentStatus || 'paid').toLowerCase();
+                const badgeColor = statusColor[status] || '#64748b';
+
+                const rows = (sale.items || []).map(item => {
+                    const qty   = Number(item.qty   || 0);
+                    const price = Number(item.price || 0);
+                    return `
+                        <tr>
+                            <td style="padding:6px 4px;border-bottom:1px solid #e2e8f0;">${item.name || '—'}</td>
+                            <td style="padding:6px 4px;border-bottom:1px solid #e2e8f0;text-align:center;">${qty}</td>
+                            <td style="padding:6px 4px;border-bottom:1px solid #e2e8f0;text-align:right;">${formatMoney(price)}</td>
+                            <td style="padding:6px 4px;border-bottom:1px solid #e2e8f0;text-align:right;font-weight:600;">${formatMoney(price * qty)}</td>
+                        </tr>`;
+                }).join('');
+
+                const subtotal  = (sale.items || []).reduce((s, i) => s + Number(i.price||0)*Number(i.qty||0), 0);
+                const discount  = Number(sale.discountAmount || 0);
+                const total     = Number(sale.finalTotal || subtotal - discount);
+                const outstanding = Number(sale.outstandingAmount || 0);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.style.cssText = 'align-items:flex-start;padding:1.2rem 0;overflow-y:auto;';
+                overlay.innerHTML = `
+                    <div class="modal-card" id="receiptPrintArea" style="max-width:380px;width:100%;padding:0;border-radius:18px;overflow:hidden;">
+                        <!-- Header band -->
+                        <div style="background:linear-gradient(135deg,#0a2540,#064e6e);padding:1.2rem 1.4rem;display:flex;align-items:center;gap:0.9rem;">
+                            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                                ${logoHtml}
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="color:white;font-weight:700;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${shopBrand.name || 'Profit Point'}</div>
+                                <div style="color:rgba(255,255,255,0.65);font-size:0.75rem;">${saleDate}</div>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div style="color:#06c6d4;font-weight:800;font-size:0.78rem;">${receiptNo}</div>
+                                <span style="display:inline-block;background:${badgeColor};color:white;padding:1px 8px;border-radius:99px;font-size:0.66rem;font-weight:700;text-transform:uppercase;margin-top:3px;">${status}</span>
+                            </div>
+                        </div>
+
+                        <!-- Meta row -->
+                        <div style="display:flex;gap:0;border-bottom:1px solid #e2e8f0;">
+                            <div style="flex:1;padding:0.7rem 1rem;border-right:1px solid #e2e8f0;">
+                                <div style="font-size:0.68rem;color:#94a3b8;font-weight:600;text-transform:uppercase;">Cashier</div>
+                                <div style="font-size:0.82rem;font-weight:600;color:#1e293b;">${sale.userName || '—'}</div>
+                            </div>
+                            <div style="flex:1;padding:0.7rem 1rem;border-right:1px solid #e2e8f0;">
+                                <div style="font-size:0.68rem;color:#94a3b8;font-weight:600;text-transform:uppercase;">Payment</div>
+                                <div style="font-size:0.82rem;font-weight:600;color:#1e293b;">${sale.payment || 'Cash'}</div>
+                            </div>
+                            ${sale.customerName ? `
+                            <div style="flex:1;padding:0.7rem 1rem;">
+                                <div style="font-size:0.68rem;color:#94a3b8;font-weight:600;text-transform:uppercase;">Customer</div>
+                                <div style="font-size:0.82rem;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sale.customerName}</div>
+                            </div>` : ''}
+                        </div>
+
+                        <!-- Items table -->
+                        <div style="padding:0.8rem 1rem;">
+                            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;color:#334155;">
+                                <thead>
+                                    <tr style="border-bottom:2px solid #e2e8f0;">
+                                        <th style="padding:5px 4px;text-align:left;font-size:0.7rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Item</th>
+                                        <th style="padding:5px 4px;text-align:center;font-size:0.7rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Qty</th>
+                                        <th style="padding:5px 4px;text-align:right;font-size:0.7rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Price</th>
+                                        <th style="padding:5px 4px;text-align:right;font-size:0.7rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </div>
+
+                        <!-- Totals -->
+                        <div style="padding:0 1rem 0.8rem;font-size:0.82rem;color:#475569;display:flex;flex-direction:column;gap:4px;">
+                            <div style="display:flex;justify-content:space-between;">
+                                <span>Subtotal</span><span>${formatMoney(subtotal)}</span>
+                            </div>
+                            ${discount > 0 ? `<div style="display:flex;justify-content:space-between;color:#d97706;">
+                                <span>Discount</span><span>− ${formatMoney(discount)}</span>
+                            </div>` : ''}
+                            ${sale.loyaltyRedeemedPoints > 0 ? `<div style="display:flex;justify-content:space-between;color:#7c3aed;">
+                                <span>Loyalty redeemed</span><span>− ${formatMoney(sale.loyaltyDiscount || 0)}</span>
+                            </div>` : ''}
+                            <div style="display:flex;justify-content:space-between;border-top:2px solid #e2e8f0;padding-top:6px;margin-top:2px;font-weight:800;font-size:0.97rem;color:#0f172a;">
+                                <span>Grand Total</span><span>${formatMoney(total)}</span>
+                            </div>
+                            ${outstanding > 0 ? `<div style="display:flex;justify-content:space-between;color:#dc2626;font-weight:600;">
+                                <span>Balance due</span><span>${formatMoney(outstanding)}</span>
+                            </div>` : ''}
+                            ${sale.loyaltyEarnedPoints > 0 ? `<div style="display:flex;justify-content:space-between;color:#16a34a;font-size:0.75rem;">
+                                <span><i class="fas fa-star"></i> Loyalty earned</span><span>+${sale.loyaltyEarnedPoints} pts</span>
+                            </div>` : ''}
+                        </div>
+
+                        <!-- Footer text -->
+                        <div style="background:#f8fafc;padding:0.65rem 1rem;text-align:center;font-size:0.73rem;color:#94a3b8;border-top:1px solid #e2e8f0;">
+                            ${receiptSettings.footer || 'Thank you for shopping with us.'}
+                            ${receiptSettings.showSupportPhone && receiptSettings.supportPhone ? `<br><i class="fas fa-phone"></i> ${receiptSettings.supportPhone}` : ''}
+                        </div>
+
+                        <!-- Actions -->
+                        <div style="display:flex;gap:0.6rem;padding:0.9rem 1rem;border-top:1px solid #e2e8f0;">
+                            <button class="modal-btn secondary" id="receiptClose" style="flex:1;"><i class="fas fa-times"></i> Close</button>
+                            <button class="modal-btn" id="receiptDownload" style="flex:1;"><i class="fas fa-download"></i> Download PDF</button>
+                        </div>
+                    </div>`;
+
+                document.body.appendChild(overlay);
+                overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+                overlay.querySelector('#receiptClose').addEventListener('click', () => overlay.remove());
+                overlay.querySelector('#receiptDownload').addEventListener('click', () => {
+                    buildReceiptPDF(sale).save(`${receiptNo}.pdf`);
+                });
+            }
+
             function buildReceiptPDF(sale) {
                 const receiptNo = sale.receiptNumber || `RCPT-${sale.id}`;
                 const saleDate = new Date(sale.date);
@@ -4524,16 +4861,25 @@
                             </div>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:1rem 0;">
-                                <input type="text" id="customerNameInput" placeholder="Customer name" value="${customerName}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
-                                <input type="tel" id="customerPhoneInput" placeholder="Customer phone" value="${customerPhone}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
+                                    <i class="fas fa-user icon-one"></i>
+                                    <input type="text" id="customerNameInput" placeholder="Customer name" value="${customerName}" style="width:100%; border:none; background:transparent; outline:none;">
+                                </div>
+                                <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
+                                    <i class="fas fa-phone icon-one"></i>
+                                    <input type="tel" id="customerPhoneInput" placeholder="Customer phone" value="${customerPhone}" style="width:100%; border:none; background:transparent; outline:none;">
+                                </div>
                             </div>
                             <div id="customerPointsHint" style="font-size:0.78rem; color:#64748b; margin-top:-0.6rem; margin-bottom:0.8rem;">Available loyalty points: ${totals.availablePoints}</div>
 
                             <div style="margin:0.8rem 0; display:flex; flex-direction:column; gap:0.55rem;">
-                                <input type="tel" id="receiptPhoneInput" placeholder="WhatsApp number (e.g. 2557...)" value="${receiptWhatsAppPhone}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
+                                    <i class="fab fa-whatsapp icon-one"></i>
+                                    <input type="tel" id="receiptPhoneInput" placeholder="WhatsApp number (e.g. 2557...)" value="${receiptWhatsAppPhone}" style="width:100%; border:none; background:transparent; outline:none;">
+                                </div>
                                 <label style="display:flex; align-items:center; gap:0.45rem; font-size:0.85rem; color:#475569; font-weight:600;">
                                     <input type="checkbox" id="sendReceiptWhatsApp" ${autoSendReceiptWhatsApp ? 'checked' : ''}>
-                                    Send receipt PDF on WhatsApp after complete sale
+                                    <i class="fas fa-paper-plane icon-one"></i> Send receipt PDF on WhatsApp after complete sale
                                 </label>
                             </div>
 
@@ -4544,7 +4890,10 @@
                                     <option value="credit" ${paymentStatus === 'credit' ? 'selected' : ''}>Credit sale</option>
                                     <option value="layaway" ${paymentStatus === 'layaway' ? 'selected' : ''}>Layaway</option>
                                 </select>
-                                <input type="number" id="amountPaidInput" min="0" placeholder="Amount paid now" value="${paidValue}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
+                                    <i class="fas fa-money-bill-wave icon-one"></i>
+                                    <input type="number" id="amountPaidInput" min="0" placeholder="Amount paid now" value="${paidValue}" style="width:100%; border:none; background:transparent; outline:none;">
+                                </div>
                             </div>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:0.8rem 0;">
@@ -4555,10 +4904,16 @@
                                 </select>
                                 <input type="number" id="discountValueInput" min="0" placeholder="Discount value" value="${cartDiscountValue}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
                             </div>
-                            <input type="text" id="discountReasonInput" placeholder="Discount reason" value="${cartDiscountReason}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none; margin-bottom:0.8rem;">
+                            <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white; margin-bottom:0.8rem;">
+                                <i class="fas fa-comment-dots icon-one"></i>
+                                <input type="text" id="discountReasonInput" placeholder="Discount reason" value="${cartDiscountReason}" style="width:100%; border:none; background:transparent; outline:none;">
+                            </div>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:0.8rem 0;">
-                                <input type="number" id="redeemPointsInput" min="0" placeholder="Redeem loyalty points" value="${totals.redeemPoints}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
+                                    <i class="fas fa-gift icon-one"></i>
+                                    <input type="number" id="redeemPointsInput" min="0" placeholder="Redeem loyalty points" value="${totals.redeemPoints}" style="width:100%; border:none; background:transparent; outline:none;">
+                                </div>
                                 <div id="liveTotalCard" style="display:flex; align-items:center; justify-content:center; border-radius:28px; background:#f8fafc; border:1px solid #dbeafe; color:#475569; font-weight:700;">${formatMoney(total)}</div>
                             </div>
 
@@ -4580,8 +4935,8 @@
                             </div>
 
                             <div style="display:flex; gap:1rem; margin-top:1.5rem;">
-                                <button class="modal-btn secondary" id="closeCartModal">${__('cancel')}</button>
-                                <button class="modal-btn" id="modalCompleteSale">${__('complete')}</button>
+                                <button class="modal-btn secondary" id="closeCartModal"><i class="fas fa-times"></i> ${__('cancel')}</button>
+                                <button class="modal-btn" id="modalCompleteSale"><i class="fas fa-check-circle"></i> ${__('complete')}</button>
                             </div>
                         </div>
                     `;
@@ -4883,7 +5238,7 @@
                             <input type="text" id="mobileSearch" placeholder="${__('search')}" value="${searchTerm}" 
                                 style="border:none; background:transparent; padding:0.9rem 0; width:100%; outline:none;">
                             <button type="button" id="scanBarcodeBtn" class="icon-btn" style="padding:0.5rem 0.8rem; background:white;">
-                                <i class="fas fa-barcode"></i>
+                                <i class="fas fa-barcode icon-one"></i> Scan
                             </button>
                         </div>
 
@@ -4904,8 +5259,8 @@
                         </div>
                         
                         <div class="cart-fab">
-                            <button class="cart-btn" id="toggleCartBtn">
-                                <i class="fas fa-shopping-cart"></i> ${__('cart')}
+                            <button class="cart-btn" id="toggleCartBtn" aria-label="Open cart">
+                                <i class="fas fa-shopping-cart icon-one"></i> ${__('cart')}
                                 <span class="cart-badge" id="cartItemCount">${cart.reduce((a, i) => a + i.qty, 0)}</span>
                             </button>
                         </div>
@@ -5821,8 +6176,8 @@
                                     <span class="sales-summary-chip">${filterLabel}</span>
                                 </div>
                                 <div class="sales-action-group">
-                                    <button class="btn-small" id="pdfSalesBtn"><i class="fas fa-file-pdf"></i> ${__('pdfSales')}</button>
-                                    <button class="btn-small sales-clear-btn" id="clearSalesBtn"><i class="fas fa-trash"></i> ${__('clearSales')}</button>
+                                    <button class="btn-small action-chip" id="pdfSalesBtn"><i class="fas fa-file-pdf icon-one"></i> ${__('pdfSales')}</button>
+                                    <button class="btn-small sales-clear-btn action-chip" id="clearSalesBtn"><i class="fas fa-trash"></i> ${__('clearSales')}</button>
                                 </div>
                             </div>
                             
@@ -5856,14 +6211,14 @@
                                                         <i class="far fa-calendar"></i> ${dateStr} ${timeStr}
                                                     </span>
                                                     <span class="sale-payment">${sale.payment || 'Cash'}</span>
-                                                    <span style="background:rgba(6,198,212,0.15); color:#06c6d4; padding:0.3rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:600;"><i class="fas fa-user"></i> ${sale.userName || 'Unknown'}</span>
-                                                    <span style="background:rgba(15,23,42,0.08); color:#0f172a; padding:0.3rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:700;">${sale.paymentStatus || 'paid'}</span>
+                                                    <span style="background:rgba(6,198,212,0.15); color:#06c6d4; padding:0.3rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:600;"><i class="fas fa-user icon-one"></i> ${sale.userName || 'Unknown'}</span>
+                                                    <span style="background:rgba(15,23,42,0.08); color:#0f172a; padding:0.3rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:700;"><i class="fas fa-circle-notch icon-one"></i> ${sale.paymentStatus || 'paid'}</span>
                                                 </div>
                                                 <div class="sale-products">${sale.receiptNumber || sale.id} · ${productNames.substring(0, 50)}${productNames.length > 50 ? '...' : ''}</div>
                                                 <div style="font-size:0.78rem; color:#64748b; margin-top:0.35rem;">${sale.customerName ? `Customer: ${sale.customerName}` : 'Walk-in'}${sale.outstandingAmount > 0 ? ` · Due ${formatMoney(sale.outstandingAmount)}` : ''}</div>
                                                 <div style="display:flex; gap:0.45rem; margin-top:0.55rem; flex-wrap:wrap;">
-                                                    <button class="btn-small analytics-ghost-btn receipt-btn" data-id="${sale.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-receipt"></i> Receipt</button>
-                                                    ${!sale.isReturn && !sale.refundedAt ? `<button class="btn-small sales-clear-btn refund-btn" data-id="${sale.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-rotate-left"></i> Refund</button>` : ''}
+                                                    <button class="btn-small analytics-ghost-btn action-chip receipt-btn" data-id="${sale.id}"><i class="fas fa-receipt icon-one"></i> Receipt</button>
+                                                    ${!sale.isReturn && !sale.refundedAt ? `<button class="btn-small sales-clear-btn action-chip refund-btn" data-id="${sale.id}"><i class="fas fa-rotate-left"></i> Refund</button>` : ''}
                                                 </div>
                                             </div>
                                             <div class="sale-amount">TSh ${sale.finalTotal}</div>
@@ -5900,7 +6255,7 @@
                         button.addEventListener('click', () => {
                             const sale = sales.find(item => String(item.id) === String(button.dataset.id));
                             if (!sale) return;
-                            buildReceiptPDF(sale).save(`${sale.receiptNumber || sale.id}.pdf`);
+                            showReceiptModal(sale);
                         });
                     });
                     document.querySelectorAll('.refund-btn').forEach(button => {
@@ -5963,26 +6318,26 @@
                             </div>
                             ${lowStock.length === 0 && balances.length === 0 ? `<div class="analytics-empty-state">No urgent actions right now.</div>` : ''}
                             ${lowStock.slice(0, 5).map(product => `
-                                <div class="analytics-expense-item" style="border-left-color:#f59e0b;">
+                                <div class="analytics-expense-item alert-card-warn">
                                     <div class="analytics-expense-head">
                                         <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title">${product.name}</div>
+                                            <div class="analytics-expense-title"><i class="fas fa-triangle-exclamation" style="color:#f59e0b; margin-right:0.45rem;"></i>${product.name}</div>
                                             <div class="analytics-expense-meta">
                                                 <span class="analytics-expense-chip">Stock ${product.stock} / Min ${product.minStock}</span>
                                                 <span class="analytics-expense-subtle">${product.supplierName || 'No supplier assigned'}</span>
                                             </div>
                                         </div>
                                         <div class="analytics-expense-side">
-                                            <button class="btn-small create-po-alert-btn" data-id="${product.id}" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-file-invoice"></i> Reorder</button>
+                                            <button class="btn-small action-chip create-po-alert-btn" data-id="${product.id}"><i class="fas fa-file-invoice icon-one"></i> Reorder</button>
                                         </div>
                                     </div>
                                 </div>
                             `).join('')}
                             ${balances.slice(0, 5).map(balance => `
-                                <div class="analytics-expense-item" style="border-left-color:#ef4444;">
+                                <div class="analytics-expense-item alert-card-danger">
                                     <div class="analytics-expense-head">
                                         <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title">${balance.customerName}</div>
+                                            <div class="analytics-expense-title"><i class="fas fa-user-clock" style="color:#ef4444; margin-right:0.45rem;"></i>${balance.customerName}</div>
                                             <div class="analytics-expense-meta">
                                                 <span class="analytics-expense-chip">${balance.count} open sale(s)</span>
                                                 <span class="analytics-expense-subtle">Layaway ${formatMoney(balance.layaway)}</span>
@@ -6201,13 +6556,13 @@
                             <div class="user-info" style="flex:1;">
                                 <div><strong>${u.name}</strong></div>
                                 <div style="font-size:0.8rem; color:#64748b;">@${u.username} · ${u.role}</div>
-                                ${u.phone ? `<div style="font-size:0.75rem; color:#06c6d4;"><i class="fas fa-phone"></i> ${u.phone}</div>` : ''}
-                                <div style="font-size:0.75rem; color:#64748b;"><i class="fas fa-chart-line"></i> ${stat.salesCount} sales · ${formatMoney(stat.salesTotal)}</div>
+                                ${u.phone ? `<div style="font-size:0.75rem; color:#06c6d4;"><i class="fas fa-phone icon-one"></i> ${u.phone}</div>` : ''}
+                                <div style="font-size:0.75rem; color:#64748b;"><i class="fas fa-chart-line icon-one"></i> ${stat.salesCount} sales · ${formatMoney(stat.salesTotal)}</div>
                             </div>
-                            <div class="user-actions">
-                                <i class="fas fa-edit" data-userid="${u.id}" style="color:#06c6d4; font-size:1.2rem; cursor:pointer; margin-right:10px;"></i>
+                            <div class="user-actions" style="display:flex; gap:0.45rem; align-items:center;">
+                                <button class="user-action-btn user-edit-btn" data-userid="${u.id}" title="Edit ${u.name}" aria-label="Edit ${u.name}"><i class="fas fa-edit icon-one"></i> Edit</button>
                                 ${u.id !== currentUser.id ? 
-                                    `<i class="fas fa-trash-alt" data-userid="${u.id}" style="color:#c0392b; font-size:1.2rem; cursor:pointer;"></i>` : 
+                                    `<button class="user-action-btn danger user-delete-btn" data-userid="${u.id}" title="Delete ${u.name}" aria-label="Delete ${u.name}"><i class="fas fa-trash-alt icon-danger"></i> Delete</button>` : 
                                     ''}
                             </div>
                         </div>
@@ -6260,7 +6615,7 @@
                     });
                 });
                 
-                document.querySelectorAll('.fa-edit').forEach(icon => {
+                document.querySelectorAll('.user-edit-btn').forEach(icon => {
                     icon.addEventListener('click', () => {
                         let uid = icon.dataset.userid;
                         let user = users.find(u => u.id === uid);
@@ -6296,6 +6651,12 @@
                                 user.phone = data.phone || '';
                                 if (data.image) user.profileImage = data.image;
                                 saveUsers();
+                                // Sync currentUser if the edited user is the logged-in user
+                                if (user.id === currentUser.id) {
+                                    currentUser = { ...currentUser, ...user };
+                                    localStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+                                    renderPhoneApp();
+                                }
                                 renderUsersMobile();
                                 showToast('User updated');
                             }
@@ -6303,7 +6664,7 @@
                     });
                 });
                 
-                document.querySelectorAll('.fa-trash-alt').forEach(icon => {
+                document.querySelectorAll('.user-delete-btn').forEach(icon => {
                     icon.addEventListener('click', () => {
                         let uid = icon.dataset.userid;
                         let user = users.find(u => u.id === uid);
@@ -6355,14 +6716,14 @@
                     <div class="app-header">
                         <div class="header-top-row">
                             <div class="header-actions" style="margin-left:auto;">
-                                <span class="icon-btn" id="langToggle">
-                                    <i class="fas fa-globe"></i> ${currentLang === 'sw' ? 'Sw' : 'En'}
+                                <span class="icon-btn" id="langToggle" title="Change language" aria-label="Change language">
+                                    <i class="fas fa-globe icon-one"></i> ${currentLang === 'sw' ? 'Sw' : 'En'}
                                 </span>
-                                <span class="icon-btn" id="settingsBtn">
-                                    <i class="fas fa-cog"></i>
+                                <span class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
+                                    <i class="fas fa-cog icon-one"></i> Settings
                                 </span>
-                                <span class="icon-btn" id="fullscreenBtn">
-                                    <i class="fas fa-expand"></i> <span id="fsText">${__('fullscreen')}</span>
+                                <span class="icon-btn" id="fullscreenBtn" title="Fullscreen" aria-label="Toggle fullscreen">
+                                    <i class="fas fa-expand icon-one"></i> <span id="fsText">${__('fullscreen')}</span>
                                 </span>
                             </div>
                         </div>
@@ -6375,10 +6736,10 @@
                             
                             <div class="user-greeting-modern">
                                 <div class="user-info-left">
-                                    <span class="user-avatar-mini">${userAvatarHtml}</span>
+                                    <span class="user-avatar-mini" id="headerAvatarBtn" title="View profile" aria-label="View profile">${userAvatarHtml}</span>
                                     <span>${currentUser.name.split(' ')[0]}</span>
                                 </div>
-                                <a href="#" id="logoutLinkMobile"><i class="fas fa-sign-out-alt"></i></a>
+                                <a href="#" id="logoutLinkMobile" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt icon-one"></i> Logout</a>
                             </div>
                         </div>
                     </div>
@@ -6399,6 +6760,8 @@
                     e.preventDefault();
                     logout();
                 });
+
+                document.getElementById('headerAvatarBtn').addEventListener('click', showUserProfileModal);
                 
                 document.getElementById('langToggle').addEventListener('click', () => {
                     currentLang = currentLang === 'sw' ? 'en' : 'sw';
@@ -6432,6 +6795,7 @@
                 document.querySelector(`.nav-item-mobile[data-page="${currentPage}"]`)?.classList.add('active');
                 
                 renderMobilePage(currentPage);
+                applyButtonLabels(container);
             }
 
             // ==================== RENDER MOBILE PAGE ====================
@@ -6446,6 +6810,8 @@
 
             // ==================== START APP ====================
             function completeStartup() {
+                ensureButtonLabelObserver();
+                applyButtonLabels(document);
                 registerPwaHooks();
                 if (!getLicense()) {
                     saveLicense({ type: 'trial', start: Date.now(), duration: TRIAL_DURATION });
