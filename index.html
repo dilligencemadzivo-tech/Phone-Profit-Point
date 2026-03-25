@@ -7065,7 +7065,7 @@
                                     <div id="threeDotDropdown" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.14);min-width:180px;z-index:9999;overflow:hidden;">
                                         <button class="three-dot-item" id="tdLangToggle"><i class="fas fa-globe icon-one"></i> Language (${currentLang === 'sw' ? 'Kiswahili' : 'English'})</button>
                                         <button class="three-dot-item" id="tdSettingsBtn"><i class="fas fa-cog icon-one"></i> Settings</button>
-                                        <button class="three-dot-item" id="tdFullscreenBtn"><i class="fas fa-expand icon-one"></i> <span id="fsText">${document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen'}</span></button>
+                                        <button class="three-dot-item" id="tdFullscreenBtn"><i id="fsIcon" class="fas ${document.fullscreenElement ? 'fa-compress' : 'fa-expand'} icon-one"></i> <span id="fsText">${document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen'}</span></button>
                                         <div style="height:1px;background:#e2e8f0;margin:0.2rem 0;"></div>
                                         <button class="three-dot-item" id="tdLogoutBtn" style="color:#dc2626;"><i class="fas fa-sign-out-alt"></i> Logout</button>
                                     </div>
@@ -7110,6 +7110,7 @@
                     e.stopPropagation();
                     const isOpen = threeDotDropdown.style.display === 'block';
                     threeDotDropdown.style.display = isOpen ? 'none' : 'block';
+                    if (!isOpen) updateFsLabel();
                 });
                 document.addEventListener('click', closeDropdown);
 
@@ -7123,18 +7124,19 @@
                     closeDropdown();
                     showSettingsModal();
                 });
+                const updateFsLabel = () => {
+                    const inFs = !!document.fullscreenElement;
+                    const fsText = document.getElementById('fsText');
+                    const fsIcon = document.getElementById('fsIcon');
+                    if (fsText) fsText.innerText = inFs ? 'Exit fullscreen' : 'Fullscreen';
+                    if (fsIcon) { fsIcon.className = `fas ${inFs ? 'fa-compress' : 'fa-expand'} icon-one`; }
+                };
                 document.getElementById('tdFullscreenBtn').addEventListener('click', () => {
                     closeDropdown();
                     toggleFullscreen();
-                    setTimeout(() => {
-                        const fsText = document.getElementById('fsText');
-                        if (fsText) fsText.innerText = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
-                    }, 50);
+                    setTimeout(updateFsLabel, 80);
                 });
-                document.addEventListener('fullscreenchange', () => {
-                    const fsText = document.getElementById('fsText');
-                    if (fsText) fsText.innerText = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
-                });
+                document.addEventListener('fullscreenchange', updateFsLabel);
                 document.getElementById('tdLogoutBtn').addEventListener('click', () => {
                     closeDropdown();
                     logout();
