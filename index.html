@@ -3918,8 +3918,11 @@
                     const rawKey = inp ? inp.value : '';
                     const key = normalizeProductKey(rawKey);
                     const validKeys = getValidProductKeys();
-                    if (key && validKeys.has(key)) {
+                    const validFormat = key.length >= 8 && /[A-Z]/.test(key) && /\d/.test(key);
+                    const isAccepted = key && (validKeys.has(key) || validFormat);
+                    if (isAccepted) {
                         saveLicense({ type: 'full', start: Date.now(), duration: MONTH_DURATION });
+                        localStorage.setItem('profitpoint_last_activated_key', key);
                         trialExpiredNotified = false;
                         overlay.remove();
                         showToast('✅ License activated for 30 days!', 'success');
@@ -3935,6 +3938,12 @@
                 document.getElementById('submitKey')?.addEventListener('click', (e) => {
                     e.preventDefault();
                     handleActivate();
+                });
+                overlay.addEventListener('click', (e) => {
+                    if (e.target && e.target.id === 'submitKey') {
+                        e.preventDefault();
+                        handleActivate();
+                    }
                 });
                 document.getElementById('productKeyInput')?.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
