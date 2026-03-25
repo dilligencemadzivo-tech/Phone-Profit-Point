@@ -9,11 +9,16 @@
     <!-- Font Awesome 6 + Google Fonts Inter + Chart.js 4 + Cropper.js + jsPDF + autoTable -->
     <link rel="stylesheet" href="./web-assets/vendor/fontawesome/css/all.min.css">
     <link href="./web-assets/vendor/fonts/inter.css" rel="stylesheet">
-    <link rel="stylesheet" href="./web-assets/vendor/cropper/cropper.min.css" />
-    <script src="./web-assets/vendor/chartjs/chart.umd.min.js"></script>
-    <script src="./web-assets/vendor/cropper/cropper.min.js"></script>
-    <script src="./web-assets/vendor/jspdf/jspdf.umd.min.js"></script>
-    <script src="./web-assets/vendor/jspdf/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="./web-assets/vendor/cropper/cropper.min.css"
+          onerror="var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css';document.head.appendChild(l);">
+    <script src="./web-assets/vendor/chartjs/chart.umd.min.js"
+            onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';document.head.appendChild(s);"></script>
+    <script src="./web-assets/vendor/cropper/cropper.min.js"
+            onerror="var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js';document.head.appendChild(s);"></script>
+    <script src="./web-assets/vendor/jspdf/jspdf.umd.min.js"
+            onerror="var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';document.head.appendChild(s);"></script>
+    <script src="./web-assets/vendor/jspdf/jspdf.plugin.autotable.min.js"
+            onerror="var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';document.head.appendChild(s);"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -1822,9 +1827,13 @@
                 padding: 0.32rem 0.65rem;
                 gap: 4px;
             }
-            /* Hide fullscreen button label text on small screens */
+            /* Short label on small screens instead of hiding */
             #fsText {
-                display: none;
+                display: inline;
+                overflow: hidden;
+                max-width: 2.2rem;
+                white-space: nowrap;
+                text-overflow: clip;
             }
             /* ── Brand / User row ── */
             .brand-chip {
@@ -2434,6 +2443,7 @@
                         el.setAttribute('role', 'button');
                     }
                 });
+                attachContactPickersToDOM(root);
             }
 
             let buttonLabelObserver = null;
@@ -3350,8 +3360,21 @@
                 document.body.appendChild(overlay);
 
                 const img = document.getElementById('cropImage');
-                img.onload = () => {
-                    if (cropper) cropper.destroy();
+
+                const initCropper = () => {
+                    if (typeof Cropper === 'undefined') {
+                        // Cropper not available — use raw image without cropping
+                        document.getElementById('confirmCrop').addEventListener('click', () => {
+                            overlay.remove();
+                            callback(imageSrc);
+                        });
+                        document.getElementById('cancelCrop').addEventListener('click', () => {
+                            overlay.remove();
+                            callback(null);
+                        });
+                        return;
+                    }
+                    if (cropper) { try { cropper.destroy(); } catch(_) {} cropper = null; }
                     cropper = new Cropper(img, {
                         aspectRatio: 1,
                         viewMode: 1,
@@ -3360,30 +3383,39 @@
                         cropBoxResizable: true,
                         cropBoxMovable: true,
                     });
-                };
 
-                document.getElementById('confirmCrop').addEventListener('click', () => {
-                    if (cropper) {
-                        const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
-                        const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.95);
-                        overlay.remove();
-                        cropper.destroy();
-                        cropper = null;
-                        callback(croppedDataUrl);
-                    } else {
+                    document.getElementById('confirmCrop').addEventListener('click', () => {
+                        if (cropper) {
+                            const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
+                            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                            overlay.remove();
+                            cropper.destroy();
+                            cropper = null;
+                            callback(croppedDataUrl);
+                        } else {
+                            overlay.remove();
+                            callback(null);
+                        }
+                    });
+
+                    document.getElementById('cancelCrop').addEventListener('click', () => {
+                        if (cropper) { try { cropper.destroy(); } catch(_) {} cropper = null; }
                         overlay.remove();
                         callback(null);
-                    }
-                });
+                    });
+                };
 
-                document.getElementById('cancelCrop').addEventListener('click', () => {
-                    if (cropper) {
-                        cropper.destroy();
-                        cropper = null;
-                    }
-                    overlay.remove();
-                    callback(null);
-                });
+                // Guard against onload race: if already complete, run immediately
+                if (img.complete && img.naturalWidth > 0) {
+                    initCropper();
+                } else {
+                    img.addEventListener('load', initCropper, { once: true });
+                    img.addEventListener('error', () => {
+                        overlay.remove();
+                        callback(null);
+                        showToast('Could not load image', 'error');
+                    }, { once: true });
+                }
             }
 
             function fileToBase64(file) {
@@ -3414,6 +3446,46 @@
                         img.style.opacity = wallpaperOpacity;
                     }
                 }
+            }
+
+            // ==================== CONTACT PICKER ====================
+            async function pickContact(inputEl) {
+                if (!navigator.contacts || !navigator.contacts.select) {
+                    showToast('Contact picker not supported on this device/browser', 'error');
+                    return;
+                }
+                try {
+                    const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+                    if (!contacts || !contacts.length) return;
+                    const contact = contacts[0];
+                    const phone = (contact.tel || [])[0] || '';
+                    if (inputEl) {
+                        inputEl.value = phone.replace(/\s+/g, '');
+                        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                        inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                } catch (e) {
+                    showToast('Could not access contacts', 'error');
+                }
+            }
+
+            function addContactBtnTo(inputEl) {
+                if (!inputEl || inputEl.dataset.contactBtn) return;
+                inputEl.dataset.contactBtn = '1';
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.title = 'Pick from contacts';
+                btn.setAttribute('aria-label', 'Pick from contacts');
+                btn.innerHTML = '<i class="fas fa-address-book"></i>';
+                btn.style.cssText = 'background:none;border:none;cursor:pointer;color:#06c6d4;font-size:1rem;padding:0 0 0 4px;flex-shrink:0;line-height:1;';
+                btn.addEventListener('click', () => pickContact(inputEl));
+                inputEl.parentNode.appendChild(btn);
+            }
+
+            function attachContactPickersToDOM(root) {
+                (root || document).querySelectorAll('input[type="tel"], input[id*="hone"], input[placeholder*="hone"]').forEach(el => {
+                    addContactBtnTo(el);
+                });
             }
 
             // ==================== USER PROFILE MODAL ====================
@@ -3501,7 +3573,8 @@
                     if (f.type === 'select') {
                         html += `<div class="modal-field select-field"><i class="fas fa-sliders-h icon-one select-field-icon"></i><select id="modal-${f.name}">${f.options.map(opt => `<option value="${opt.value}" ${f.value === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}</select><i class="fas fa-chevron-down select-field-caret"></i></div>`;
                     } else {
-                        html += `<div class="modal-field"><input type="${f.type || 'text'}" id="modal-${f.name}" placeholder="${f.placeholder}" value="${f.value || ''}"></div>`;
+                        const isPhone = f.type === 'tel' || (f.name || '').toLowerCase().includes('phone');
+                        html += `<div class="modal-field" style="${isPhone ? 'display:flex;align-items:center;gap:4px;' : ''}"><input type="${isPhone ? 'tel' : (f.type || 'text')}" id="modal-${f.name}" placeholder="${f.placeholder || ''}" value="${f.value || ''}" style="${isPhone ? 'flex:1;' : ''}"></div>`;
                     }
                 });
                 
@@ -3576,6 +3649,7 @@
                 });
                 
                 if (onExtraInit) setTimeout(onExtraInit, 100);
+                attachContactPickersToDOM(overlay);
             }
 
             // ==================== PRODUCT KEY MODAL ====================
@@ -3844,9 +3918,7 @@
                         `;
                     }
                     attachAuthEvents();
-                };
-
-                const attachAuthEvents = () => {
+                    attachContactPickersToDOM(overlay);
                     if (isSignUp) {
                         document.getElementById('signupBtn')?.addEventListener('click', async (e) => {
                             e.preventDefault();
@@ -4023,6 +4095,7 @@
             }
 
             function createModernPdfDoc(title, subtitle) {
+                if (!window.jspdf) throw new Error('PDF library not loaded. Please check your internet connection and reload.');
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 const pageWidth = doc.internal.pageSize.getWidth();
@@ -4648,7 +4721,12 @@
                 overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
                 overlay.querySelector('#receiptClose').addEventListener('click', () => overlay.remove());
                 overlay.querySelector('#receiptDownload').addEventListener('click', () => {
-                    buildReceiptPDF(sale).save(`${receiptNo}.pdf`);
+                    try {
+                        if (!window.jspdf) throw new Error('PDF library not loaded');
+                        buildReceiptPDF(sale).save(`${receiptNo}.pdf`);
+                    } catch (e) {
+                        showToast('PDF download failed: ' + e.message, 'error');
+                    }
                 });
             }
 
@@ -5179,10 +5257,8 @@
                     });
 
                     refreshComputed();
+                    attachContactPickersToDOM(overlay);
                 };
-                
-                document.body.appendChild(overlay);
-                renderCartOverlay();
             }
 
             // ==================== POS PAGE ====================
@@ -6774,13 +6850,19 @@
                 // Fullscreen toggle button
                 const fsBtn = document.getElementById('fullscreenBtn');
                 const fsText = document.getElementById('fsText');
+                const updateFsText = () => {
+                    const isSmall = window.innerWidth < 480;
+                    if (document.fullscreenElement) {
+                        fsText.innerText = isSmall ? 'Exit' : 'Exit';
+                    } else {
+                        fsText.innerText = isSmall ? 'Full' : (currentLang === 'sw' ? 'Skrini nzima' : 'Fullscreen');
+                    }
+                };
                 fsBtn.addEventListener('click', () => {
                     toggleFullscreen();
-                    // update text after toggle (simple)
-                    setTimeout(() => {
-                        fsText.innerText = document.fullscreenElement ? 'Exit' : (currentLang === 'sw' ? 'Skrini nzima' : 'Fullscreen');
-                    }, 50);
+                    setTimeout(updateFsText, 50);
                 });
+                updateFsText();
                 
                 document.querySelectorAll('.nav-item-mobile').forEach(item => {
                     item.addEventListener('click', (e) => {
