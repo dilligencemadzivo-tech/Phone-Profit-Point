@@ -3219,13 +3219,11 @@
                 };
 
                 if (!window.isSecureContext) {
-                    showToast('Camera scan needs HTTPS/localhost. Using manual barcode input.', 'error');
                     fallbackManual();
                     return;
                 }
 
                 if (!('BarcodeDetector' in window)) {
-                    showToast('Barcode detector not available. Using manual barcode input.', 'error');
                     fallbackManual();
                     return;
                 }
@@ -5312,8 +5310,8 @@
                             <i class="fas fa-search icon-one"></i>
                             <input type="text" id="mobileSearch" placeholder="${__('search')}" value="${searchTerm}" 
                                 style="border:none; background:transparent; padding:0.9rem 0; width:100%; outline:none;">
-                            <button type="button" id="scanBarcodeBtn" class="icon-btn" style="padding:0.5rem 0.8rem; background:white;">
-                                <i class="fas fa-barcode icon-one"></i> Scan
+                            <button type="button" id="scanBarcodeBtn" class="icon-btn" style="padding:0.5rem 1rem; background:var(--color-accent); color:#fff; border-color:var(--color-accent); flex-shrink:0;">
+                                <i class="fas fa-barcode" style="color:#fff;"></i> Scan
                             </button>
                         </div>
 
