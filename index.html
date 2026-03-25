@@ -5023,7 +5023,9 @@
                                             </div>
                                             <div style="text-align:right; display:flex; flex-direction:column; gap:0.4rem; align-items:flex-end;">
                                                 <strong>${formatMoney(lineTotal)}</strong>
-                                                <i class="fas fa-trash icon-danger" style="cursor:pointer;" data-idx="${idx}"></i>
+                                                    <button type="button" class="btn-small cart-item-remove-btn" data-idx="${idx}" style="padding:0.45rem 0.8rem; font-size:0.72rem; min-height:auto; background:linear-gradient(135deg,#dc2626,#b91c1c); box-shadow:0 10px 22px rgba(220,38,38,0.22);">
+                                                        <i class="fas fa-trash"></i> Remove
+                                                    </button>
                                             </div>
                                         </div>
                                     `;
@@ -5144,10 +5146,10 @@
 
                     overlay.querySelector('#closeCartModal')?.addEventListener('click', () => overlay.remove());
 
-                    overlay.querySelectorAll('.fa-trash').forEach(icon => {
-                        icon.addEventListener('click', event => {
+                    overlay.querySelectorAll('.cart-item-remove-btn').forEach(button => {
+                        button.addEventListener('click', event => {
                             event.stopPropagation();
-                            const idx = Number(icon.dataset.idx);
+                            const idx = Number(button.dataset.idx);
                             if (!Number.isNaN(idx)) {
                                 cart.splice(idx, 1);
                                 saveCart();
