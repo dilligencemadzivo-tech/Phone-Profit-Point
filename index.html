@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#06c6d4">
     <title>Profit Point · premium POS</title>
+    <link rel="manifest" href="./manifest.webmanifest">
     <!-- Font Awesome 6 + Google Fonts Inter + Chart.js 4 + Cropper.js + jsPDF + autoTable -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="./web-assets/vendor/fontawesome/css/all.min.css">
+    <link href="./web-assets/vendor/fonts/inter.css" rel="stylesheet">
+    <link rel="stylesheet" href="./web-assets/vendor/cropper/cropper.min.css" />
+    <script src="./web-assets/vendor/chartjs/chart.umd.min.js"></script>
+    <script src="./web-assets/vendor/cropper/cropper.min.js"></script>
+    <script src="./web-assets/vendor/jspdf/jspdf.umd.min.js"></script>
+    <script src="./web-assets/vendor/jspdf/jspdf.plugin.autotable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -1415,6 +1417,8 @@
         .modal-btn.secondary { background: rgba(245, 250, 255, 0.9); color: #06c6d4; border: 2px solid rgba(6,198,212,0.3); }
         .modal-btn.secondary:hover { background: white; border-color: #06c6d4; }
         .modal-btn.danger { background: #d32f2f; color: white; border-color: #d32f2f; }
+        .icon-one { color: #06c6d4 !important; }
+        .icon-danger { color: #c0392b !important; }
         .user-row {
             display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0.8rem;
             border-bottom: 1px solid #e8eef5; border-radius: 12px; transition: all 0.25s ease;
@@ -2242,8 +2246,13 @@
             const TRIAL_DURATION = 60 * 1000; // 1 minute trial
             const MONTH_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
             const VALID_PRODUCT_KEYS = ['12345ABCDE', 'ABCDE12345'];
+            const NORMALIZED_PRODUCT_KEYS = new Set(VALID_PRODUCT_KEYS.map(normalizeProductKey));
             let licenseCheckInterval = null;
             let trialExpiredNotified = false;
+
+            function normalizeProductKey(value) {
+                return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            }
 
             function getLicense() {
                 const lic = localStorage.getItem(LICENSE_KEY);
@@ -2426,26 +2435,699 @@
             let sales = JSON.parse(localStorage.getItem('profitpoint_sales')) || [];
             let expenses = JSON.parse(localStorage.getItem('profitpoint_expenses')) || [];
             let customers = JSON.parse(localStorage.getItem('profitpoint_customers')) || [];
+            let suppliers = JSON.parse(localStorage.getItem('profitpoint_suppliers')) || [];
+            let purchaseOrders = JSON.parse(localStorage.getItem('profitpoint_purchase_orders')) || [];
+            let shifts = JSON.parse(localStorage.getItem('profitpoint_shifts')) || [];
+            let auditLogs = JSON.parse(localStorage.getItem('profitpoint_audit_logs')) || [];
+            let notifications = JSON.parse(localStorage.getItem('profitpoint_notifications')) || [];
             let shopBrand = JSON.parse(localStorage.getItem('profitpoint_brand')) || { name: 'Profit Point', logo: '💎' };
             let cart = JSON.parse(localStorage.getItem('profitpoint_cart')) || [];
             let selectedPayment = 'Cash';
             let receiptWhatsAppPhone = localStorage.getItem('profitpoint_receipt_phone') || '';
             let autoSendReceiptWhatsApp = localStorage.getItem('profitpoint_receipt_auto') === '1';
+            let receiptSettings = JSON.parse(localStorage.getItem('profitpoint_receipt_settings')) || {
+                prefix: 'PP',
+                footer: 'Thank you for shopping with us.',
+                supportPhone: '',
+                showSupportPhone: false,
+                nextReceiptNumber: 1
+            };
+            let loyaltySettings = JSON.parse(localStorage.getItem('profitpoint_loyalty_settings')) || {
+                pointsPer1000: 1,
+                redeemValuePerPoint: 10
+            };
+            let recentProductIds = JSON.parse(localStorage.getItem('profitpoint_recent_products')) || [];
+            let deferredInstallPrompt = null;
 
             // Wallpaper with higher default opacity
             let wallpaperOpacity = parseFloat(localStorage.getItem('profitpoint_wallpaper_opacity')) || 0.3; // increased from 0.25
-            let wallpaperImage = localStorage.getItem('profitpoint_wallpaper') || 'https://images.unsplash.com/photo-1584132967334-10e028c69f1c?w=1200';
+            let wallpaperImage = localStorage.getItem('profitpoint_wallpaper') || './web-assets/images/default-wallpaper.svg';
 
             // ==================== UTILITY FUNCTIONS ====================
             function saveProducts() { localStorage.setItem(STORAGE_PROD, JSON.stringify(products)); }
             function saveSales() { localStorage.setItem('profitpoint_sales', JSON.stringify(sales)); }
             function saveExpenses() { localStorage.setItem('profitpoint_expenses', JSON.stringify(expenses)); }
             function saveCustomers() { localStorage.setItem('profitpoint_customers', JSON.stringify(customers)); }
+            function saveSuppliers() { localStorage.setItem('profitpoint_suppliers', JSON.stringify(suppliers)); }
+            function savePurchaseOrders() { localStorage.setItem('profitpoint_purchase_orders', JSON.stringify(purchaseOrders)); }
+            function saveShifts() { localStorage.setItem('profitpoint_shifts', JSON.stringify(shifts)); }
+            function saveAuditLogs() { localStorage.setItem('profitpoint_audit_logs', JSON.stringify(auditLogs)); }
+            function saveNotifications() { localStorage.setItem('profitpoint_notifications', JSON.stringify(notifications)); }
             function saveUsers() { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
             function saveBrand() { localStorage.setItem('profitpoint_brand', JSON.stringify(shopBrand)); }
             function saveCart() { localStorage.setItem('profitpoint_cart', JSON.stringify(cart)); }
             function saveWallpaper() { localStorage.setItem('profitpoint_wallpaper', wallpaperImage); }
             function saveWallpaperOpacity(v) { localStorage.setItem('profitpoint_wallpaper_opacity', v); }
+            function saveReceiptSettings() { localStorage.setItem('profitpoint_receipt_settings', JSON.stringify(receiptSettings)); }
+            function saveLoyaltySettings() { localStorage.setItem('profitpoint_loyalty_settings', JSON.stringify(loyaltySettings)); }
+            function saveRecentProducts() { localStorage.setItem('profitpoint_recent_products', JSON.stringify(recentProductIds.slice(0, 12))); }
+
+            function formatMoney(value) {
+                return `TSh ${Number(value || 0).toLocaleString()}`;
+            }
+
+            function ensureDataShape() {
+                products = products.map(product => ({
+                    minStock: 5,
+                    favorite: false,
+                    barcode: '',
+                    supplierId: '',
+                    supplierName: '',
+                    variants: [],
+                    stockHistory: [],
+                    ...product,
+                    variants: Array.isArray(product.variants)
+                        ? product.variants
+                        : String(product.variants || '')
+                            .split(',')
+                            .map(item => item.trim())
+                            .filter(Boolean)
+                }));
+
+                customers = customers.map(customer => ({
+                    loyaltyPoints: 0,
+                    totalSpent: 0,
+                    lastSaleAt: null,
+                    ...customer
+                }));
+
+                suppliers = suppliers.map(supplier => ({
+                    contact: '',
+                    phone: '',
+                    notes: '',
+                    ...supplier
+                }));
+
+                sales = sales.map(sale => ({
+                    receiptNumber: sale.receiptNumber || `${receiptSettings.prefix}-${String(sale.id).slice(-6)}`,
+                    paymentStatus: sale.paymentStatus || 'paid',
+                    paidAmount: sale.paidAmount ?? sale.finalTotal ?? 0,
+                    outstandingAmount: sale.outstandingAmount ?? 0,
+                    discountType: sale.discountType || 'none',
+                    discountValue: sale.discountValue || 0,
+                    discountAmount: sale.discountAmount || 0,
+                    discountReason: sale.discountReason || '',
+                    loyaltyRedeemedPoints: sale.loyaltyRedeemedPoints || 0,
+                    loyaltyRedeemedValue: sale.loyaltyRedeemedValue || 0,
+                    loyaltyEarnedPoints: sale.loyaltyEarnedPoints || 0,
+                    amountPaidNow: sale.amountPaidNow ?? sale.paidAmount ?? sale.finalTotal ?? 0,
+                    ...sale
+                }));
+
+                saveProducts();
+                saveCustomers();
+                saveSuppliers();
+                saveSales();
+            }
+
+            function recordAudit(action, detail, meta = {}) {
+                auditLogs.unshift({
+                    id: Date.now() + Math.random(),
+                    action,
+                    detail,
+                    userId: currentUser?.id || null,
+                    userName: currentUser?.name || 'System',
+                    date: new Date().toISOString(),
+                    meta
+                });
+                auditLogs = auditLogs.slice(0, 250);
+                saveAuditLogs();
+            }
+
+            function pushNotification(title, body, type = 'info') {
+                notifications.unshift({
+                    id: Date.now() + Math.random(),
+                    title,
+                    body,
+                    type,
+                    read: false,
+                    date: new Date().toISOString()
+                });
+                notifications = notifications.slice(0, 100);
+                saveNotifications();
+            }
+
+            function getActiveShift() {
+                return shifts.find(shift => !shift.closedAt) || null;
+            }
+
+            function getOrCreateCustomer(name, phone = '') {
+                const normalizedName = String(name || '').trim();
+                const normalizedPhone = String(phone || '').trim();
+                if (!normalizedName && !normalizedPhone) return null;
+
+                let customer = customers.find(item => (
+                    normalizedPhone && item.phone === normalizedPhone
+                ) || (
+                    normalizedName && String(item.name || '').toLowerCase() === normalizedName.toLowerCase()
+                ));
+
+                if (!customer) {
+                    customer = {
+                        id: `c${Date.now()}`,
+                        name: normalizedName || normalizedPhone,
+                        phone: normalizedPhone,
+                        loyaltyPoints: 0,
+                        totalSpent: 0,
+                        lastSaleAt: null,
+                        createdAt: new Date().toISOString()
+                    };
+                    customers.push(customer);
+                    saveCustomers();
+                }
+
+                return customer;
+            }
+
+            function findCustomer(name, phone = '') {
+                const normalizedName = String(name || '').trim().toLowerCase();
+                const normalizedPhone = String(phone || '').trim();
+                if (!normalizedName && !normalizedPhone) return null;
+                return customers.find(item => (
+                    normalizedPhone && item.phone === normalizedPhone
+                ) || (
+                    normalizedName && String(item.name || '').toLowerCase() === normalizedName
+                )) || null;
+            }
+
+            function getCustomerBalances() {
+                const balances = {};
+                sales.forEach(sale => {
+                    if (!sale.customerId || sale.isReturn) return;
+                    if (!balances[sale.customerId]) {
+                        balances[sale.customerId] = {
+                            customerId: sale.customerId,
+                            customerName: sale.customerName || 'Walk-in',
+                            outstanding: 0,
+                            layaway: 0,
+                            count: 0
+                        };
+                    }
+                    const outstanding = Number(sale.outstandingAmount || 0);
+                    balances[sale.customerId].outstanding += outstanding;
+                    if (sale.paymentStatus === 'layaway') {
+                        balances[sale.customerId].layaway += outstanding;
+                    }
+                    if (outstanding > 0) {
+                        balances[sale.customerId].count += 1;
+                    }
+                });
+                return Object.values(balances).filter(item => item.outstanding > 0).sort((a, b) => b.outstanding - a.outstanding);
+            }
+
+            function getTopSellingProducts(limit = 5) {
+                const totals = {};
+                sales.forEach(sale => {
+                    if (sale.isReturn) return;
+                    (sale.items || []).forEach(item => {
+                        totals[item.productId] = (totals[item.productId] || 0) + Number(item.qty || 0);
+                    });
+                });
+                return Object.entries(totals)
+                    .map(([productId, qty]) => ({ productId, qty, product: products.find(product => String(product.id) === String(productId)) }))
+                    .filter(item => item.product)
+                    .sort((a, b) => b.qty - a.qty)
+                    .slice(0, limit);
+            }
+
+            function getVariantLabel(product, variant) {
+                return variant ? `${product.name} · ${variant}` : product.name;
+            }
+
+            function addRecentProduct(productId) {
+                recentProductIds = [String(productId), ...recentProductIds.filter(id => String(id) !== String(productId))].slice(0, 12);
+                saveRecentProducts();
+            }
+
+            function computeDiscountAmount(subtotal, discountType, discountValue) {
+                const safeSubtotal = Number(subtotal || 0);
+                const safeValue = Number(discountValue || 0);
+                if (discountType === 'percent') return Math.min(safeSubtotal, (safeSubtotal * safeValue) / 100);
+                if (discountType === 'fixed') return Math.min(safeSubtotal, safeValue);
+                return 0;
+            }
+
+            function awardLoyalty(customerId, netSpend, redeemedPoints = 0) {
+                if (!customerId) return { earned: 0, redeemedValue: 0 };
+                const customer = customers.find(item => item.id === customerId);
+                if (!customer) return { earned: 0, redeemedValue: 0 };
+
+                const redeemValue = Math.min(Number(redeemedPoints || 0) * Number(loyaltySettings.redeemValuePerPoint || 0), Number(netSpend || 0));
+                customer.loyaltyPoints = Math.max(0, Number(customer.loyaltyPoints || 0) - Number(redeemedPoints || 0));
+
+                const earned = Math.floor(Number(netSpend || 0) / 1000) * Number(loyaltySettings.pointsPer1000 || 0);
+                customer.loyaltyPoints += earned;
+                customer.totalSpent = Number(customer.totalSpent || 0) + Number(netSpend || 0);
+                customer.lastSaleAt = new Date().toISOString();
+                saveCustomers();
+
+                return { earned, redeemedValue: redeemValue };
+            }
+
+            function getLowStockProducts() {
+                return products
+                    .filter(product => Number(product.stock || 0) <= Number(product.minStock || 0))
+                    .sort((a, b) => (a.stock - a.minStock) - (b.stock - b.minStock));
+            }
+
+            function getUnreadNotificationCount() {
+                return notifications.filter(item => !item.read).length;
+            }
+
+            function markNotificationsRead() {
+                notifications = notifications.map(item => ({ ...item, read: true }));
+                saveNotifications();
+            }
+
+            function generateReceiptNumber() {
+                const receiptNumber = `${receiptSettings.prefix || 'PP'}-${String(receiptSettings.nextReceiptNumber || 1).padStart(5, '0')}`;
+                receiptSettings.nextReceiptNumber = Number(receiptSettings.nextReceiptNumber || 1) + 1;
+                saveReceiptSettings();
+                return receiptNumber;
+            }
+
+            function addProductToCart(product, variant = '') {
+                if (!product || Number(product.stock || 0) <= 0) {
+                    showToast(__('outOfStock'), 'error');
+                    return;
+                }
+
+                const cartKey = `${product.id}::${variant}`;
+                const existing = cart.find(item => item.cartKey === cartKey);
+                if (existing) {
+                    existing.qty += 1;
+                } else {
+                    cart.push({
+                        cartKey,
+                        productId: product.id,
+                        variant,
+                        name: getVariantLabel(product, variant),
+                        baseName: product.name,
+                        price: parseFloat(product.sellPrice) || 0,
+                        qty: 1
+                    });
+                }
+
+                addRecentProduct(product.id);
+                saveCart();
+            }
+
+            function showVariantPicker(product, onPick) {
+                const variants = Array.isArray(product?.variants) ? product.variants.filter(Boolean) : [];
+                if (!variants.length) {
+                    onPick('');
+                    return;
+                }
+
+                showEnhancedModal({
+                    title: 'Choose variant',
+                    fields: [
+                        {
+                            name: 'variant',
+                            type: 'select',
+                            value: variants[0],
+                            options: variants.map(variant => ({ value: variant, label: variant }))
+                        }
+                    ],
+                    onConfirm: data => onPick(data.variant || variants[0])
+                });
+            }
+
+            function findProductByBarcode(code) {
+                const normalized = String(code || '').trim();
+                return products.find(product => String(product.barcode || '').trim() === normalized) || null;
+            }
+
+            function createPurchaseOrderFromProduct(product, quantity = 0) {
+                if (!product) return;
+                const po = {
+                    id: `po${Date.now()}`,
+                    productId: product.id,
+                    productName: product.name,
+                    supplierId: product.supplierId || '',
+                    supplierName: product.supplierName || '',
+                    qty: Number(quantity || Math.max(1, (product.minStock || 5) - (product.stock || 0) + 5)),
+                    status: 'open',
+                    costPerUnit: Number(product.buyPrice || 0),
+                    createdBy: currentUser?.name || 'System',
+                    createdAt: new Date().toISOString()
+                };
+                purchaseOrders.unshift(po);
+                savePurchaseOrders();
+                recordAudit('purchase-order-created', `Purchase order created for ${product.name}`, { quantity: po.qty });
+                pushNotification('Purchase order created', `${product.name} · ${po.qty} units`, 'info');
+            }
+
+            function receivePurchaseOrder(orderId) {
+                const order = purchaseOrders.find(item => item.id === orderId);
+                if (!order || order.status === 'received') return;
+                const product = products.find(item => String(item.id) === String(order.productId));
+                if (!product) return;
+
+                product.stock = Number(product.stock || 0) + Number(order.qty || 0);
+                product.stockHistory = [
+                    {
+                        type: 'purchase-order',
+                        qty: Number(order.qty || 0),
+                        date: new Date().toISOString(),
+                        note: `Received ${order.qty} from PO ${order.id}`
+                    },
+                    ...(product.stockHistory || [])
+                ].slice(0, 20);
+
+                order.status = 'received';
+                order.receivedAt = new Date().toISOString();
+                saveProducts();
+                savePurchaseOrders();
+                recordAudit('purchase-order-received', `Stock received for ${product.name}`, { quantity: order.qty });
+            }
+
+            function addStockIntake(productId, qty, costPerUnit = 0, note = 'Manual stock intake') {
+                const product = products.find(item => String(item.id) === String(productId));
+                const quantity = Number(qty || 0);
+                if (!product || quantity <= 0) return;
+
+                product.stock = Number(product.stock || 0) + quantity;
+                if (Number(costPerUnit || 0) > 0) {
+                    product.buyPrice = Number(costPerUnit);
+                }
+                product.stockHistory = [
+                    {
+                        type: 'intake',
+                        qty: quantity,
+                        date: new Date().toISOString(),
+                        note
+                    },
+                    ...(product.stockHistory || [])
+                ].slice(0, 20);
+                saveProducts();
+                recordAudit('stock-intake', `${quantity} units added to ${product.name}`, { quantity, costPerUnit });
+            }
+
+            function startShift(openingCash) {
+                if (getActiveShift()) {
+                    showToast('A shift is already open', 'error');
+                    return;
+                }
+
+                shifts.unshift({
+                    id: `shift${Date.now()}`,
+                    openedAt: new Date().toISOString(),
+                    openingCash: Number(openingCash || 0),
+                    openedBy: currentUser?.name || 'System',
+                    salesCount: 0,
+                    salesTotal: 0
+                });
+                saveShifts();
+                recordAudit('shift-opened', 'Shift opened', { openingCash: Number(openingCash || 0) });
+            }
+
+            function closeShift(actualCash) {
+                const shift = getActiveShift();
+                if (!shift) {
+                    showToast('No open shift found', 'error');
+                    return null;
+                }
+
+                const expectedCash = Number(shift.openingCash || 0) + sales
+                    .filter(sale => !sale.isReturn && sale.payment === 'Cash' && new Date(sale.date) >= new Date(shift.openedAt))
+                    .reduce((sum, sale) => sum + Number(sale.amountPaidNow || sale.paidAmount || sale.finalTotal || 0), 0);
+
+                shift.closedAt = new Date().toISOString();
+                shift.actualCash = Number(actualCash || 0);
+                shift.expectedCash = expectedCash;
+                shift.cashVariance = Number(actualCash || 0) - expectedCash;
+                shift.closedBy = currentUser?.name || 'System';
+                saveShifts();
+                recordAudit('shift-closed', 'Shift closed', { actualCash: shift.actualCash, expectedCash });
+                return shift;
+            }
+
+            function recordSaleOnShift(sale) {
+                const shift = getActiveShift();
+                if (!shift || !sale || sale.isReturn) return;
+                shift.salesCount = Number(shift.salesCount || 0) + 1;
+                shift.salesTotal = Number(shift.salesTotal || 0) + Number(sale.finalTotal || 0);
+                saveShifts();
+            }
+
+            function createSaleRecord(payload) {
+                const subtotal = Number(payload.subtotal || 0);
+                const discountAmount = Number(payload.discountAmount || 0);
+                const finalTotal = Math.max(0, subtotal - discountAmount - Number(payload.loyaltyRedeemedValue || 0));
+                const amountPaidNow = Math.min(finalTotal, Number(payload.amountPaidNow ?? finalTotal));
+                const outstandingAmount = Math.max(0, finalTotal - amountPaidNow);
+                const sale = {
+                    id: Date.now(),
+                    receiptNumber: generateReceiptNumber(),
+                    items: payload.items || [],
+                    subtotal,
+                    finalTotal,
+                    payment: payload.payment || 'Cash',
+                    paymentStatus: payload.paymentStatus || 'paid',
+                    paidAmount: amountPaidNow,
+                    amountPaidNow,
+                    outstandingAmount,
+                    customerId: payload.customerId || null,
+                    customerName: payload.customerName || '',
+                    customerPhone: payload.customerPhone || '',
+                    userId: currentUser?.id || null,
+                    userName: currentUser?.name || 'Unknown User',
+                    discountType: payload.discountType || 'none',
+                    discountValue: Number(payload.discountValue || 0),
+                    discountAmount,
+                    discountReason: payload.discountReason || '',
+                    loyaltyRedeemedPoints: Number(payload.loyaltyRedeemedPoints || 0),
+                    loyaltyRedeemedValue: Number(payload.loyaltyRedeemedValue || 0),
+                    loyaltyEarnedPoints: Number(payload.loyaltyEarnedPoints || 0),
+                    note: payload.note || '',
+                    date: new Date().toISOString()
+                };
+                sales.push(sale);
+                saveSales();
+                recordSaleOnShift(sale);
+                recordAudit('sale-completed', `${sale.receiptNumber} completed`, { finalTotal: sale.finalTotal, paymentStatus: sale.paymentStatus });
+                if (sale.outstandingAmount > 0) {
+                    pushNotification('Customer balance due', `${sale.customerName || 'Customer'} owes ${formatMoney(sale.outstandingAmount)}`, 'warning');
+                }
+                return sale;
+            }
+
+            function refundSale(saleId) {
+                const sale = sales.find(item => item.id === saleId);
+                if (!sale || sale.isReturn || sale.refundedAt) return false;
+
+                (sale.items || []).forEach(item => {
+                    const product = products.find(productItem => String(productItem.id) === String(item.productId));
+                    if (product) {
+                        product.stock = Number(product.stock || 0) + Number(item.qty || 0);
+                    }
+                });
+                saveProducts();
+
+                sale.refundedAt = new Date().toISOString();
+                const refund = {
+                    id: Date.now() + 1,
+                    receiptNumber: `${sale.receiptNumber}-R`,
+                    originalSaleId: sale.id,
+                    items: sale.items || [],
+                    subtotal: -Math.abs(Number(sale.subtotal || sale.finalTotal || 0)),
+                    finalTotal: -Math.abs(Number(sale.finalTotal || 0)),
+                    payment: 'Refund',
+                    paymentStatus: 'refunded',
+                    paidAmount: -Math.abs(Number(sale.finalTotal || 0)),
+                    amountPaidNow: -Math.abs(Number(sale.finalTotal || 0)),
+                    outstandingAmount: 0,
+                    customerId: sale.customerId || null,
+                    customerName: sale.customerName || '',
+                    customerPhone: sale.customerPhone || '',
+                    userId: currentUser?.id || null,
+                    userName: currentUser?.name || 'Unknown User',
+                    isReturn: true,
+                    note: `Refund for ${sale.receiptNumber}`,
+                    date: new Date().toISOString()
+                };
+                sales.push(refund);
+                saveSales();
+                recordAudit('sale-refunded', `${sale.receiptNumber} refunded`, { amount: sale.finalTotal });
+                pushNotification('Refund processed', `${sale.receiptNumber} refunded`, 'warning');
+                return true;
+            }
+
+            function exportBackupData() {
+                return {
+                    exportedAt: new Date().toISOString(),
+                    version: 2,
+                    products,
+                    sales,
+                    expenses,
+                    customers,
+                    suppliers,
+                    purchaseOrders,
+                    shifts,
+                    auditLogs,
+                    notifications,
+                    users,
+                    shopBrand,
+                    receiptSettings,
+                    loyaltySettings,
+                    wallpaperImage,
+                    wallpaperOpacity,
+                    license: getLicense()
+                };
+            }
+
+            function downloadTextFile(filename, content, mimeType = 'application/json') {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            }
+
+            function importBackupData(payload) {
+                products = payload.products || [];
+                sales = payload.sales || [];
+                expenses = payload.expenses || [];
+                customers = payload.customers || [];
+                suppliers = payload.suppliers || [];
+                purchaseOrders = payload.purchaseOrders || [];
+                shifts = payload.shifts || [];
+                auditLogs = payload.auditLogs || [];
+                notifications = payload.notifications || [];
+                users = payload.users || users;
+                shopBrand = payload.shopBrand || shopBrand;
+                receiptSettings = { ...receiptSettings, ...(payload.receiptSettings || {}) };
+                loyaltySettings = { ...loyaltySettings, ...(payload.loyaltySettings || {}) };
+                wallpaperImage = payload.wallpaperImage || wallpaperImage;
+                wallpaperOpacity = Number(payload.wallpaperOpacity || wallpaperOpacity);
+                if (payload.license) saveLicense(payload.license);
+
+                saveProducts();
+                saveSales();
+                saveExpenses();
+                saveCustomers();
+                saveSuppliers();
+                savePurchaseOrders();
+                saveShifts();
+                saveAuditLogs();
+                saveNotifications();
+                saveUsers();
+                saveBrand();
+                saveReceiptSettings();
+                saveLoyaltySettings();
+                saveWallpaper();
+                saveWallpaperOpacity(wallpaperOpacity);
+                ensureDataShape();
+            }
+
+            async function scanBarcode(onDetected) {
+                const fallbackManual = () => {
+                    showEnhancedModal({
+                        title: 'Enter barcode',
+                        fields: [
+                            { name: 'barcode', placeholder: 'Type or paste barcode' }
+                        ],
+                        onConfirm: data => {
+                            const value = String(data.barcode || '').trim();
+                            if (!value) {
+                                showToast('Barcode is required', 'error');
+                                return;
+                            }
+                            onDetected(value);
+                        }
+                    });
+                };
+
+                if (!window.isSecureContext) {
+                    showToast('Camera scan needs HTTPS/localhost. Using manual barcode input.', 'error');
+                    fallbackManual();
+                    return;
+                }
+
+                if (!('BarcodeDetector' in window)) {
+                    showToast('Barcode detector not available. Using manual barcode input.', 'error');
+                    fallbackManual();
+                    return;
+                }
+
+                try {
+                    const supported = await window.BarcodeDetector.getSupportedFormats();
+                    const detector = new window.BarcodeDetector({ formats: supported.length ? supported : ['ean_13', 'ean_8', 'code_128', 'qr_code'] });
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'crop-modal-overlay';
+                    overlay.innerHTML = `
+                        <div class="crop-card">
+                            <h3 style="margin-bottom:1rem;">Scan barcode</h3>
+                            <video id="barcodeVideo" autoplay playsinline style="width:100%; border-radius:24px; background:#0f172a;"></video>
+                            <div class="modal-actions">
+                                <button class="modal-btn secondary" id="barcodeManual">Manual</button>
+                                <button class="modal-btn secondary" id="barcodeCancel">Cancel</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(overlay);
+                    const video = overlay.querySelector('#barcodeVideo');
+                    video.srcObject = stream;
+
+                    let active = true;
+                    const stop = () => {
+                        active = false;
+                        stream.getTracks().forEach(track => track.stop());
+                        overlay.remove();
+                    };
+
+                    overlay.querySelector('#barcodeCancel').addEventListener('click', stop);
+                    overlay.querySelector('#barcodeManual').addEventListener('click', () => {
+                        stop();
+                        fallbackManual();
+                    });
+
+                    const tick = async () => {
+                        if (!active) return;
+                        try {
+                            const codes = await detector.detect(video);
+                            if (codes[0]?.rawValue) {
+                                stop();
+                                onDetected(codes[0].rawValue);
+                                return;
+                            }
+                        } catch {
+                            // Ignore transient detector errors while camera warms up.
+                        }
+                        requestAnimationFrame(tick);
+                    };
+
+                    requestAnimationFrame(tick);
+                } catch {
+                    showToast('Camera permission denied or unavailable. Using manual barcode input.', 'error');
+                    fallbackManual();
+                }
+            }
+
+            function registerPwaHooks() {
+                window.addEventListener('beforeinstallprompt', event => {
+                    event.preventDefault();
+                    deferredInstallPrompt = event;
+                });
+
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('./service-worker.js').catch(() => {
+                        pushNotification('Offline mode', 'Service worker registration failed', 'warning');
+                    });
+                }
+
+                if (!window.isSecureContext) {
+                    pushNotification('Install requirement', 'Install/offline cache requires HTTPS or localhost. Core POS still works from local storage.', 'warning');
+                }
+            }
+
+            ensureDataShape();
 
             let currentPage = 'pos';
             const isManager = () => currentUser?.role === 'manager';
@@ -2708,8 +3390,9 @@
                 setTimeout(() => { const input = document.getElementById('productKeyInput'); if (input) input.focus(); }, 50);
                 const handleActivate = () => {
                     const inp = document.getElementById('productKeyInput');
-                    const key = inp ? inp.value.trim().toUpperCase().replace(/\s/g, '') : '';
-                    if (key && VALID_PRODUCT_KEYS.includes(key)) {
+                    const rawKey = inp ? inp.value : '';
+                    const key = normalizeProductKey(rawKey);
+                    if (key && NORMALIZED_PRODUCT_KEYS.has(key)) {
                         saveLicense({ type: 'full', start: Date.now(), duration: MONTH_DURATION });
                         trialExpiredNotified = false;
                         overlay.remove();
@@ -2762,7 +3445,13 @@
                     imageLabel: __('uploadLogo'),
                     fields: [
                         { name: 'language', type: 'select', options: [{ value: 'en', label: 'English' }, { value: 'sw', label: 'Kiswahili' }], value: currentLang },
-                        { name: 'shopName', placeholder: __('shopName'), type: 'text', value: shopBrand.name }
+                        { name: 'shopName', placeholder: __('shopName'), type: 'text', value: shopBrand.name },
+                        { name: 'receiptPrefix', placeholder: 'Receipt prefix', type: 'text', value: receiptSettings.prefix || 'PP' },
+                        { name: 'receiptFooter', placeholder: 'Receipt footer', type: 'text', value: receiptSettings.footer || '' },
+                        { name: 'supportPhone', placeholder: 'Receipt support phone', type: 'text', value: receiptSettings.supportPhone || '' },
+                        { name: 'showSupportPhone', type: 'select', options: [{ value: '0', label: 'Hide support phone' }, { value: '1', label: 'Show support phone' }], value: receiptSettings.showSupportPhone ? '1' : '0' },
+                        { name: 'loyaltyRate', placeholder: 'Points per 1000 TSh', type: 'number', value: loyaltySettings.pointsPer1000 || 1 },
+                        { name: 'redeemValue', placeholder: 'TSh per point', type: 'number', value: loyaltySettings.redeemValuePerPoint || 10 }
                     ],
                     extraContent: `
                         <div style="background:#eef5ff; border-radius:40px; padding:1rem; margin:1rem 0; display:flex; justify-content:space-between; align-items:center;">
@@ -2778,6 +3467,14 @@
                             <input type="range" id="wallpaperOpacitySlider" min="0.05" max="0.8" step="0.01" value="${wallpaperOpacity}">
                             <span id="opacityValue">${Math.round(wallpaperOpacity * 100)}%</span>
                         </div>
+                        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.7rem; margin-top:1rem;">
+                            <button class="btn-small" id="backupExportBtn" type="button"><i class="fas fa-download"></i> Backup</button>
+                            <button class="btn-small analytics-ghost-btn" id="backupImportBtn" type="button"><i class="fas fa-upload"></i> Restore</button>
+                        </div>
+                        <input type="file" id="backupImportInput" accept="application/json" style="display:none;">
+                        <button class="btn-small" id="installAppBtn" style="width:100%; margin-top:0.8rem;">
+                            <i class="fas fa-mobile-screen-button"></i> Install App
+                        </button>
                         <button class="btn-small" id="enterKeyBtn" style="width:100%; margin-top:0.5rem;">
                             <i class="fas fa-key"></i> ${__('enterKey')}
                         </button>
@@ -2789,7 +3486,15 @@
                         }
                         shopBrand.name = data.shopName || 'Profit Point';
                         if (data.image) shopBrand.logo = data.image;
+                        receiptSettings.prefix = (data.receiptPrefix || 'PP').trim().toUpperCase() || 'PP';
+                        receiptSettings.footer = data.receiptFooter || 'Thank you for shopping with us.';
+                        receiptSettings.supportPhone = data.supportPhone || '';
+                        receiptSettings.showSupportPhone = data.showSupportPhone === '1';
+                        loyaltySettings.pointsPer1000 = Math.max(0, Number(data.loyaltyRate || 0));
+                        loyaltySettings.redeemValuePerPoint = Math.max(0, Number(data.redeemValue || 0));
                         saveBrand();
+                        saveReceiptSettings();
+                        saveLoyaltySettings();
                         renderPhoneApp();
                         startLicenseMonitoring();
                         showToast('Brand updated');
@@ -2822,6 +3527,47 @@
                                     }
                                 });
                             }
+                        });
+
+                        document.getElementById('backupExportBtn')?.addEventListener('click', () => {
+                            downloadTextFile(`profit-point-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(exportBackupData(), null, 2));
+                            showToast('Backup exported');
+                        });
+
+                        document.getElementById('backupImportBtn')?.addEventListener('click', () => {
+                            document.getElementById('backupImportInput')?.click();
+                        });
+
+                        document.getElementById('backupImportInput')?.addEventListener('change', async (event) => {
+                            const file = event.target.files?.[0];
+                            if (!file) return;
+                            try {
+                                const text = await file.text();
+                                const payload = JSON.parse(text);
+                                importBackupData(payload);
+                                renderPhoneApp();
+                                showToast('Backup restored');
+                            } catch {
+                                showToast('Backup restore failed', 'error');
+                            }
+                        });
+
+                        document.getElementById('installAppBtn')?.addEventListener('click', async () => {
+                            if (!deferredInstallPrompt) {
+                                const onFileProtocol = location.protocol === 'file:';
+                                if (onFileProtocol) {
+                                    showToast('Install requires localhost/HTTPS. Run via local server first.', 'error');
+                                } else {
+                                    showToast('Install prompt unavailable. Use browser menu: Add to Home Screen / Install App.', 'error');
+                                }
+                                return;
+                            }
+                            deferredInstallPrompt.prompt();
+                            const choice = await deferredInstallPrompt.userChoice;
+                            if (choice?.outcome === 'accepted') {
+                                showToast('App installation started');
+                            }
+                            deferredInstallPrompt = null;
                         });
                         
                         document.getElementById('enterKeyBtn').addEventListener('click', showProductKeyModal);
@@ -3570,7 +4316,7 @@
             }
 
             function buildReceiptPDF(sale) {
-                const receiptNo = `RCPT-${sale.id}`;
+                const receiptNo = sale.receiptNumber || `RCPT-${sale.id}`;
                 const saleDate = new Date(sale.date);
                 const itemCount = (sale.items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
                 const { doc, pageWidth, startY, meta } = createModernPdfDoc('Sales Receipt', `${shopBrand?.name || 'Profit Point'} | ${receiptNo}`);
@@ -3587,7 +4333,7 @@
                     {
                         label: 'Payment',
                         value: sale.payment || 'N/A',
-                        note: `Cashier: ${sale.userName || 'Unknown'}`,
+                        note: `${sale.paymentStatus || 'paid'} · Cashier: ${sale.userName || 'Unknown'}`,
                         color: [236, 253, 245],
                         border: [167, 243, 208],
                         valueColor: [6, 95, 70]
@@ -3595,7 +4341,7 @@
                     {
                         label: 'Total',
                         value: formatPdfCurrency(sale.finalTotal),
-                        note: `${itemCount} item(s)`,
+                        note: `${itemCount} item(s)${sale.discountAmount ? ` · Discount ${formatPdfCurrency(sale.discountAmount)}` : ''}`,
                         color: [255, 251, 235],
                         border: [253, 230, 138],
                         valueColor: [146, 64, 14]
@@ -3630,7 +4376,23 @@
                     }
                 });
 
-                const totalY = ensurePdfSpace(doc, finalY + 8, 16);
+                let totalY = ensurePdfSpace(doc, finalY + 8, 24);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(71, 85, 105);
+                if (sale.customerName) {
+                    doc.text(`Customer: ${sale.customerName}`, 14, totalY);
+                    totalY += 5;
+                }
+                if (sale.outstandingAmount > 0) {
+                    doc.text(`Outstanding balance: ${formatPdfCurrency(sale.outstandingAmount)}`, 14, totalY);
+                    totalY += 5;
+                }
+                if (sale.loyaltyEarnedPoints || sale.loyaltyRedeemedPoints) {
+                    doc.text(`Loyalty: +${sale.loyaltyEarnedPoints || 0} pts / -${sale.loyaltyRedeemedPoints || 0} pts`, 14, totalY);
+                    totalY += 5;
+                }
+
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(12);
                 doc.setTextColor(17, 24, 39);
@@ -3639,7 +4401,10 @@
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(9);
                 doc.setTextColor(100, 116, 139);
-                doc.text('Thank you for your purchase.', 14, totalY);
+                doc.text(receiptSettings.footer || 'Thank you for your purchase.', 14, totalY);
+                if (receiptSettings.showSupportPhone && receiptSettings.supportPhone) {
+                    doc.text(`Support: ${receiptSettings.supportPhone}`, 14, totalY + 5);
+                }
 
                 finalizeModernPdfDoc(doc, meta);
                 return doc;
@@ -3654,7 +4419,8 @@
 
                 const doc = buildReceiptPDF(sale);
                 const fileName = `receipt-${sale.id}.pdf`;
-                const message = `Hello, here is your receipt ${`RCPT-${sale.id}`} from ${shopBrand?.name || 'Profit Point'} for ${formatPdfCurrency(sale.finalTotal)}.`;
+                const receiptNo = sale.receiptNumber || `RCPT-${sale.id}`;
+                const message = `Hello, here is your receipt ${receiptNo} from ${shopBrand?.name || 'Profit Point'} for ${formatPdfCurrency(sale.finalTotal)}.`;
 
                 try {
                     const blob = doc.output('blob');
@@ -3674,7 +4440,17 @@
                 }
 
                 doc.save(fileName);
-                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`${message} PDF downloaded, please attach it from your files.`)}`, '_blank');
+                const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(`${message} PDF downloaded, please attach it from your files.`)}`;
+                const popup = window.open(waUrl, '_blank');
+                if (!popup) {
+                    try {
+                        await navigator.clipboard.writeText(waUrl);
+                        showToast('WhatsApp link copied. Open WhatsApp and paste it.');
+                    } catch {
+                        showToast('Open WhatsApp manually and attach the downloaded PDF.', 'error');
+                    }
+                    return;
+                }
                 showToast('PDF downloaded. Attach it in WhatsApp chat.');
             }
 
@@ -3682,132 +4458,376 @@
             function showCartModal() {
                 const overlay = document.createElement('div');
                 overlay.className = 'cart-modal-overlay';
-                
-                let total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-                
-                overlay.innerHTML = `
-                    <div class="cart-modal-card">
-                        <h3 style="display:flex; align-items:center; gap:10px; margin-bottom:1.5rem;">
-                            <i class="fas fa-shopping-cart" style="color:#06c6d4;"></i> ${__('cart')}
-                        </h3>
-                        <div id="modalCartItems">
-                            ${cart.length ? cart.map((i, idx) => `
-                                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #e6f0fa;">
-                                    <span><strong>${i.name}</strong> x${i.qty}</span>
-                                    <span>TSh ${i.price * i.qty} 
-                                        <i class="fas fa-trash" style="color:#c0392b; margin-left:12px; cursor:pointer;" data-idx="${idx}"></i>
+                let cartDiscountType = 'none';
+                let cartDiscountValue = 0;
+                let cartDiscountReason = '';
+                let paymentStatus = 'paid';
+                let customerName = '';
+                let customerPhone = '';
+                let redeemPoints = 0;
+                let amountPaidDraft = null;
+
+                const getTotals = () => {
+                    const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.qty || 0)), 0);
+                    const itemDiscountTotal = cart.reduce((sum, item) => sum + computeDiscountAmount(Number(item.price || 0) * Number(item.qty || 0), item.discountType, item.discountValue), 0);
+                    const afterItemDiscounts = subtotal - itemDiscountTotal;
+                    const cartDiscountAmount = computeDiscountAmount(afterItemDiscounts, cartDiscountType, cartDiscountValue);
+                    const provisionalTotal = Math.max(0, afterItemDiscounts - cartDiscountAmount);
+                    const customer = findCustomer(customerName, customerPhone);
+                    const availablePoints = customer ? Number(customer.loyaltyPoints || 0) : 0;
+                    const normalizedRedeemPoints = Math.max(0, Math.min(availablePoints, Number(redeemPoints || 0)));
+                    const loyaltyRedeemedValue = Math.min(provisionalTotal, normalizedRedeemPoints * Number(loyaltySettings.redeemValuePerPoint || 0));
+                    const finalTotal = Math.max(0, provisionalTotal - loyaltyRedeemedValue);
+                    return {
+                        subtotal,
+                        itemDiscountTotal,
+                        cartDiscountAmount,
+                        provisionalTotal,
+                        availablePoints,
+                        redeemPoints: normalizedRedeemPoints,
+                        loyaltyRedeemedValue,
+                        finalTotal
+                    };
+                };
+
+                const renderCartOverlay = () => {
+                    const totals = getTotals();
+                    const total = totals.finalTotal;
+                    const paidValue = amountPaidDraft === null ? total : Number(amountPaidDraft || 0);
+
+                    overlay.innerHTML = `
+                        <div class="cart-modal-card">
+                            <h3 style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                                <i class="fas fa-shopping-cart icon-one"></i> ${__('cart')}
+                            </h3>
+                            <div id="modalCartItems">
+                                ${cart.length ? cart.map((item, idx) => {
+                                    const lineSubtotal = Number(item.price || 0) * Number(item.qty || 0);
+                                    const lineDiscount = computeDiscountAmount(lineSubtotal, item.discountType, item.discountValue);
+                                    const lineTotal = lineSubtotal - lineDiscount;
+                                    return `
+                                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.8rem; padding:12px 0; border-bottom:1px solid #e6f0fa;">
+                                            <div>
+                                                <div><strong>${item.name}</strong> x${item.qty}</div>
+                                                <div style="font-size:0.78rem; color:#64748b; margin-top:4px;">${formatMoney(item.price)} each${lineDiscount ? ` · item discount ${formatMoney(lineDiscount)}` : ''}</div>
+                                                <button type="button" class="analytics-ghost-btn btn-small cart-item-discount-btn" data-idx="${idx}" style="padding:0.45rem 0.8rem; margin-top:0.45rem; font-size:0.72rem; min-height:auto;">
+                                                    <i class="fas fa-tags"></i> Item discount
+                                                </button>
+                                            </div>
+                                            <div style="text-align:right; display:flex; flex-direction:column; gap:0.4rem; align-items:flex-end;">
+                                                <strong>${formatMoney(lineTotal)}</strong>
+                                                <i class="fas fa-trash icon-danger" style="cursor:pointer;" data-idx="${idx}"></i>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('') : `<p style="text-align:center; color:#64748b; padding:1rem;">${__('emptyCart')}</p>`}
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:1rem 0;">
+                                <input type="text" id="customerNameInput" placeholder="Customer name" value="${customerName}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                <input type="tel" id="customerPhoneInput" placeholder="Customer phone" value="${customerPhone}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                            </div>
+                            <div id="customerPointsHint" style="font-size:0.78rem; color:#64748b; margin-top:-0.6rem; margin-bottom:0.8rem;">Available loyalty points: ${totals.availablePoints}</div>
+
+                            <div style="margin:0.8rem 0; display:flex; flex-direction:column; gap:0.55rem;">
+                                <input type="tel" id="receiptPhoneInput" placeholder="WhatsApp number (e.g. 2557...)" value="${receiptWhatsAppPhone}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                <label style="display:flex; align-items:center; gap:0.45rem; font-size:0.85rem; color:#475569; font-weight:600;">
+                                    <input type="checkbox" id="sendReceiptWhatsApp" ${autoSendReceiptWhatsApp ? 'checked' : ''}>
+                                    Send receipt PDF on WhatsApp after complete sale
+                                </label>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:0.8rem 0;">
+                                <select id="paymentStatusInput" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                    <option value="paid" ${paymentStatus === 'paid' ? 'selected' : ''}>Paid</option>
+                                    <option value="partial" ${paymentStatus === 'partial' ? 'selected' : ''}>Part payment</option>
+                                    <option value="credit" ${paymentStatus === 'credit' ? 'selected' : ''}>Credit sale</option>
+                                    <option value="layaway" ${paymentStatus === 'layaway' ? 'selected' : ''}>Layaway</option>
+                                </select>
+                                <input type="number" id="amountPaidInput" min="0" placeholder="Amount paid now" value="${paidValue}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:0.8rem 0;">
+                                <select id="discountTypeInput" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                    <option value="none" ${cartDiscountType === 'none' ? 'selected' : ''}>No cart discount</option>
+                                    <option value="fixed" ${cartDiscountType === 'fixed' ? 'selected' : ''}>Fixed discount</option>
+                                    <option value="percent" ${cartDiscountType === 'percent' ? 'selected' : ''}>Percent discount</option>
+                                </select>
+                                <input type="number" id="discountValueInput" min="0" placeholder="Discount value" value="${cartDiscountValue}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                            </div>
+                            <input type="text" id="discountReasonInput" placeholder="Discount reason" value="${cartDiscountReason}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none; margin-bottom:0.8rem;">
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:0.8rem 0;">
+                                <input type="number" id="redeemPointsInput" min="0" placeholder="Redeem loyalty points" value="${totals.redeemPoints}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
+                                <div id="liveTotalCard" style="display:flex; align-items:center; justify-content:center; border-radius:28px; background:#f8fafc; border:1px solid #dbeafe; color:#475569; font-weight:700;">${formatMoney(total)}</div>
+                            </div>
+
+                            <div style="display:flex; gap:0.5rem; margin:1rem 0; flex-wrap:wrap;">
+                                ${['Cash', 'Card', 'Mobile'].map(method => `
+                                    <span class="payment-option ${selectedPayment === method ? 'active' : ''}" data-pay="${method}">
+                                        ${method === 'Cash' ? __('cash') : method}
                                     </span>
-                                </div>
-                            `).join('') : `<p style="text-align:center; color:#64748b; padding:1rem;">${__('emptyCart')}</p>`}
+                                `).join('')}
+                            </div>
+
+                            <div style="background:#f8fafc; border-radius:28px; padding:1rem; margin:1rem 0; color:#0f172a;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;"><span>Subtotal</span><strong id="summarySubtotal">${formatMoney(totals.subtotal)}</strong></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;"><span>Item discounts</span><strong id="summaryItemDiscount">-${formatMoney(totals.itemDiscountTotal)}</strong></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;"><span>Cart discount</span><strong id="summaryCartDiscount">-${formatMoney(totals.cartDiscountAmount)}</strong></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;"><span>Loyalty redeemed</span><strong id="summaryLoyaltyDiscount">-${formatMoney(totals.loyaltyRedeemedValue)}</strong></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;"><span>Outstanding</span><strong id="summaryOutstanding">${formatMoney(Math.max(0, total - Math.max(0, paidValue)))}</strong></div>
+                                <div style="display:flex; justify-content:space-between; font-size:1.1rem; color:#06c6d4;"><span>${__('total')}</span><strong id="summaryTotal">${formatMoney(total)}</strong></div>
+                            </div>
+
+                            <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                                <button class="modal-btn secondary" id="closeCartModal">${__('cancel')}</button>
+                                <button class="modal-btn" id="modalCompleteSale">${__('complete')}</button>
+                            </div>
                         </div>
+                    `;
 
-                        <div style="margin:1rem 0; display:flex; flex-direction:column; gap:0.55rem;">
-                            <input type="tel" id="receiptPhoneInput" placeholder="WhatsApp number (e.g. 2557...)" value="${receiptWhatsAppPhone}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
-                            <label style="display:flex; align-items:center; gap:0.45rem; font-size:0.85rem; color:#475569; font-weight:600;">
-                                <input type="checkbox" id="sendReceiptWhatsApp" ${autoSendReceiptWhatsApp ? 'checked' : ''}>
-                                Send receipt PDF on WhatsApp after complete sale
-                            </label>
-                        </div>
-                        
-                        <div style="display:flex; gap:0.5rem; margin:1rem 0; flex-wrap:wrap;">
-                            ${['Cash', 'Card', 'Mobile'].map(p => `
-                                <span class="payment-option ${selectedPayment === p ? 'active' : ''}" data-pay="${p}">
-                                    ${p === 'Cash' ? __('cash') : p}
-                                </span>
-                            `).join('')}
-                        </div>
-                        
-                        <div style="font-size:1.8rem; font-weight:700; margin:1rem 0; color:#06c6d4; word-break:break-word;">
-                            ${__('total')}: TSh ${total}
-                        </div>
-                        
-                        <div style="display:flex; gap:1rem; margin-top:1.5rem;">
-                            <button class="modal-btn secondary" id="closeCartModal">${__('cancel')}</button>
-                            <button class="modal-btn" id="modalCompleteSale">${__('complete')}</button>
-                        </div>
-                    </div>
-                `;
-                
-                document.body.appendChild(overlay);
+                    bindCartEvents();
+                };
 
-                overlay.querySelectorAll('.payment-option').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        selectedPayment = el.dataset.pay;
-                        overlay.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
-                        el.classList.add('active');
-                    });
-                });
-
-                overlay.querySelector('#closeCartModal').addEventListener('click', () => overlay.remove());
-
-                overlay.querySelector('#modalCompleteSale').addEventListener('click', async () => {
-                    if (cart.length === 0) {
-                        showToast(__('emptyCart'), 'error');
-                        overlay.remove();
-                        return;
-                    }
-
-                    const phoneInput = (overlay.querySelector('#receiptPhoneInput')?.value || '').trim();
-                    const shouldSendReceipt = !!overlay.querySelector('#sendReceiptWhatsApp')?.checked;
-                    receiptWhatsAppPhone = phoneInput;
-                    autoSendReceiptWhatsApp = shouldSendReceipt;
-                    localStorage.setItem('profitpoint_receipt_phone', receiptWhatsAppPhone);
-                    localStorage.setItem('profitpoint_receipt_auto', autoSendReceiptWhatsApp ? '1' : '0');
-                    
-                    let finalTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-                    let saleItems = cart.map(i => ({
-                        productId: i.productId,
-                        name: i.name,
-                        qty: i.qty,
-                        price: i.price
-                    }));
-                    
-                    saleItems.forEach(si => {
-                        let prod = products.find(p => p.id === si.productId);
-                        if (prod) prod.stock -= si.qty;
-                    });
-                    saveProducts();
-
-                    const createdSale = {
-                        id: Date.now(),
-                        items: saleItems,
-                        finalTotal: finalTotal,
-                        payment: selectedPayment,
-                        customerId: null,
-                        userId: currentUser?.id || null,
-                        userName: currentUser?.name || 'Unknown User',
-                        date: new Date().toISOString()
+                const bindCartEvents = () => {
+                    const refreshComputed = () => {
+                        const totals = getTotals();
+                        const paidRaw = Number(overlay.querySelector('#amountPaidInput')?.value || 0);
+                        const adjustedPaid = paymentStatus === 'credit' ? 0 : Math.max(0, Math.min(totals.finalTotal, paidRaw));
+                        if (paymentStatus === 'credit') {
+                            const amountInput = overlay.querySelector('#amountPaidInput');
+                            if (amountInput) amountInput.value = '0';
+                            amountPaidDraft = 0;
+                        }
+                        overlay.querySelector('#liveTotalCard').textContent = formatMoney(totals.finalTotal);
+                        overlay.querySelector('#summarySubtotal').textContent = formatMoney(totals.subtotal);
+                        overlay.querySelector('#summaryItemDiscount').textContent = `-${formatMoney(totals.itemDiscountTotal)}`;
+                        overlay.querySelector('#summaryCartDiscount').textContent = `-${formatMoney(totals.cartDiscountAmount)}`;
+                        overlay.querySelector('#summaryLoyaltyDiscount').textContent = `-${formatMoney(totals.loyaltyRedeemedValue)}`;
+                        overlay.querySelector('#summaryOutstanding').textContent = formatMoney(Math.max(0, totals.finalTotal - adjustedPaid));
+                        overlay.querySelector('#summaryTotal').textContent = formatMoney(totals.finalTotal);
+                        overlay.querySelector('#customerPointsHint').textContent = `Available loyalty points: ${totals.availablePoints}`;
                     };
 
-                    sales.push(createdSale);
-                    saveSales();
-                    
-                    cart = [];
-                    saveCart();
-                    
-                    overlay.remove();
-                    showToast('Sale completed');
-                    renderPosMobile();
+                    overlay.querySelectorAll('.payment-option').forEach(el => {
+                        el.addEventListener('click', event => {
+                            event.preventDefault();
+                            selectedPayment = el.dataset.pay;
+                            renderCartOverlay();
+                        });
+                    });
 
-                    if (shouldSendReceipt) {
-                        await sendReceiptOnWhatsApp(createdSale, phoneInput);
-                    }
-                });
+                    overlay.querySelector('#closeCartModal')?.addEventListener('click', () => overlay.remove());
 
-                overlay.querySelectorAll('.fa-trash').forEach(icon => {
-                    icon.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        let idx = icon.dataset.idx;
-                        if (idx !== undefined) {
-                            cart.splice(idx, 1);
-                            saveCart();
+                    overlay.querySelectorAll('.fa-trash').forEach(icon => {
+                        icon.addEventListener('click', event => {
+                            event.stopPropagation();
+                            const idx = Number(icon.dataset.idx);
+                            if (!Number.isNaN(idx)) {
+                                cart.splice(idx, 1);
+                                saveCart();
+                                renderCartOverlay();
+                            }
+                        });
+                    });
+
+                    overlay.querySelectorAll('.cart-item-discount-btn').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const idx = Number(button.dataset.idx);
+                            const item = cart[idx];
+                            if (!item) return;
+                            showEnhancedModal({
+                                title: 'Item discount',
+                                fields: [
+                                    {
+                                        name: 'discountType',
+                                        type: 'select',
+                                        value: item.discountType || 'none',
+                                        options: [
+                                            { value: 'none', label: 'No discount' },
+                                            { value: 'fixed', label: 'Fixed' },
+                                            { value: 'percent', label: 'Percent' }
+                                        ]
+                                    },
+                                    { name: 'discountValue', type: 'number', value: item.discountValue || 0, placeholder: 'Discount value' }
+                                ],
+                                onConfirm: data => {
+                                    item.discountType = data.discountType || 'none';
+                                    item.discountValue = Number(data.discountValue || 0);
+                                    saveCart();
+                                    renderCartOverlay();
+                                }
+                            });
+                        });
+                    });
+
+                    overlay.querySelector('#paymentStatusInput')?.addEventListener('change', event => {
+                        paymentStatus = event.target.value;
+                        if (paymentStatus === 'paid') {
+                            const totals = getTotals();
+                            const amountInput = overlay.querySelector('#amountPaidInput');
+                            if (amountInput) {
+                                amountInput.value = totals.finalTotal;
+                                amountPaidDraft = totals.finalTotal;
+                            }
+                        }
+                        refreshComputed();
+                    });
+
+                    overlay.querySelector('#discountTypeInput')?.addEventListener('change', event => {
+                        cartDiscountType = event.target.value;
+                        refreshComputed();
+                    });
+
+                    overlay.querySelector('#discountValueInput')?.addEventListener('input', event => {
+                        cartDiscountValue = Number(event.target.value || 0);
+                        refreshComputed();
+                    });
+
+                    overlay.querySelector('#discountReasonInput')?.addEventListener('input', event => {
+                        cartDiscountReason = event.target.value;
+                    });
+
+                    overlay.querySelector('#customerNameInput')?.addEventListener('input', event => {
+                        customerName = event.target.value;
+                        refreshComputed();
+                    });
+
+                    overlay.querySelector('#customerPhoneInput')?.addEventListener('input', event => {
+                        customerPhone = event.target.value;
+                        refreshComputed();
+                    });
+
+                    overlay.querySelector('#redeemPointsInput')?.addEventListener('input', event => {
+                        redeemPoints = Number(event.target.value || 0);
+                        refreshComputed();
+                    });
+
+                    overlay.querySelector('#amountPaidInput')?.addEventListener('input', event => {
+                        amountPaidDraft = Number(event.target.value || 0);
+                        refreshComputed();
+                    });
+
+                    overlay.querySelector('#modalCompleteSale')?.addEventListener('click', async () => {
+                        if (cart.length === 0) {
+                            showToast(__('emptyCart'), 'error');
                             overlay.remove();
-                            showCartModal();
+                            return;
+                        }
+
+                        customerName = (overlay.querySelector('#customerNameInput')?.value || '').trim();
+                        customerPhone = (overlay.querySelector('#customerPhoneInput')?.value || '').trim();
+                        const phoneInput = (overlay.querySelector('#receiptPhoneInput')?.value || '').trim();
+                        const shouldSendReceipt = !!overlay.querySelector('#sendReceiptWhatsApp')?.checked;
+                        const paidNowInput = Number(overlay.querySelector('#amountPaidInput')?.value || 0);
+                        const redeemPointsRequested = Number(overlay.querySelector('#redeemPointsInput')?.value || 0);
+                        paymentStatus = overlay.querySelector('#paymentStatusInput')?.value || paymentStatus;
+                        cartDiscountType = overlay.querySelector('#discountTypeInput')?.value || cartDiscountType;
+                        cartDiscountValue = Number(overlay.querySelector('#discountValueInput')?.value || 0);
+                        cartDiscountReason = overlay.querySelector('#discountReasonInput')?.value || '';
+
+                        receiptWhatsAppPhone = phoneInput;
+                        autoSendReceiptWhatsApp = shouldSendReceipt;
+                        localStorage.setItem('profitpoint_receipt_phone', receiptWhatsAppPhone);
+                        localStorage.setItem('profitpoint_receipt_auto', autoSendReceiptWhatsApp ? '1' : '0');
+
+                        if ((paymentStatus === 'credit' || paymentStatus === 'layaway' || paymentStatus === 'partial') && !customerName && !customerPhone) {
+                            showToast('Customer name or phone is required for balance tracking', 'error');
+                            return;
+                        }
+
+                        const customer = getOrCreateCustomer(customerName, customerPhone);
+                        const availablePoints = customer ? Number(customer.loyaltyPoints || 0) : 0;
+                        const redeemedPoints = Math.max(0, Math.min(availablePoints, redeemPointsRequested));
+
+                        const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.qty || 0)), 0);
+                        const itemDiscountTotal = cart.reduce((sum, item) => sum + computeDiscountAmount(Number(item.price || 0) * Number(item.qty || 0), item.discountType, item.discountValue), 0);
+                        const afterItemDiscounts = subtotal - itemDiscountTotal;
+                        const cartDiscountAmount = computeDiscountAmount(afterItemDiscounts, cartDiscountType, cartDiscountValue);
+                        const provisionalTotal = Math.max(0, afterItemDiscounts - cartDiscountAmount);
+                        const loyaltyRedeemedValue = Math.min(provisionalTotal, redeemedPoints * Number(loyaltySettings.redeemValuePerPoint || 0));
+                        const finalTotal = Math.max(0, provisionalTotal - loyaltyRedeemedValue);
+
+                        let amountPaidNow = finalTotal;
+                        if (paymentStatus === 'partial' || paymentStatus === 'layaway') {
+                            amountPaidNow = Math.min(finalTotal, Math.max(0, paidNowInput));
+                        }
+                        if (paymentStatus === 'credit') {
+                            amountPaidNow = 0;
+                        }
+                        if (paymentStatus === 'paid') {
+                            amountPaidNow = finalTotal;
+                        }
+
+                        for (const item of cart) {
+                            const product = products.find(productItem => String(productItem.id) === String(item.productId));
+                            if (!product || Number(product.stock || 0) < Number(item.qty || 0)) {
+                                showToast(`${item.name} has insufficient stock`, 'error');
+                                return;
+                            }
+                        }
+
+                        const saleItems = cart.map(item => ({
+                            productId: item.productId,
+                            name: item.name,
+                            qty: item.qty,
+                            price: item.price,
+                            variant: item.variant || '',
+                            discountType: item.discountType || 'none',
+                            discountValue: Number(item.discountValue || 0),
+                            discountAmount: computeDiscountAmount(Number(item.price || 0) * Number(item.qty || 0), item.discountType, item.discountValue)
+                        }));
+
+                        saleItems.forEach(item => {
+                            const product = products.find(productItem => String(productItem.id) === String(item.productId));
+                            if (product) {
+                                product.stock = Number(product.stock || 0) - Number(item.qty || 0);
+                                if (Number(product.stock || 0) <= Number(product.minStock || 0)) {
+                                    pushNotification('Low stock', `${product.name} is down to ${product.stock}`, 'warning');
+                                }
+                            }
+                        });
+                        saveProducts();
+
+                        const sale = createSaleRecord({
+                            items: saleItems,
+                            subtotal,
+                            payment: selectedPayment,
+                            paymentStatus,
+                            amountPaidNow,
+                            customerId: customer?.id || null,
+                            customerName: customer?.name || '',
+                            customerPhone: customer?.phone || '',
+                            discountType: cartDiscountType,
+                            discountValue: cartDiscountValue,
+                            discountAmount: itemDiscountTotal + cartDiscountAmount,
+                            discountReason: cartDiscountReason,
+                            loyaltyRedeemedPoints: redeemedPoints,
+                            loyaltyRedeemedValue,
+                            note: paymentStatus === 'layaway' ? 'Layaway sale' : ''
+                        });
+
+                        const loyalty = awardLoyalty(customer?.id, sale.finalTotal, redeemedPoints);
+                        sale.loyaltyEarnedPoints = loyalty.earned;
+                        sale.loyaltyRedeemedValue = loyaltyRedeemedValue;
+                        saveSales();
+
+                        cart = [];
+                        saveCart();
+                        overlay.remove();
+                        showToast(`Sale completed · ${sale.receiptNumber}`);
+                        renderPosMobile();
+
+                        if (shouldSendReceipt) {
+                            await sendReceiptOnWhatsApp(sale, phoneInput);
                         }
                     });
-                });
 
+                    refreshComputed();
+                };
+                
+                document.body.appendChild(overlay);
+                renderCartOverlay();
             }
 
             // ==================== POS PAGE ====================
@@ -3818,12 +4838,15 @@
                 const filterProducts = () => {
                     return products.filter(p => 
                         (activeCat === 'all' || p.category === activeCat) && 
-                        (searchTerm === '' || p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                        (searchTerm === '' || p.name.toLowerCase().includes(searchTerm.toLowerCase()) || String(p.barcode || '').includes(searchTerm))
                     );
                 };
                 
                 const renderPosContent = () => {
                     const filtered = filterProducts();
+                    const favorites = products.filter(product => product.favorite).slice(0, 6);
+                    const recent = recentProductIds.map(id => products.find(product => String(product.id) === String(id))).filter(Boolean).slice(0, 6);
+                    const topSelling = getTopSellingProducts(5);
                     
                     // Get all unique categories from products
                     const uniqueCategories = [...new Set(products.map(p => p.category).filter(c => c))];
@@ -3855,11 +4878,22 @@
                     });
                     
                     let html = `
-                        <div style="display:flex; background:#ecf5fe; border-radius:60px; padding:0.2rem 1.2rem; margin-bottom:0.5rem;">
-                            <i class="fas fa-search" style="color:#0b4b7a;"></i>
+                        <div style="display:flex; align-items:center; gap:0.5rem; background:#ecf5fe; border-radius:60px; padding:0.2rem 1rem; margin-bottom:0.5rem;">
+                            <i class="fas fa-search icon-one"></i>
                             <input type="text" id="mobileSearch" placeholder="${__('search')}" value="${searchTerm}" 
                                 style="border:none; background:transparent; padding:0.9rem 0; width:100%; outline:none;">
+                            <button type="button" id="scanBarcodeBtn" class="icon-btn" style="padding:0.5rem 0.8rem; background:white;">
+                                <i class="fas fa-barcode"></i>
+                            </button>
                         </div>
+
+                        ${(favorites.length || recent.length || topSelling.length) ? `
+                            <div style="background:white; border-radius:30px; padding:1rem; margin:0.6rem 0 1rem; box-shadow:0 8px 20px rgba(0,0,0,0.05);">
+                                ${favorites.length ? `<div style="margin-bottom:0.7rem;"><div style="font-size:0.75rem; font-weight:900; color:#06c6d4; text-transform:uppercase; margin-bottom:0.5rem;">Favorites</div><div style="display:flex; flex-wrap:wrap; gap:0.45rem;">${favorites.map(product => `<span class="chip quick-pick" data-id="${product.id}"><i class="fas fa-star"></i> ${product.name}</span>`).join('')}</div></div>` : ''}
+                                ${recent.length ? `<div style="margin-bottom:0.7rem;"><div style="font-size:0.75rem; font-weight:900; color:#64748b; text-transform:uppercase; margin-bottom:0.5rem;">Recent</div><div style="display:flex; flex-wrap:wrap; gap:0.45rem;">${recent.map(product => `<span class="chip quick-pick" data-id="${product.id}"><i class="fas fa-clock"></i> ${product.name}</span>`).join('')}</div></div>` : ''}
+                                ${topSelling.length ? `<div><div style="font-size:0.75rem; font-weight:900; color:#0f172a; text-transform:uppercase; margin-bottom:0.5rem;">Top sellers</div><div style="display:flex; flex-wrap:wrap; gap:0.45rem;">${topSelling.map(item => `<span class="chip quick-pick" data-id="${item.product.id}"><i class="fas fa-fire"></i> ${item.product.name}</span>`).join('')}</div></div>` : ''}
+                            </div>
+                        ` : ''}
                         
                         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.5rem 0;">
                             ${categoryChipsHtml}
@@ -3898,8 +4932,9 @@
                     document.querySelectorAll('.product-tile-mobile').forEach(t => {
                         t.addEventListener('click', (e) => {
                             e.preventDefault();
-                            let id = t.dataset.id;
-                            let stock = parseInt(t.dataset.stock);
+                            const id = t.dataset.id;
+                            const stock = parseInt(t.dataset.stock);
+                            const product = products.find(item => String(item.id) === String(id));
                             
                             if (stock <= 0) {
                                 showToast(__('outOfStock'), 'error');
@@ -3934,27 +4969,49 @@
                                 setTimeout(() => fly.remove(), 760);
                             })();
 
-                            let existing = cart.find(i => i.productId === id);
-                            if (existing) {
-                                existing.qty++;
-                            } else {
-                                cart.push({
-                                    productId: id,
-                                    name: t.dataset.name,
-                                    price: parseFloat(t.dataset.price),
-                                    qty: 1
-                                });
-                            }
+                            showVariantPicker(product, variant => {
+                                addProductToCart(product, variant);
+                                const cartBtn = document.getElementById('toggleCartBtn');
+                                if (cartBtn) {
+                                    cartBtn.classList.add('cart-bump');
+                                    setTimeout(() => cartBtn.classList.remove('cart-bump'), 400);
+                                }
+                                renderPosContent();
+                            });
                             
-                            const cartBtn = document.getElementById('toggleCartBtn');
-                            if (cartBtn) {
-                                cartBtn.classList.add('cart-bump');
-                                setTimeout(() => cartBtn.classList.remove('cart-bump'), 400);
-                            }
-                            
-                            saveCart();
-                            renderPosContent();
                         });
+                    });
+
+                    document.querySelectorAll('.quick-pick').forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            const product = products.find(item => String(item.id) === String(chip.dataset.id));
+                            if (!product) return;
+                            showVariantPicker(product, variant => {
+                                addProductToCart(product, variant);
+                                renderPosContent();
+                            });
+                        });
+                    });
+
+                    document.getElementById('scanBarcodeBtn')?.addEventListener('click', async () => {
+                        try {
+                            await scanBarcode(rawValue => {
+                                const product = findProductByBarcode(rawValue);
+                                if (!product) {
+                                    showToast(`No product found for ${rawValue}`, 'error');
+                                    searchTerm = rawValue;
+                                    renderPosContent();
+                                    return;
+                                }
+                                showVariantPicker(product, variant => {
+                                    addProductToCart(product, variant);
+                                    renderPosContent();
+                                    showToast(`${product.name} scanned`);
+                                });
+                            });
+                        } catch {
+                            showToast('Unable to start barcode scanner', 'error');
+                        }
                     });
                     
                     document.getElementById('toggleCartBtn')?.addEventListener('click', (e) => {
@@ -3973,10 +5030,15 @@
                     renderPosMobile();
                     return;
                 }
+
+                const supplierOptions = [{ value: '', label: 'No supplier' }, ...suppliers.map(supplier => ({ value: supplier.id, label: supplier.name }))];
                 
                 let html = `
                     <div style="background:white; border-radius:40px; padding:1.4rem;">
-                        <h3 style="margin-bottom:1rem;"><i class="fas fa-cubes" style="color:#06c6d4;"></i> ${__('productTitle')}</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.7rem; margin-bottom:1rem; flex-wrap:wrap;">
+                            <h3><i class="fas fa-cubes icon-one"></i> ${__('productTitle')}</h3>
+                            <button class="btn-small analytics-ghost-btn" id="addSupplierBtn" style="min-height:auto; padding:0.7rem 1rem;"><i class="fas fa-truck"></i> Supplier</button>
+                        </div>
                 `;
                 
                 products.forEach(p => {
@@ -3990,13 +5052,18 @@
                         <div style="display:flex; align-items:center; gap:0.8rem; padding:12px 0; border-bottom:1px solid #e2edff;">
                             <div style="min-width:40px;">${imgHtml}</div>
                             <div style="flex:1;">
-                                <div style="font-weight:600;">${p.name}</div>
-                                <div style="font-size:0.8rem; color:#64748b;">${p.category}</div>
+                                <div style="font-weight:600; display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap;">${p.name} ${p.favorite ? '<i class="fas fa-star icon-one"></i>' : ''}</div>
+                                <div style="font-size:0.8rem; color:#64748b;">${p.category}${p.barcode ? ` · ${p.barcode}` : ''}</div>
+                                <div style="font-size:0.75rem; color:#06c6d4;">${p.supplierName || 'No supplier'}${p.variants?.length ? ` · ${p.variants.join(', ')}` : ''}</div>
                             </div>
                             <div style="text-align:right;">
                                 <div><small>B: TSh ${p.buyPrice}</small></div>
                                 <div><strong>S: TSh ${p.sellPrice}</strong> <span style="color:#27ae60;">+${profit}</span></div>
-                                <div style="font-size:0.8rem;">Stock: ${p.stock}</div>
+                                <div style="font-size:0.8rem;">Stock: ${p.stock} · Min ${p.minStock || 0}</div>
+                                <div style="display:flex; gap:0.35rem; justify-content:flex-end; margin-top:0.45rem;">
+                                    <button class="analytics-ghost-btn btn-small stock-intake-btn" data-id="${p.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-plus"></i></button>
+                                    <button class="analytics-ghost-btn btn-small create-po-btn" data-id="${p.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-file-invoice"></i></button>
+                                </div>
                             </div>
                             <i class="fas fa-edit" data-id="${p.id}" style="color:#06c6d4; font-size:1.2rem; cursor:pointer; margin-left:8px;"></i>
                         </div>
@@ -4011,6 +5078,31 @@
                 `;
                 
                 document.getElementById('mobileContent').innerHTML = html;
+
+                document.getElementById('addSupplierBtn')?.addEventListener('click', () => {
+                    showEnhancedModal({
+                        title: 'New supplier',
+                        fields: [
+                            { name: 'name', placeholder: 'Supplier name' },
+                            { name: 'contact', placeholder: 'Contact person' },
+                            { name: 'phone', placeholder: 'Phone number' },
+                            { name: 'notes', placeholder: 'Notes' }
+                        ],
+                        onConfirm: data => {
+                            suppliers.unshift({
+                                id: `s${Date.now()}`,
+                                name: data.name || 'Supplier',
+                                contact: data.contact || '',
+                                phone: data.phone || '',
+                                notes: data.notes || '',
+                                createdAt: new Date().toISOString()
+                            });
+                            saveSuppliers();
+                            recordAudit('supplier-created', `Supplier ${data.name || 'Supplier'} created`);
+                            renderProductsMobile();
+                        }
+                    });
+                });
                 
                 document.getElementById('addProdBtn').addEventListener('click', () => {
                     showEnhancedModal({
@@ -4022,9 +5114,15 @@
                             { name: 'buyPrice', placeholder: __('buyPrice'), type: 'number' },
                             { name: 'sellPrice', placeholder: __('sellPrice'), type: 'number' },
                             { name: 'stock', placeholder: __('quantity'), type: 'number', value: 0 },
-                            { name: 'category', placeholder: __('category'), value: 'General' }
+                            { name: 'minStock', placeholder: 'Minimum stock', type: 'number', value: 5 },
+                            { name: 'barcode', placeholder: 'Barcode' },
+                            { name: 'variants', placeholder: 'Variants (comma separated)' },
+                            { name: 'category', placeholder: __('category'), value: 'General' },
+                            { name: 'supplierId', type: 'select', options: supplierOptions, value: '' },
+                            { name: 'favorite', type: 'select', options: [{ value: '0', label: 'Normal' }, { value: '1', label: 'Favorite' }], value: '0' }
                         ],
                         onConfirm: (d) => {
+                            const supplier = suppliers.find(item => item.id === d.supplierId);
                             products.push({
                                 id: 'p' + Date.now(),
                                 name: d.name,
@@ -4032,13 +5130,49 @@
                                 buyPrice: parseFloat(d.buyPrice) || 0,
                                 sellPrice: parseFloat(d.sellPrice) || 0,
                                 stock: parseInt(d.stock) || 0,
-                                minStock: 5,
-                                image: d.image || null
+                                minStock: parseInt(d.minStock) || 5,
+                                barcode: d.barcode || '',
+                                supplierId: d.supplierId || '',
+                                supplierName: supplier?.name || '',
+                                variants: String(d.variants || '').split(',').map(item => item.trim()).filter(Boolean),
+                                favorite: d.favorite === '1',
+                                image: d.image || null,
+                                stockHistory: []
                             });
                             saveProducts();
+                            recordAudit('product-created', `Product ${d.name} created`);
                             renderProductsMobile();
                             showToast('Product added');
                         }
+                    });
+                });
+
+                document.querySelectorAll('.stock-intake-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const product = products.find(item => String(item.id) === String(button.dataset.id));
+                        if (!product) return;
+                        showEnhancedModal({
+                            title: `Stock intake · ${product.name}`,
+                            fields: [
+                                { name: 'qty', type: 'number', placeholder: 'Quantity received', value: 1 },
+                                { name: 'costPerUnit', type: 'number', placeholder: 'Cost per unit', value: product.buyPrice || 0 },
+                                { name: 'note', placeholder: 'Intake note', value: 'Manual stock intake' }
+                            ],
+                            onConfirm: data => {
+                                addStockIntake(product.id, data.qty, data.costPerUnit, data.note || 'Manual stock intake');
+                                renderProductsMobile();
+                                showToast('Stock updated');
+                            }
+                        });
+                    });
+                });
+
+                document.querySelectorAll('.create-po-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const product = products.find(item => String(item.id) === String(button.dataset.id));
+                        if (!product) return;
+                        createPurchaseOrderFromProduct(product);
+                        showToast('Purchase order created');
                     });
                 });
                 
@@ -4057,16 +5191,29 @@
                                 { name: 'buyPrice', type: 'number', value: p.buyPrice },
                                 { name: 'sellPrice', type: 'number', value: p.sellPrice },
                                 { name: 'stock', type: 'number', value: p.stock },
-                                { name: 'category', value: p.category }
+                                { name: 'minStock', type: 'number', value: p.minStock || 5 },
+                                { name: 'barcode', value: p.barcode || '' },
+                                { name: 'variants', value: (p.variants || []).join(', ') },
+                                { name: 'category', value: p.category },
+                                { name: 'supplierId', type: 'select', options: supplierOptions, value: p.supplierId || '' },
+                                { name: 'favorite', type: 'select', options: [{ value: '0', label: 'Normal' }, { value: '1', label: 'Favorite' }], value: p.favorite ? '1' : '0' }
                             ],
                             onConfirm: (d) => {
+                                const supplier = suppliers.find(item => item.id === d.supplierId);
                                 p.name = d.name;
                                 p.buyPrice = parseFloat(d.buyPrice) || 0;
                                 p.sellPrice = parseFloat(d.sellPrice) || 0;
                                 p.stock = parseInt(d.stock) || 0;
+                                p.minStock = parseInt(d.minStock) || 5;
+                                p.barcode = d.barcode || '';
+                                p.variants = String(d.variants || '').split(',').map(item => item.trim()).filter(Boolean);
                                 p.category = d.category;
+                                p.supplierId = d.supplierId || '';
+                                p.supplierName = supplier?.name || '';
+                                p.favorite = d.favorite === '1';
                                 if (d.image) p.image = d.image;
                                 saveProducts();
+                                recordAudit('product-updated', `Product ${p.name} updated`);
                                 renderProductsMobile();
                                 showToast('Product updated');
                             }
@@ -4179,7 +5326,7 @@
                         <section class="analytics-card">
                             <div class="analytics-section-head">
                                 <div>
-                                    <h4><i class="fas fa-layer-group" style="color:#06c6d4;"></i> ${__('analysis')}</h4>
+                                    <h4><i class="fas fa-layer-group icon-one"></i> ${__('analysis')}</h4>
                                     <p>${__('averageOrder')} · ${__('topProduct')} · ${__('transactions')}</p>
                                 </div>
                             </div>
@@ -4214,7 +5361,7 @@
                         <section class="analytics-card">
                             <div class="analytics-section-head">
                                 <div>
-                                    <h4><i class="fas fa-trophy" style="color:#06c6d4;"></i> Product Performance</h4>
+                                    <h4><i class="fas fa-trophy icon-one"></i> Product Performance</h4>
                                     <p>Most sold · least sold · never sold</p>
                                 </div>
                             </div>
@@ -4236,7 +5383,7 @@
                         <section class="analytics-card">
                             <div class="analytics-section-head">
                                 <div>
-                                    <h4><i class="fas fa-chart-area" style="color:#06c6d4;"></i> ${__('revenue')}</h4>
+                                    <h4><i class="fas fa-chart-area icon-one"></i> ${__('revenue')}</h4>
                                     <p>Last 7 days</p>
                                 </div>
                                 <span class="analytics-mini-chip">7 Days</span>
@@ -4249,7 +5396,7 @@
                         <section class="analytics-card">
                             <div class="analytics-section-head">
                                 <div>
-                                    <h4><i class="fas fa-wallet" style="color:#06c6d4;"></i> ${__('expenses')}</h4>
+                                    <h4><i class="fas fa-wallet icon-one"></i> ${__('expenses')}</h4>
                                     <p>${__('expenseHistory')}</p>
                                 </div>
                                 <div class="analytics-actions">
@@ -4632,6 +5779,7 @@
             function renderSalesMobile() {
                 let filter = currentSalesFilter || 'all';
                 let filteredSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date));
+                let searchTerm = '';
                 
                 const filterSales = () => {
                     const now = new Date();
@@ -4641,10 +5789,20 @@
                     const monthAgo = new Date(today);
                     monthAgo.setMonth(monthAgo.getMonth() - 1);
                     
-                    if (filter === 'today') return filteredSales.filter(s => new Date(s.date) >= today);
-                    if (filter === 'week') return filteredSales.filter(s => new Date(s.date) >= weekAgo);
-                    if (filter === 'month') return filteredSales.filter(s => new Date(s.date) >= monthAgo);
-                    return filteredSales;
+                    let result = filteredSales;
+                    if (filter === 'today') result = filteredSales.filter(s => new Date(s.date) >= today);
+                    if (filter === 'week') result = filteredSales.filter(s => new Date(s.date) >= weekAgo);
+                    if (filter === 'month') result = filteredSales.filter(s => new Date(s.date) >= monthAgo);
+                    if (searchTerm) {
+                        const lowered = searchTerm.toLowerCase();
+                        result = result.filter(sale => (
+                            String(sale.receiptNumber || '').toLowerCase().includes(lowered) ||
+                            String(sale.customerName || '').toLowerCase().includes(lowered) ||
+                            String(sale.userName || '').toLowerCase().includes(lowered) ||
+                            (sale.items || []).some(item => String(item.name || '').toLowerCase().includes(lowered))
+                        ));
+                    }
+                    return result;
                 };
                 
                 const renderSalesContent = () => {
@@ -4657,7 +5815,7 @@
                             <div class="sales-header-row">
                                 <div class="sales-title-row">
                                     <div class="sales-title-block">
-                                        <h3><i class="fas fa-history" style="color:#06c6d4;"></i> ${__('salesHistory')}</h3>
+                                        <h3><i class="fas fa-history icon-one"></i> ${__('salesHistory')}</h3>
                                         <div class="sales-header-meta">${displaySales.length} ${__('transactions')}</div>
                                     </div>
                                     <span class="sales-summary-chip">${filterLabel}</span>
@@ -4674,6 +5832,8 @@
                                 <span class="filter-tab ${filter === 'week' ? 'active' : ''}" data-filter="week">${__('week')}</span>
                                 <span class="filter-tab ${filter === 'month' ? 'active' : ''}" data-filter="month">${__('month')}</span>
                             </div>
+
+                            <input type="text" id="salesSearchInput" placeholder="Search receipt, cashier, customer, product" value="${searchTerm}" style="width:100%; padding:0.9rem 1rem; border-radius:999px; border:1px solid #c2daf5; outline:none; margin-bottom:0.8rem;">
                             
                             <div style="background:#f8fafc; border-radius:40px; padding:1rem; margin:1rem 0; text-align:center;">
                                 <div style="font-size:0.9rem; color:#64748b;">Total Sales</div>
@@ -4697,8 +5857,14 @@
                                                     </span>
                                                     <span class="sale-payment">${sale.payment || 'Cash'}</span>
                                                     <span style="background:rgba(6,198,212,0.15); color:#06c6d4; padding:0.3rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:600;"><i class="fas fa-user"></i> ${sale.userName || 'Unknown'}</span>
+                                                    <span style="background:rgba(15,23,42,0.08); color:#0f172a; padding:0.3rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:700;">${sale.paymentStatus || 'paid'}</span>
                                                 </div>
-                                                <div class="sale-products">${productNames.substring(0, 50)}${productNames.length > 50 ? '...' : ''}</div>
+                                                <div class="sale-products">${sale.receiptNumber || sale.id} · ${productNames.substring(0, 50)}${productNames.length > 50 ? '...' : ''}</div>
+                                                <div style="font-size:0.78rem; color:#64748b; margin-top:0.35rem;">${sale.customerName ? `Customer: ${sale.customerName}` : 'Walk-in'}${sale.outstandingAmount > 0 ? ` · Due ${formatMoney(sale.outstandingAmount)}` : ''}</div>
+                                                <div style="display:flex; gap:0.45rem; margin-top:0.55rem; flex-wrap:wrap;">
+                                                    <button class="btn-small analytics-ghost-btn receipt-btn" data-id="${sale.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-receipt"></i> Receipt</button>
+                                                    ${!sale.isReturn && !sale.refundedAt ? `<button class="btn-small sales-clear-btn refund-btn" data-id="${sale.id}" style="padding:0.45rem 0.8rem; min-height:auto;"><i class="fas fa-rotate-left"></i> Refund</button>` : ''}
+                                                </div>
                                             </div>
                                             <div class="sale-amount">TSh ${sale.finalTotal}</div>
                                         </div>
@@ -4717,6 +5883,10 @@
                             renderSalesContent();
                         });
                     });
+                    document.getElementById('salesSearchInput')?.addEventListener('input', event => {
+                        searchTerm = event.target.value;
+                        renderSalesContent();
+                    });
                     document.getElementById('pdfSalesBtn')?.addEventListener('click', generateSalesPDF);
                     document.getElementById('clearSalesBtn')?.addEventListener('click', () => {
                         if(confirm('Delete all sales?')) {
@@ -4726,6 +5896,25 @@
                             showToast('Sales cleared');
                         }
                     });
+                    document.querySelectorAll('.receipt-btn').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const sale = sales.find(item => String(item.id) === String(button.dataset.id));
+                            if (!sale) return;
+                            buildReceiptPDF(sale).save(`${sale.receiptNumber || sale.id}.pdf`);
+                        });
+                    });
+                    document.querySelectorAll('.refund-btn').forEach(button => {
+                        button.addEventListener('click', () => {
+                            if (!confirm('Refund this sale and restore stock?')) return;
+                            const ok = refundSale(Number(button.dataset.id));
+                            if (!ok) {
+                                showToast('Refund could not be processed', 'error');
+                                return;
+                            }
+                            renderSalesContent();
+                            showToast('Refund processed');
+                        });
+                    });
                 };
                 
                 renderSalesContent();
@@ -4733,35 +5922,275 @@
 
             // ==================== ALERTS PAGE ====================
             function renderAlertsMobile() {
-                let lowStock = products.filter(p => p.stock <= p.minStock);
-                
+                const lowStock = getLowStockProducts();
+                const balances = getCustomerBalances();
+                const activeShift = getActiveShift();
+
                 let html = `
-                    <div style="background:white; border-radius:40px; padding:1.4rem;">
-                        <h3 style="margin-bottom:1rem;"><i class="fas fa-bell" style="color:#06c6d4;"></i> ${__('alertTitle')}</h3>
-                        ${lowStock.length === 0 ? 
-                            `<p style="text-align:center; padding:2rem;">${__('noAlerts')}</p>` : 
-                            lowStock.map(p => `
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin:0.7rem 0; padding:0.8rem 1rem; background:#fff3e0; border-radius:40px;">
-                                    <span><strong>${p.name}</strong></span>
-                                    <span style="color:#c0392b; font-weight:600;">${p.stock} ${__('quantity')}</span>
+                    <div class="analytics-page">
+                        <section class="analytics-card analytics-hero">
+                            <div class="analytics-hero-top">
+                                <div class="analytics-hero-copy">
+                                    <span class="analytics-eyebrow">Operations</span>
+                                    <h2>Store control</h2>
+                                    <p>Low stock, purchase orders, balances, shifts, notifications, and audit trail.</p>
+                                </div>
+                                <span class="analytics-hero-chip"><i class="fas fa-bell"></i> ${getUnreadNotificationCount()} unread</span>
+                            </div>
+                            <div class="analytics-hero-grid">
+                                <div class="analytics-hero-metric">
+                                    <span class="analytics-hero-label">Low stock</span>
+                                    <strong>${lowStock.length}</strong>
+                                </div>
+                                <div class="analytics-hero-metric">
+                                    <span class="analytics-hero-label">Balances due</span>
+                                    <strong>${formatMoney(balances.reduce((sum, item) => sum + item.outstanding, 0))}</strong>
+                                </div>
+                            </div>
+                            <div class="analytics-hero-strip">
+                                <span class="analytics-hero-chip"><i class="fas fa-truck"></i> ${suppliers.length} suppliers</span>
+                                <span class="analytics-hero-chip"><i class="fas fa-file-invoice"></i> ${purchaseOrders.filter(item => item.status !== 'received').length} open POs</span>
+                                <span class="analytics-hero-chip"><i class="fas fa-cash-register"></i> ${activeShift ? 'Shift open' : 'No shift open'}</span>
+                            </div>
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-bell icon-one"></i> Dashboard alerts</h4>
+                                    <p>Priority actions for today</p>
+                                </div>
+                            </div>
+                            ${lowStock.length === 0 && balances.length === 0 ? `<div class="analytics-empty-state">No urgent actions right now.</div>` : ''}
+                            ${lowStock.slice(0, 5).map(product => `
+                                <div class="analytics-expense-item" style="border-left-color:#f59e0b;">
+                                    <div class="analytics-expense-head">
+                                        <div class="analytics-expense-main">
+                                            <div class="analytics-expense-title">${product.name}</div>
+                                            <div class="analytics-expense-meta">
+                                                <span class="analytics-expense-chip">Stock ${product.stock} / Min ${product.minStock}</span>
+                                                <span class="analytics-expense-subtle">${product.supplierName || 'No supplier assigned'}</span>
+                                            </div>
+                                        </div>
+                                        <div class="analytics-expense-side">
+                                            <button class="btn-small create-po-alert-btn" data-id="${product.id}" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-file-invoice"></i> Reorder</button>
+                                        </div>
+                                    </div>
                                 </div>
                             `).join('')}
+                            ${balances.slice(0, 5).map(balance => `
+                                <div class="analytics-expense-item" style="border-left-color:#ef4444;">
+                                    <div class="analytics-expense-head">
+                                        <div class="analytics-expense-main">
+                                            <div class="analytics-expense-title">${balance.customerName}</div>
+                                            <div class="analytics-expense-meta">
+                                                <span class="analytics-expense-chip">${balance.count} open sale(s)</span>
+                                                <span class="analytics-expense-subtle">Layaway ${formatMoney(balance.layaway)}</span>
+                                            </div>
+                                        </div>
+                                        <div class="analytics-expense-side">
+                                            <div class="analytics-expense-amount">${formatMoney(balance.outstanding)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-truck icon-one"></i> Suppliers</h4>
+                                    <p>Supplier contacts and linked inventory</p>
+                                </div>
+                            </div>
+                            ${suppliers.length === 0 ? `<div class="analytics-empty-state">No suppliers added yet.</div>` : suppliers.map(supplier => `
+                                <div class="analytics-expense-item">
+                                    <div class="analytics-expense-head">
+                                        <div class="analytics-expense-main">
+                                            <div class="analytics-expense-title">${supplier.name}</div>
+                                            <div class="analytics-expense-meta">
+                                                <span class="analytics-expense-chip">${supplier.contact || 'No contact'}</span>
+                                                <span class="analytics-expense-subtle">${supplier.phone || 'No phone'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-file-invoice icon-one"></i> Purchase Orders</h4>
+                                    <p>Restock workflow and goods received</p>
+                                </div>
+                            </div>
+                            ${purchaseOrders.length === 0 ? `<div class="analytics-empty-state">No purchase orders yet.</div>` : purchaseOrders.slice(0, 8).map(order => `
+                                <div class="analytics-expense-item">
+                                    <div class="analytics-expense-head">
+                                        <div class="analytics-expense-main">
+                                            <div class="analytics-expense-title">${order.productName}</div>
+                                            <div class="analytics-expense-meta">
+                                                <span class="analytics-expense-chip">${order.qty} units</span>
+                                                <span class="analytics-expense-subtle">${order.supplierName || 'No supplier'}</span>
+                                                <span class="analytics-expense-subtle">${order.status}</span>
+                                            </div>
+                                        </div>
+                                        <div class="analytics-expense-side">
+                                            ${order.status !== 'received' ? `<button class="btn-small receive-po-btn" data-id="${order.id}" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-box-open"></i> Receive</button>` : `<span class="analytics-mini-chip">Received</span>`}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-cash-register icon-one"></i> Shift Control</h4>
+                                    <p>Open and close daily cash shifts</p>
+                                </div>
+                            </div>
+                            <div class="analytics-expense-item">
+                                <div class="analytics-expense-head">
+                                    <div class="analytics-expense-main">
+                                        <div class="analytics-expense-title">${activeShift ? `Opened by ${activeShift.openedBy}` : 'No active shift'}</div>
+                                        <div class="analytics-expense-meta">
+                                            <span class="analytics-expense-chip">${activeShift ? new Date(activeShift.openedAt).toLocaleString() : 'Open a shift to track cash-up'}</span>
+                                            ${activeShift ? `<span class="analytics-expense-subtle">Opening ${formatMoney(activeShift.openingCash)}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="analytics-expense-side">
+                                        ${activeShift ? `<button class="btn-small" id="closeShiftBtn" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-lock"></i> Close shift</button>` : `<button class="btn-small" id="openShiftBtn" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-unlock"></i> Open shift</button>`}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-message icon-one"></i> Notifications</h4>
+                                    <p>System and workflow events</p>
+                                </div>
+                                <button class="btn-small analytics-ghost-btn" id="markNotificationsReadBtn" style="padding:0.55rem 0.9rem; min-height:auto;">Mark all read</button>
+                            </div>
+                            ${notifications.length === 0 ? `<div class="analytics-empty-state">No notifications yet.</div>` : notifications.slice(0, 10).map(item => `
+                                <div class="analytics-expense-item">
+                                    <div class="analytics-expense-head">
+                                        <div class="analytics-expense-main">
+                                            <div class="analytics-expense-title">${item.title}</div>
+                                            <div class="analytics-expense-meta">
+                                                <span class="analytics-expense-chip">${item.type}</span>
+                                                <span class="analytics-expense-subtle">${new Date(item.date).toLocaleString()}</span>
+                                            </div>
+                                            <div style="margin-top:0.5rem; color:#475569; font-size:0.85rem;">${item.body}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </section>
+
+                        <section class="analytics-card">
+                            <div class="analytics-section-head">
+                                <div>
+                                    <h4><i class="fas fa-clipboard-list icon-one"></i> Audit Log</h4>
+                                    <p>Recent operational activity</p>
+                                </div>
+                            </div>
+                            ${auditLogs.length === 0 ? `<div class="analytics-empty-state">No audit entries yet.</div>` : auditLogs.slice(0, 12).map(entry => `
+                                <div class="analytics-expense-item">
+                                    <div class="analytics-expense-head">
+                                        <div class="analytics-expense-main">
+                                            <div class="analytics-expense-title">${entry.detail}</div>
+                                            <div class="analytics-expense-meta">
+                                                <span class="analytics-expense-chip">${entry.action}</span>
+                                                <span class="analytics-expense-subtle">${entry.userName}</span>
+                                                <span class="analytics-expense-subtle">${new Date(entry.date).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </section>
                     </div>
                 `;
-                
+
                 document.getElementById('mobileContent').innerHTML = html;
+
+                document.querySelectorAll('.create-po-alert-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const product = products.find(item => String(item.id) === String(button.dataset.id));
+                        if (!product) return;
+                        createPurchaseOrderFromProduct(product);
+                        renderAlertsMobile();
+                        showToast('Purchase order created');
+                    });
+                });
+
+                document.querySelectorAll('.receive-po-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        receivePurchaseOrder(button.dataset.id);
+                        renderAlertsMobile();
+                        showToast('Purchase order received');
+                    });
+                });
+
+                document.getElementById('markNotificationsReadBtn')?.addEventListener('click', () => {
+                    markNotificationsRead();
+                    renderAlertsMobile();
+                });
+
+                document.getElementById('openShiftBtn')?.addEventListener('click', () => {
+                    showEnhancedModal({
+                        title: 'Open shift',
+                        fields: [
+                            { name: 'openingCash', type: 'number', placeholder: 'Opening cash', value: 0 }
+                        ],
+                        onConfirm: data => {
+                            startShift(data.openingCash);
+                            renderAlertsMobile();
+                            showToast('Shift opened');
+                        }
+                    });
+                });
+
+                document.getElementById('closeShiftBtn')?.addEventListener('click', () => {
+                    showEnhancedModal({
+                        title: 'Close shift',
+                        fields: [
+                            { name: 'actualCash', type: 'number', placeholder: 'Actual cash counted', value: activeShift ? activeShift.openingCash : 0 }
+                        ],
+                        onConfirm: data => {
+                            const closed = closeShift(data.actualCash);
+                            if (!closed) return;
+                            renderAlertsMobile();
+                            showToast(`Shift closed · variance ${formatMoney(closed.cashVariance)}`);
+                        }
+                    });
+                });
             }
 
             // ==================== USERS PAGE ====================
             function renderUsersMobile() {
                 if (!isManager()) return;
+
+                const cashierStats = users.map(user => {
+                    const userSales = sales.filter(sale => !sale.isReturn && String(sale.userId) === String(user.id));
+                    return {
+                        id: user.id,
+                        salesCount: userSales.length,
+                        salesTotal: userSales.reduce((sum, sale) => sum + Number(sale.finalTotal || 0), 0)
+                    };
+                });
                 
                 let html = `
                     <div style="background:white; border-radius:40px; padding:1.4rem;">
-                        <h3 style="margin-bottom:1rem;"><i class="fas fa-users" style="color:#06c6d4;"></i> ${__('userTitle')}</h3>
+                        <h3 style="margin-bottom:1rem;"><i class="fas fa-users icon-one"></i> ${__('userTitle')}</h3>
                 `;
                 
                 users.forEach(u => {
+                    const stat = cashierStats.find(item => item.id === u.id) || { salesCount: 0, salesTotal: 0 };
                     let avatarHtml = u.profileImage ? 
                         `<img src="${u.profileImage}" style="width:100%; height:100%; object-fit:cover;">` : 
                         '<i class="fas fa-user" style="font-size:1.2rem;"></i>';
@@ -4773,6 +6202,7 @@
                                 <div><strong>${u.name}</strong></div>
                                 <div style="font-size:0.8rem; color:#64748b;">@${u.username} · ${u.role}</div>
                                 ${u.phone ? `<div style="font-size:0.75rem; color:#06c6d4;"><i class="fas fa-phone"></i> ${u.phone}</div>` : ''}
+                                <div style="font-size:0.75rem; color:#64748b;"><i class="fas fa-chart-line"></i> ${stat.salesCount} sales · ${formatMoney(stat.salesTotal)}</div>
                             </div>
                             <div class="user-actions">
                                 <i class="fas fa-edit" data-userid="${u.id}" style="color:#06c6d4; font-size:1.2rem; cursor:pointer; margin-right:10px;"></i>
@@ -5016,6 +6446,7 @@
 
             // ==================== START APP ====================
             function completeStartup() {
+                registerPwaHooks();
                 if (!getLicense()) {
                     saveLicense({ type: 'trial', start: Date.now(), duration: TRIAL_DURATION });
                 }
