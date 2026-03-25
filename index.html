@@ -2451,6 +2451,7 @@
             const NORMALIZED_PRODUCT_KEYS = new Set(VALID_PRODUCT_KEYS.map(normalizeProductKey));
             let licenseCheckInterval = null;
             let trialExpiredNotified = false;
+            let lastLicenseWarningDate = null;
 
             function normalizeProductKey(value) {
                 return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -3903,6 +3904,18 @@
                 licenseCheckInterval = setInterval(() => {
                     const remaining = getRemainingMs();
                     
+                    // Notify when 3 days remaining (only once per day)
+                    const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+                    const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+                    if (remaining <= threeDaysMs && remaining > twoDaysMs) {
+                        const today = new Date().toDateString();
+                        if (lastLicenseWarningDate !== today) {
+                            lastLicenseWarningDate = today;
+                            const daysLeft = Math.ceil(remaining / (24 * 60 * 60 * 1000));
+                            pushNotification('License renewal', `Your license expires in ${daysLeft} days. Please renew to continue using Profit Point.`, 'warning');
+                        }
+                    }
+                    
                     if (remaining <= 10000 && remaining > 0 && !trialExpiredNotified) {
                         trialExpiredNotified = true;
                         showToast('⚠️ Trial expiring in 10 seconds. Product key required!', 'error');
@@ -3914,6 +3927,100 @@
                         showProductKeyModal(true);
                     }
                 }, 1000);
+            }
+
+            // ==================== MANUAL/INSTRUCTIONS MODAL ====================
+            function showManualModal() {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.style.cssText = 'align-items:flex-start;padding:1.2rem 0;overflow-y:auto;';
+                overlay.innerHTML = `
+                    <div class="modal-card" style="max-width:500px;width:100%;padding:1.6rem;border-radius:18px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                            <h2 style="margin:0;"><i class="fas fa-book icon-one"></i> Profit Point POS Guide</h2>
+                            <button id="manualClose" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94a3b8;"><i class="fas fa-times"></i></button>
+                        </div>
+                        
+                        <div style="color:#475569;line-height:1.7;font-size:0.95rem;">
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-home icon-one"></i> Getting Started</h3>
+                            <p>Welcome to Profit Point, your mobile-first Point of Sale system. Here's how to use it:</p>
+                            
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-cash-register icon-one"></i> POS (Sales)</h3>
+                            <ul style="padding-left:1.5rem;margin:0.5rem 0;">
+                                <li><strong>Search Products:</strong> Use the search bar to find products by name or barcode</li>
+                                <li><strong>Scan Barcode:</strong> Tap the scan button (camera icon) to use your camera, or manually enter a barcode</li>
+                                <li><strong>Add Products:</strong> Click products to add them to your cart with quantity</li>
+                                <li><strong>Manage Cart:</strong> Edit prices, add discounts, or remove items before checkout</li>
+                                <li><strong>Payment Types:</strong> Choose Cash, Card, Mobile Money, Credit, or Layaway</li>
+                                <li><strong>Customer Tracking:</strong> Add customer name/phone for credit sales and balance tracking</li>
+                            </ul>
+                            
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-cubes icon-one"></i> Products</h3>
+                            <ul style="padding-left:1.5rem;margin:0.5rem 0;">
+                                <li><strong>Add Products:</strong> Create new products with buy/sell prices, stock, and barcode</li>
+                                <li><strong>Images:</strong> Upload or capture product photos for visual recognition</li>
+                                <li><strong>Variants:</strong> Create variants like sizes or colors (comma-separated)</li>
+                                <li><strong>Stock Management:</strong> Track stock levels and set minimum thresholds</li>
+                                <li><strong>Suppliers:</strong> Link products to suppliers for purchase orders</li>
+                            </ul>
+                            
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-chart-pie icon-one"></i> Analytics</h3>
+                            <ul style="padding-left:1.5rem;margin:0.5rem 0;">
+                                <li><strong>Daily Sales:</strong> View total sales, transactions, and cash flow</li>
+                                <li><strong>Expenses:</strong> Track daily expenses and manage business costs</li>
+                                <li><strong>Top Products:</strong> See which products are selling best</li>
+                                <li><strong>Customer Trends:</strong> Monitor best customers and buying patterns</li>
+                            </ul>
+                            
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-history icon-one"></i> Sales History</h3>
+                            <ul style="padding-left:1.5rem;margin:0.5rem 0;">
+                                <li><strong>View Receipts:</strong> Tap "Receipt" to view and download sales details as PDF</li>
+                                <li><strong>Refunds:</strong> Process refunds and restore stock automatically</li>
+                                <li><strong>Record Payments:</strong> Track partial/credit payments for each sale</li>
+                                <li><strong>Search:</strong> Filter by date, customer, payment method, or status</li>
+                            </ul>
+                            
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-bell icon-one"></i> Alerts & Operations</h3>
+                            <ul style="padding-left:1.5rem;margin:0.5rem 0;">
+                                <li><strong>Low Stock Alerts:</strong> Get notified when products fall below minimum stock</li>
+                                <li><strong>Customer Balances:</strong> View and manage credit sales and customer payments</li>
+                                <li><strong>Purchase Orders:</strong> Create and track orders with suppliers</li>
+                                <li><strong>Shifts:</strong> Open and close shifts to track cashier performance</li>
+                            </ul>
+                            
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-cog icon-one"></i> Settings</h3>
+                            <ul style="padding-left:1.5rem;margin:0.5rem 0;">
+                                <li><strong>Language:</strong> Switch between English and Kiswahili</li>
+                                <li><strong>Shop Info:</strong> Customize your shop name and receipt details</li>
+                                <li><strong>Wallpaper:</strong> Personalize the app appearance</li>
+                                <li><strong>Fullscreen:</strong> Toggle fullscreen mode for better display</li>
+                            </ul>
+                            
+                            <h3 style="color:#0f172a;margin-top:1.2rem;margin-bottom:0.5rem;"><i class="fas fa-lightbulb icon-one"></i> Quick Tips</h3>
+                            <ul style="padding-left:1.5rem;margin:0.5rem 0;">
+                                <li><strong>Barcode Scanning:</strong> Works on HTTPS or localhost. Use manual entry as fallback</li>
+                                <li><strong>Camera Permissions:</strong> Grant camera access for barcode scanning and product photos</li>
+                                <li><strong>Auto-Fullscreen:</strong> Toggle in the 3-dot menu to auto-enter fullscreen on open</li>
+                                <li><strong>Receipt PDF:</strong> Receipts are saved locally; tap Download to export as PDF</li>
+                                <li><strong>Data Backup:</strong> All data is saved to browser storage. Backup regularly in Settings</li>
+                            </ul>
+                            
+                            <div style="background:#f1f5f9;border-radius:12px;padding:1rem;margin-top:1.5rem;color:#0f172a;">
+                                <strong><i class="fas fa-info-circle"></i> Need Help?</strong><br>
+                                Contact support or check the audit log in Alerts for system activity details.
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex;gap:0.6rem;margin-top:1.5rem;">
+                            <button id="manualCloseBtn" style="flex:1;padding:0.8rem 1rem;background:#06c6d4;color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;font-size:0.95rem;">Close</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(overlay);
+                overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+                document.getElementById('manualClose').addEventListener('click', () => overlay.remove());
+                document.getElementById('manualCloseBtn').addEventListener('click', () => overlay.remove());
             }
 
             // ==================== SETTINGS MODAL ====================
@@ -7094,7 +7201,7 @@
                         </div>
                         
                         <div class="brand-user-row">
-                            <div class="brand-chip">
+                            <div class="brand-chip" id="shopLogoBtn" style="cursor:pointer;" title="View manual and instructions">
                                 <span class="shop-logo-preview">${logoHtml}</span>
                                 <span class="shop-name-display">${shopBrand.name}</span>
                             </div>
@@ -7121,6 +7228,9 @@
                 `;
                 
                 document.getElementById('headerAvatarBtn').addEventListener('click', showUserProfileModal);
+
+                // Logo click shows manual
+                document.getElementById('shopLogoBtn').addEventListener('click', showManualModal);
 
                 // 3-dot menu
                 const threeDotBtn = document.getElementById('threeDotMenuBtn');
