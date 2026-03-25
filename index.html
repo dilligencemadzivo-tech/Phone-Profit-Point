@@ -2447,6 +2447,9 @@
             const LICENSE_KEY = 'profitpoint_license';
             const TRIAL_DURATION = 60 * 1000; // 1 minute trial
             const MONTH_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
+            const SUPPORT_EMAIL = 'info@bitlynxcontrols.dev';
+            const SUPPORT_WHATSAPP = '255654307174';
+            const PRODUCT_KEY_REQUEST_MESSAGE = 'Hello, I would like to request a Profit Point product key.';
             const VALID_PRODUCT_KEYS = ['12345ABCDE', 'ABCDE12345'];
             const NORMALIZED_PRODUCT_KEYS = new Set(VALID_PRODUCT_KEYS.map(normalizeProductKey));
             let licenseCheckInterval = null;
@@ -3864,6 +3867,10 @@
                             ${cancelBtn}
                             <button class="modal-btn" id="submitKey" onclick="handleActivateKey()">Activate</button>
                         </div>
+                        <div style="margin-top:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <a href="https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(PRODUCT_KEY_REQUEST_MESSAGE)}" target="_blank" rel="noopener" class="btn-small" style="text-decoration:none; min-height:auto; padding:0.55rem 0.8rem; background:#16a34a; color:#fff; border-color:#16a34a;"><i class="fab fa-whatsapp"></i> Request key on WhatsApp</a>
+                            <a href="mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Product Key Request')}&body=${encodeURIComponent(PRODUCT_KEY_REQUEST_MESSAGE)}" class="btn-small analytics-ghost-btn" style="text-decoration:none; min-height:auto; padding:0.55rem 0.8rem;"><i class="fas fa-envelope"></i> Request key by Email</a>
+                        </div>
                     </div>
                 `;
                 document.body.appendChild(overlay);
@@ -4009,6 +4016,10 @@
                                 <strong><i class="fas fa-info-circle"></i> Need Help?</strong><br>
                                 Support email: <a href="mailto:info@bitlynxcontrols.dev" style="color:#0ea5e9; font-weight:600;">info@bitlynxcontrols.dev</a><br>
                                 WhatsApp: <a href="https://wa.me/255654307174" target="_blank" rel="noopener" style="color:#16a34a; font-weight:600;">+255654307174</a><br>
+                                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.6rem;">
+                                    <a href="https://wa.me/255654307174?text=Hello%2C%20I%20would%20like%20to%20request%20a%20Profit%20Point%20product%20key." target="_blank" rel="noopener" class="btn-small" style="text-decoration:none; min-height:auto; padding:0.55rem 0.8rem; background:#16a34a; color:#fff; border-color:#16a34a;"><i class="fab fa-whatsapp"></i> Request Product Key</a>
+                                    <a href="mailto:info@bitlynxcontrols.dev?subject=Product%20Key%20Request&body=Hello%2C%20I%20would%20like%20to%20request%20a%20Profit%20Point%20product%20key." class="btn-small analytics-ghost-btn" style="text-decoration:none; min-height:auto; padding:0.55rem 0.8rem;"><i class="fas fa-envelope"></i> Request by Email</a>
+                                </div>
                                 You can also check the audit log in Alerts for system activity details.
                             </div>
                         </div>
