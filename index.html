@@ -3212,6 +3212,44 @@
                 return true;
             }
 
+            function recordCreditPayment(saleId, amount) {
+                const sale = sales.find(s => String(s.id) === String(saleId));
+                if (!sale || Number(amount) <= 0) return 0;
+                const pay = Math.min(Number(amount), Number(sale.outstandingAmount || 0));
+                if (pay <= 0) return 0;
+                sale.outstandingAmount = Math.max(0, Number(sale.outstandingAmount) - pay);
+                sale.paidAmount = Number(sale.paidAmount || 0) + pay;
+                sale.amountPaidNow = Number(sale.amountPaidNow || 0) + pay;
+                sale.paymentStatus = sale.outstandingAmount === 0 ? 'paid' : 'partial';
+                saveSales();
+                recordAudit('credit-payment', `Payment of ${formatMoney(pay)} on ${sale.receiptNumber}`, { saleId, amount: pay });
+                return pay;
+            }
+
+            function recordCustomerCreditPayment(customerId, amount) {
+                const creditSales = sales
+                    .filter(s => String(s.customerId) === String(customerId) && !s.isReturn && Number(s.outstandingAmount || 0) > 0)
+                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+                let remaining = Number(amount);
+                let totalPaid = 0;
+                creditSales.forEach(sale => {
+                    if (remaining <= 0) return;
+                    const pay = Math.min(remaining, Number(sale.outstandingAmount));
+                    sale.outstandingAmount = Math.max(0, Number(sale.outstandingAmount) - pay);
+                    sale.paidAmount = Number(sale.paidAmount || 0) + pay;
+                    sale.amountPaidNow = Number(sale.amountPaidNow || 0) + pay;
+                    sale.paymentStatus = sale.outstandingAmount === 0 ? 'paid' : 'partial';
+                    remaining -= pay;
+                    totalPaid += pay;
+                });
+                if (totalPaid > 0) {
+                    saveSales();
+                    const customerName = creditSales[0]?.customerName || 'Customer';
+                    recordAudit('credit-payment', `Payment of ${formatMoney(totalPaid)} for ${customerName}`, { customerId, amount: totalPaid });
+                }
+                return totalPaid;
+            }
+
             function exportBackupData() {
                 return {
                     exportedAt: new Date().toISOString(),
@@ -5021,9 +5059,14 @@
                                             <div>
                                                 <div><strong>${item.name}</strong> x${item.qty}</div>
                                                 <div style="font-size:0.78rem; color:#64748b; margin-top:4px;">${formatMoney(item.price)} each${lineDiscount ? ` · item discount ${formatMoney(lineDiscount)}` : ''}</div>
-                                                <button type="button" class="analytics-ghost-btn btn-small cart-item-discount-btn" data-idx="${idx}" style="padding:0.45rem 0.8rem; margin-top:0.45rem; font-size:0.72rem; min-height:auto;">
-                                                    <i class="fas fa-tags"></i> Item discount
-                                                </button>
+                                                <div style="display:flex; gap:0.45rem; flex-wrap:wrap; margin-top:0.45rem;">
+                                                    <button type="button" class="analytics-ghost-btn btn-small cart-item-price-btn" data-idx="${idx}" style="padding:0.45rem 0.8rem; font-size:0.72rem; min-height:auto;">
+                                                        <i class="fas fa-pen"></i> Edit price
+                                                    </button>
+                                                    <button type="button" class="analytics-ghost-btn btn-small cart-item-discount-btn" data-idx="${idx}" style="padding:0.45rem 0.8rem; font-size:0.72rem; min-height:auto;">
+                                                        <i class="fas fa-tags"></i> Item discount
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div style="text-align:right; display:flex; flex-direction:column; gap:0.4rem; align-items:flex-end;">
                                                 <strong>${formatMoney(lineTotal)}</strong>
@@ -5159,6 +5202,30 @@
                                 saveCart();
                                 renderCartOverlay();
                             }
+                        });
+                    });
+
+                    overlay.querySelectorAll('.cart-item-price-btn').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const idx = Number(button.dataset.idx);
+                            const item = cart[idx];
+                            if (!item) return;
+                            showEnhancedModal({
+                                title: 'Edit price',
+                                fields: [
+                                    { name: 'price', type: 'number', value: Number(item.price || 0), placeholder: 'Unit price' }
+                                ],
+                                onConfirm: data => {
+                                    const nextPrice = Number(data.price || 0);
+                                    if (nextPrice <= 0) {
+                                        showToast('Price must be greater than zero', 'error');
+                                        return;
+                                    }
+                                    item.price = nextPrice;
+                                    saveCart();
+                                    renderCartOverlay();
+                                }
+                            });
                         });
                     });
 
@@ -6388,6 +6455,7 @@
                                                 <div style="display:flex; gap:0.45rem; margin-top:0.55rem; flex-wrap:wrap;">
                                                     <button class="btn-small analytics-ghost-btn action-chip receipt-btn" data-id="${sale.id}"><i class="fas fa-receipt icon-one"></i> Receipt</button>
                                                     ${!sale.isReturn && !sale.refundedAt ? `<button class="btn-small sales-clear-btn action-chip refund-btn" data-id="${sale.id}"><i class="fas fa-rotate-left"></i> Refund</button>` : ''}
+                                                    ${sale.outstandingAmount > 0 && !sale.isReturn ? `<button class="btn-small action-chip pay-credit-btn" style="background:#16a34a;color:#fff;border-color:#16a34a;" data-id="${sale.id}" data-outstanding="${sale.outstandingAmount}"><i class="fas fa-money-bill-wave"></i> Record payment</button>` : ''}
                                                 </div>
                                             </div>
                                             <div class="sale-amount">TSh ${sale.finalTotal}</div>
@@ -6437,6 +6505,26 @@
                             }
                             renderSalesContent();
                             showToast('Refund processed');
+                        });
+                    });
+                    document.querySelectorAll('.pay-credit-btn').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const saleId = button.dataset.id;
+                            const outstanding = Number(button.dataset.outstanding);
+                            showEnhancedModal({
+                                title: 'Record credit payment',
+                                fields: [
+                                    { name: 'amount', type: 'number', placeholder: `Outstanding: ${formatMoney(outstanding)}`, value: outstanding }
+                                ],
+                                onConfirm: data => {
+                                    const amount = Number(data.amount);
+                                    if (!amount || amount <= 0) { showToast('Enter a valid amount', 'error'); return; }
+                                    if (amount > outstanding + 0.001) { showToast(`Amount exceeds outstanding (${formatMoney(outstanding)})`, 'error'); return; }
+                                    const paid = recordCreditPayment(saleId, amount);
+                                    showToast(`Payment of ${formatMoney(paid)} recorded`);
+                                    renderSalesContent();
+                                }
+                            });
                         });
                     });
                 };
@@ -6513,8 +6601,9 @@
                                                 <span class="analytics-expense-subtle">Layaway ${formatMoney(balance.layaway)}</span>
                                             </div>
                                         </div>
-                                        <div class="analytics-expense-side">
+                                        <div class="analytics-expense-side" style="flex-direction:column;align-items:flex-end;gap:0.4rem;">
                                             <div class="analytics-expense-amount">${formatMoney(balance.outstanding)}</div>
+                                            <button class="btn-small action-chip record-payment-btn" style="background:#16a34a;color:#fff;border-color:#16a34a;white-space:nowrap;" data-customer-id="${balance.customerId}" data-outstanding="${balance.outstanding}" data-name="${balance.customerName}"><i class="fas fa-money-bill-wave"></i> Pay</button>
                                         </div>
                                     </div>
                                 </div>
@@ -6650,6 +6739,31 @@
                         createPurchaseOrderFromProduct(product);
                         renderAlertsMobile();
                         showToast('Purchase order created');
+                    });
+                });
+
+                document.querySelectorAll('.record-payment-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const customerId = button.dataset.customerId;
+                        const outstanding = Number(button.dataset.outstanding);
+                        const customerName = button.dataset.name;
+                        showEnhancedModal({
+                            title: `Record payment — ${customerName}`,
+                            fields: [
+                                { name: 'amount', type: 'number', placeholder: `Outstanding: ${formatMoney(outstanding)}`, value: outstanding }
+                            ],
+                            onConfirm: data => {
+                                const amount = Number(data.amount);
+                                if (!amount || amount <= 0) { showToast('Enter a valid amount', 'error'); return; }
+                                const paid = recordCustomerCreditPayment(customerId, amount);
+                                if (paid > 0) {
+                                    showToast(`Payment of ${formatMoney(paid)} recorded for ${customerName}`);
+                                    renderAlertsMobile();
+                                } else {
+                                    showToast('No outstanding balance found', 'error');
+                                }
+                            }
+                        });
                     });
                 });
 
