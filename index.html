@@ -2712,6 +2712,9 @@
             };
             let recentProductIds = JSON.parse(localStorage.getItem('profitpoint_recent_products')) || [];
             let deferredInstallPrompt = null;
+            const FULLSCREEN_PREF_KEY = 'profitpoint_auto_fullscreen';
+            let shouldAutoFullscreen = localStorage.getItem(FULLSCREEN_PREF_KEY) !== '0';
+            let autoFullscreenListenersBound = false;
 
             // Wallpaper with higher default opacity
             let wallpaperOpacity = parseFloat(localStorage.getItem('profitpoint_wallpaper_opacity')) || 0.3; // increased from 0.25
@@ -2735,6 +2738,7 @@
             function saveReceiptSettings() { localStorage.setItem('profitpoint_receipt_settings', JSON.stringify(receiptSettings)); }
             function saveLoyaltySettings() { localStorage.setItem('profitpoint_loyalty_settings', JSON.stringify(loyaltySettings)); }
             function saveRecentProducts() { localStorage.setItem('profitpoint_recent_products', JSON.stringify(recentProductIds.slice(0, 12))); }
+            function saveFullscreenPreference() { localStorage.setItem(FULLSCREEN_PREF_KEY, shouldAutoFullscreen ? '1' : '0'); }
 
             function formatMoney(value) {
                 return `TSh ${Number(value || 0).toLocaleString()}`;
@@ -3670,7 +3674,7 @@
                         const isPhone = f.type === 'tel' || (f.name || '').toLowerCase().includes('phone');
                         const isBarcode = (f.name || '').toLowerCase().includes('barcode');
                         if (isBarcode) {
-                            html += `<div class="modal-field" style="display:flex;align-items:center;gap:4px;"><input type="text" id="modal-${f.name}" placeholder="${f.placeholder || ''}" value="${f.value || ''}" style="flex:1;"><button type="button" id="scanBarcodeModalBtn" class="camera-btn" style="padding:0.45rem 0.8rem; flex-shrink:0;"><i class="fas fa-barcode"></i></button></div>`;
+                            html += `<div class="modal-field" style="display:flex;align-items:center;gap:4px;"><input type="text" id="modal-${f.name}" placeholder="${f.placeholder || ''}" value="${f.value || ''}" style="flex:1;"><button type="button" id="scanBarcodeModalBtn" class="camera-btn" aria-label="Scan barcode" style="padding:0.45rem 0.8rem; flex-shrink:0;"><i class="fas fa-barcode"></i> Scan</button></div>`;
                         } else {
                             html += `<div class="modal-field" style="${isPhone ? 'display:flex;align-items:center;gap:4px;' : ''}"><input type="${isPhone ? 'tel' : (f.type || 'text')}" id="modal-${f.name}" placeholder="${f.placeholder || ''}" value="${f.value || ''}" style="${isPhone ? 'flex:1;' : ''}"></div>`;
                         }
@@ -6858,13 +6862,37 @@
             }
 
             // ==================== FULLSCREEN TOGGLE (NEW) ====================
+            async function requestAppFullscreen() {
+                if (document.fullscreenElement || !shouldAutoFullscreen || !document.documentElement.requestFullscreen) return;
+                try {
+                    await document.documentElement.requestFullscreen();
+                } catch {
+                    // Browsers can reject fullscreen until a user gesture is available.
+                }
+            }
+
+            function bindAutoFullscreen() {
+                if (autoFullscreenListenersBound) return;
+                autoFullscreenListenersBound = true;
+                const tryEnterFullscreen = () => {
+                    if (shouldAutoFullscreen && !document.fullscreenElement) {
+                        requestAppFullscreen();
+                    }
+                };
+                document.addEventListener('pointerdown', tryEnterFullscreen, true);
+                document.addEventListener('touchstart', tryEnterFullscreen, true);
+                document.addEventListener('keydown', tryEnterFullscreen, true);
+            }
+
             function toggleFullscreen() {
                 if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    }
+                    shouldAutoFullscreen = true;
+                    saveFullscreenPreference();
+                    requestAppFullscreen();
+                } else if (document.exitFullscreen) {
+                    shouldAutoFullscreen = false;
+                    saveFullscreenPreference();
+                    document.exitFullscreen();
                 }
             }
 
@@ -6958,7 +6986,10 @@
                     toggleFullscreen();
                     setTimeout(updateFsText, 50);
                 });
+                document.addEventListener('fullscreenchange', updateFsText);
                 updateFsText();
+                bindAutoFullscreen();
+                requestAppFullscreen();
                 
                 document.querySelectorAll('.nav-item-mobile').forEach(item => {
                     item.addEventListener('click', (e) => {
