@@ -159,13 +159,13 @@
         }
         /* ── Voice search button ── */
         .voice-btn {
-            width: 40px; height: 40px; border-radius: 50%; border: none;
+            height: 40px; padding: 0 14px; border-radius: 50px; border: none;
             background: linear-gradient(135deg, #06c6d4, #0891b2);
-            color: #fff; font-size: 1rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
             flex-shrink: 0; transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(6,198,212,0.25);
-            position: relative;
+            position: relative; white-space: nowrap;
         }
         .voice-btn:active { transform: scale(0.92); }
         .voice-btn.listening {
@@ -3284,26 +3284,17 @@
                 }
                 voiceRecognition = new SpeechAPI();
                 voiceRecognition.lang = currentLang === 'sw' ? 'sw-TZ' : 'en-US';
-                voiceRecognition.interimResults = true;
+                voiceRecognition.interimResults = false;
                 voiceRecognition.maxAlternatives = 1;
 
                 if (btn) btn.classList.add('listening');
                 showToast('Listening... speak now', 'info');
 
                 voiceRecognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    const searchInput = document.getElementById('mobileSearch');
-                    if (searchInput) {
-                        searchInput.value = transcript;
-                        searchTerm = transcript;
-                        renderPosContent();
-                        // Re-focus keeps keyboard away on mobile
-                        const newInput = document.getElementById('mobileSearch');
-                        if (newInput) newInput.value = transcript;
-                    }
-                    if (event.results[0].isFinal) {
-                        showToast(`Searched: "${transcript}"`, 'success');
-                    }
+                    const transcript = event.results[0][0].transcript.trim();
+                    if (btn) btn.classList.remove('listening');
+                    voiceRecognition = null;
+                    if (transcript) showVoiceConfirmation(transcript);
                 };
 
                 voiceRecognition.onerror = (event) => {
@@ -3324,6 +3315,44 @@
                 };
 
                 voiceRecognition.start();
+            }
+
+            function showVoiceConfirmation(transcript) {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML = `
+                    <div class="modal-card" style="text-align:center;">
+                        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#06c6d4,#0891b2);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                            <i class="fas fa-microphone" style="font-size:1.6rem;color:#fff;"></i>
+                        </div>
+                        <h3 style="margin:0 0 0.4rem;">Did you say?</h3>
+                        <div style="background:#f0f9ff;border:2px solid #bae6fd;border-radius:16px;padding:1rem 1.2rem;margin:0.8rem 0 1.2rem;font-size:1.15rem;font-weight:700;color:#0c4a6e;word-break:break-word;">
+                            "${transcript}"
+                        </div>
+                        <div class="modal-actions" style="justify-content:center;gap:0.7rem;">
+                            <button class="modal-btn secondary" id="voiceRetry" style="gap:6px;"><i class="fas fa-redo"></i> Retry</button>
+                            <button class="modal-btn" id="voiceConfirm" style="gap:6px;"><i class="fas fa-check"></i> Yes, search</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(overlay);
+
+                document.getElementById('voiceConfirm').addEventListener('click', () => {
+                    overlay.remove();
+                    searchTerm = transcript;
+                    renderPosContent();
+                    const newInput = document.getElementById('mobileSearch');
+                    if (newInput) newInput.value = transcript;
+                    showToast(`Searched: "${transcript}"`, 'success');
+                });
+
+                document.getElementById('voiceRetry').addEventListener('click', () => {
+                    overlay.remove();
+                    startVoiceSearch();
+                });
+
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) overlay.remove();
+                });
             }
 
             function inferButtonLabel(el) {
@@ -6486,7 +6515,7 @@
                             <input type="text" id="mobileSearch" placeholder="${__('search')}" value="${searchTerm}" 
                                 style="border:none; background:transparent; padding:0.9rem 0; width:100%; outline:none;">
                             <button type="button" id="voiceSearchBtn" class="voice-btn" title="Voice search" aria-label="Search by voice">
-                                <i class="fas fa-microphone"></i>
+                                <i class="fas fa-microphone"></i> Mic
                             </button>
                             <button type="button" id="scanBarcodeBtn" class="icon-btn" style="padding:0.5rem 1rem; background:var(--color-accent); color:#fff; border-color:var(--color-accent); flex-shrink:0;">
                                 <i class="fas fa-barcode" style="color:#fff;"></i> Scan
