@@ -8166,7 +8166,7 @@
                                         <button class="three-dot-item" id="tdLangToggle"><i class="fas fa-globe icon-one"></i> Language (${currentLang === 'sw' ? 'Kiswahili' : 'English'})</button>
                                         <button class="three-dot-item" id="tdSettingsBtn"><i class="fas fa-cog icon-one"></i> Settings</button>
                                         <button class="three-dot-item" id="tdManualBtn"><i class="fas fa-book icon-one"></i> Manual & Instructions</button>
-                                        <button class="three-dot-item" id="tdFullscreenBtn"><i id="fsIcon" class="fas ${document.fullscreenElement ? 'fa-compress' : 'fa-expand'} icon-one"></i> <span id="fsText">${document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen'}</span></button>
+                                        <button class="three-dot-item" id="tdFullscreenBtn"><i id="fsIcon" class="fas ${document.fullscreenElement ? 'fa-compress' : 'fa-expand'} icon-one"></i> <span id="fsText">${document.fullscreenElement ? 'Exit' : 'Full'}</span></button>
                                         <div style="height:1px;background:#e2e8f0;margin:0.2rem 0;"></div>
                                         <button class="three-dot-item" id="tdLogoutBtn" style="color:#dc2626;"><i class="fas fa-sign-out-alt"></i> Logout</button>
                                     </div>
@@ -8222,7 +8222,7 @@
                     const inFs = !!document.fullscreenElement;
                     const fsText = document.getElementById('fsText');
                     const fsIcon = document.getElementById('fsIcon');
-                    if (fsText) fsText.innerText = inFs ? 'Exit fullscreen' : 'Fullscreen';
+                    if (fsText) fsText.innerText = inFs ? 'Exit' : 'Full';
                     if (fsIcon) { fsIcon.className = `fas ${inFs ? 'fa-compress' : 'fa-expand'} icon-one`; }
                 };
                 document.getElementById('tdFullscreenBtn').addEventListener('click', () => {
