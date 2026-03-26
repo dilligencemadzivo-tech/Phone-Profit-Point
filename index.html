@@ -1516,7 +1516,7 @@
         .toast .toast-progress {
             position: absolute; bottom: 0; left: 0; height: 3px;
             background: rgba(255,255,255,0.45);
-            animation: toastTimer 4s linear forwards;
+            animation: toastTimer 2s linear forwards;
             border-radius: 0 0 18px 18px;
         }
         /* ── Color variants ── */
@@ -3263,61 +3263,69 @@
                 t.className = `toast ${type}`;
                 t.innerHTML = `<span class="toast-icon"><i class="fas ${icons[type] || icons.success}"></i></span><span>${msg}</span><span class="toast-progress"></span>`;
                 toastContainer.appendChild(t);
-                setTimeout(() => { t.style.transition = 'opacity 0.35s, transform 0.35s'; t.style.opacity = '0'; t.style.transform = 'translateY(20px) scale(0.92)'; setTimeout(() => t.remove(), 400); }, 4000);
+                setTimeout(() => { t.style.transition = 'opacity 0.35s, transform 0.35s'; t.style.opacity = '0'; t.style.transform = 'translateY(20px) scale(0.92)'; setTimeout(() => t.remove(), 400); }, 2000);
             }
 
-            // ==================== VOICE SEARCH ====================
+            // ==================== VOICE INPUT (generic) ====================
             let voiceRecognition = null;
-            function startVoiceSearch() {
+            let voiceTargetInputId = null;
+            let voiceActiveBtnEl = null;
+
+            function startVoiceInput(targetInputId, triggerBtn) {
                 const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechAPI) {
-                    showToast('Voice search is not supported in this browser', 'error');
+                    showToast('Voice input is not supported in this browser', 'error');
                     return;
                 }
-                const btn = document.getElementById('voiceSearchBtn');
                 // If already listening, stop
                 if (voiceRecognition) {
                     voiceRecognition.abort();
                     voiceRecognition = null;
-                    if (btn) btn.classList.remove('listening');
+                    if (voiceActiveBtnEl) voiceActiveBtnEl.classList.remove('listening');
+                    voiceActiveBtnEl = null;
                     return;
                 }
+                voiceTargetInputId = targetInputId;
+                voiceActiveBtnEl = triggerBtn || null;
                 voiceRecognition = new SpeechAPI();
                 voiceRecognition.lang = currentLang === 'sw' ? 'sw-TZ' : 'en-US';
                 voiceRecognition.interimResults = false;
                 voiceRecognition.maxAlternatives = 1;
 
-                if (btn) btn.classList.add('listening');
+                if (voiceActiveBtnEl) voiceActiveBtnEl.classList.add('listening');
                 showToast('Listening... speak now', 'info');
 
                 voiceRecognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript.trim();
-                    if (btn) btn.classList.remove('listening');
+                    if (voiceActiveBtnEl) voiceActiveBtnEl.classList.remove('listening');
                     voiceRecognition = null;
-                    if (transcript) showVoiceConfirmation(transcript);
+                    if (transcript) showVoiceConfirmation(transcript, voiceTargetInputId);
                 };
 
                 voiceRecognition.onerror = (event) => {
-                    if (btn) btn.classList.remove('listening');
+                    if (voiceActiveBtnEl) voiceActiveBtnEl.classList.remove('listening');
                     voiceRecognition = null;
                     if (event.error === 'no-speech') {
                         showToast('No speech detected. Try again.', 'warning');
                     } else if (event.error === 'not-allowed') {
                         showToast('Microphone permission denied', 'error');
                     } else {
-                        showToast('Voice search error: ' + event.error, 'error');
+                        showToast('Voice input error: ' + event.error, 'error');
                     }
                 };
 
                 voiceRecognition.onend = () => {
-                    if (btn) btn.classList.remove('listening');
+                    if (voiceActiveBtnEl) voiceActiveBtnEl.classList.remove('listening');
                     voiceRecognition = null;
                 };
 
                 voiceRecognition.start();
             }
 
-            function showVoiceConfirmation(transcript) {
+            // Backward-compatible wrapper for POS search
+            function startVoiceSearch() { startVoiceInput('mobileSearch', document.getElementById('voiceSearchBtn')); }
+
+            function showVoiceConfirmation(transcript, targetInputId) {
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
                 overlay.innerHTML = `
@@ -3331,24 +3339,25 @@
                         </div>
                         <div class="modal-actions" style="justify-content:center;gap:0.7rem;">
                             <button class="modal-btn secondary" id="voiceRetry" style="gap:6px;"><i class="fas fa-redo"></i> Retry</button>
-                            <button class="modal-btn" id="voiceConfirm" style="gap:6px;"><i class="fas fa-check"></i> Yes, search</button>
+                            <button class="modal-btn" id="voiceConfirm" style="gap:6px;"><i class="fas fa-check"></i> Yes, enter</button>
                         </div>
                     </div>`;
                 document.body.appendChild(overlay);
 
                 document.getElementById('voiceConfirm').addEventListener('click', () => {
                     overlay.remove();
-                    const searchInput = document.getElementById('mobileSearch');
-                    if (searchInput) {
-                        searchInput.value = transcript;
-                        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    const input = document.getElementById(targetInputId);
+                    if (input) {
+                        input.value = transcript;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-                    showToast(`Searched: "${transcript}"`, 'success');
+                    showToast(`Entered: "${transcript}"`, 'success');
                 });
 
                 document.getElementById('voiceRetry').addEventListener('click', () => {
                     overlay.remove();
-                    startVoiceSearch();
+                    startVoiceInput(targetInputId, voiceActiveBtnEl);
                 });
 
                 overlay.addEventListener('click', (e) => {
@@ -4594,7 +4603,9 @@
                         if (isBarcode) {
                             html += `<div class="modal-field" style="display:flex;align-items:center;gap:4px;"><input type="text" id="modal-${f.name}" placeholder="${f.placeholder || ''}" value="${f.value || ''}" style="flex:1;"><button type="button" id="scanBarcodeModalBtn" class="camera-btn" aria-label="Scan barcode" style="padding:0.45rem 0.8rem; flex-shrink:0;"><i class="fas fa-barcode"></i> Scan</button></div>`;
                         } else {
-                            html += `<div class="modal-field" style="${isPhone ? 'display:flex;align-items:center;gap:4px;' : ''}"><input type="${isPhone ? 'tel' : (f.type || 'text')}" id="modal-${f.name}" placeholder="${f.placeholder || ''}" value="${f.value || ''}" style="${isPhone ? 'flex:1;' : ''}"></div>`;
+                            const isNumber = f.type === 'number';
+                            const showMic = !isPhone && !isNumber;
+                            html += `<div class="modal-field" style="display:flex;align-items:center;gap:4px;"><input type="${isPhone ? 'tel' : (f.type || 'text')}" id="modal-${f.name}" placeholder="${f.placeholder || ''}" value="${f.value || ''}" style="flex:1;">${showMic ? `<button type="button" class="voice-btn voice-mic-btn" data-target="modal-${f.name}" style="font-size:0.7rem;flex-shrink:0;" aria-label="Voice input"><i class="fas fa-microphone"></i> Mic</button>` : ''}</div>`;
                         }
                     }
                 });
@@ -6114,9 +6125,10 @@
                             </div>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:1rem 0;">
-                                <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
+                                <div style="display:flex; align-items:center; gap:0.4rem; width:100%; padding:0.4rem 0.5rem 0.4rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
                                     <i class="fas fa-user icon-one"></i>
                                     <input type="text" id="customerNameInput" placeholder="Customer name" value="${customerName}" style="width:100%; border:none; background:transparent; outline:none;">
+                                    <button type="button" class="voice-btn voice-mic-btn" data-target="customerNameInput" style="font-size:0.7rem;" aria-label="Voice input"><i class="fas fa-microphone"></i> Mic</button>
                                 </div>
                                 <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white;">
                                     <i class="fas fa-phone icon-one"></i>
@@ -6157,9 +6169,10 @@
                                 </select>
                                 <input type="number" id="discountValueInput" min="0" placeholder="Discount value" value="${cartDiscountValue}" style="width:100%; padding:0.8rem; border-radius:60px; border:1px solid #c2daf5; outline:none;">
                             </div>
-                            <div style="display:flex; align-items:center; gap:0.55rem; width:100%; padding:0.8rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white; margin-bottom:0.8rem;">
+                            <div style="display:flex; align-items:center; gap:0.4rem; width:100%; padding:0.4rem 0.5rem 0.4rem 1rem; border-radius:60px; border:1px solid #c2daf5; background:white; margin-bottom:0.8rem;">
                                 <i class="fas fa-comment-dots icon-one"></i>
                                 <input type="text" id="discountReasonInput" placeholder="Discount reason" value="${cartDiscountReason}" style="width:100%; border:none; background:transparent; outline:none;">
+                                <button type="button" class="voice-btn voice-mic-btn" data-target="discountReasonInput" style="font-size:0.7rem;" aria-label="Voice input"><i class="fas fa-microphone"></i> Mic</button>
                             </div>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:0.8rem 0;">
@@ -7048,10 +7061,11 @@
                                     <div class="analytics-summary-value">TSh ${averageExpenseValue.toLocaleString()}</div>
                                 </div>
                             </div>
-                            <label class="analytics-search">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="expenseSearchInput" placeholder="${__('searchExpense')}">
-                            </label>
+                            <div style="display:flex; align-items:center; gap:0.5rem; border-radius:999px; border:1px solid #c2daf5; padding:0.2rem 0.5rem 0.2rem 1rem; background:white;">
+                                <i class="fas fa-search" style="color:#94a3b8;"></i>
+                                <input type="text" id="expenseSearchInput" placeholder="${__('searchExpense')}" style="width:100%; padding:0.7rem 0; border:none; outline:none;">
+                                <button type="button" class="voice-btn voice-mic-btn" data-target="expenseSearchInput" title="Voice search" aria-label="Voice search"><i class="fas fa-microphone"></i> Mic</button>
+                            </div>
                             <div class="filter-tabs analytics-filter-tabs">
                                 <span class="filter-tab active" data-expense-filter="all">${__('all')}</span>
                                 <span class="filter-tab" data-expense-filter="today">${__('today')}</span>
@@ -7467,7 +7481,11 @@
                                 <span class="filter-tab ${filter === 'month' ? 'active' : ''}" data-filter="month">${__('month')}</span>
                             </div>
 
-                            <input type="text" id="salesSearchInput" placeholder="Search receipt, cashier, customer, product" value="${searchTerm}" style="width:100%; padding:0.9rem 1rem; border-radius:999px; border:1px solid #c2daf5; outline:none; margin-bottom:0.8rem;">
+                            <div style="display:flex; align-items:center; gap:0.5rem; border-radius:999px; border:1px solid #c2daf5; padding:0.2rem 0.5rem 0.2rem 1rem; margin-bottom:0.8rem; background:white;">
+                                <i class="fas fa-search" style="color:#94a3b8;"></i>
+                                <input type="text" id="salesSearchInput" placeholder="Search receipt, cashier, customer, product" value="${searchTerm}" style="width:100%; padding:0.7rem 0; border:none; outline:none;">
+                                <button type="button" class="voice-btn voice-mic-btn" data-target="salesSearchInput" title="Voice search" aria-label="Voice search"><i class="fas fa-microphone"></i> Mic</button>
+                            </div>
                             
                             <div style="background:#f8fafc; border-radius:40px; padding:1rem; margin:1rem 0; text-align:center;">
                                 <div style="font-size:0.9rem; color:#64748b;">Total Sales</div>
@@ -8198,6 +8216,14 @@
                 else if (page === 'alerts') renderAlertsMobile();
                 else if (page === 'users' && isManager()) renderUsersMobile();
             }
+
+            // ==================== GLOBAL VOICE MIC DELEGATION ====================
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.voice-mic-btn');
+                if (!btn) return;
+                const targetId = btn.dataset.target;
+                if (targetId) startVoiceInput(targetId, btn);
+            });
 
             // ==================== START APP ====================
             function completeStartup() {
