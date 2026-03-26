@@ -410,7 +410,7 @@
             background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(244, 250, 249, 0.95) 100%);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            padding: 0.7rem 0.5rem 0.6rem;
+            padding: 1rem 0.6rem 0.9rem;
             border-top: 1.5px solid rgba(15,118,110,0.18);
             box-shadow: 0 -16px 34px rgba(10, 59, 67, 0.16), 0 0 1px rgba(15,118,110,0.1);
             border-radius: 30px 30px 0 0;
@@ -423,9 +423,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 0.72rem;
+            font-size: 0.82rem;
             color: #7a8fa0;
-            padding: 9px 0;
+            padding: 12px 0;
             border-radius: 50px;
             cursor: pointer;
             font-weight: 700;
@@ -462,8 +462,8 @@
         .nav-item-mobile:nth-child(5) { animation-delay: 0.5s; }
         .nav-item-mobile:nth-child(6) { animation-delay: 0.6s; }
         .nav-item-mobile i {
-            font-size: 1.6rem;
-            margin-bottom: 4px;
+            font-size: 1.9rem;
+            margin-bottom: 5px;
             transition: all 0.3s ease;
             color: #708598;
         }
@@ -3954,6 +3954,121 @@
                 savePurchaseOrders();
                 recordAudit('purchase-order-created', `Purchase order created for ${product.name}`, { quantity: po.qty });
                 pushNotification('Purchase order created', `${product.name} · ${po.qty} units`, 'info');
+            }
+
+            function buildPurchaseOrderPDF(order) {
+                const supplier = suppliers.find(s => s.id === order.supplierId) || {};
+                const product = products.find(p => String(p.id) === String(order.productId));
+                const totalCost = Number(order.qty || 0) * Number(order.costPerUnit || 0);
+                const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A';
+
+                const { doc, pageWidth, startY, meta } = createModernPdfDoc('Purchase Order', `${shopBrand?.name || 'Profit Point'} | ${order.id}`);
+
+                let cursorY = drawPdfMetricCards(doc, startY, [
+                    {
+                        label: 'PO Number',
+                        value: order.id,
+                        note: `Date: ${orderDate}`,
+                        color: [240, 249, 255],
+                        border: [186, 230, 253],
+                        valueColor: [12, 74, 110]
+                    },
+                    {
+                        label: 'Supplier',
+                        value: supplier.name || order.supplierName || 'N/A',
+                        note: supplier.phone ? `Phone: ${supplier.phone}` : (supplier.contact || ''),
+                        color: [236, 253, 245],
+                        border: [167, 243, 208],
+                        valueColor: [6, 95, 70]
+                    },
+                    {
+                        label: 'Total Cost',
+                        value: formatPdfCurrency(totalCost),
+                        note: `Status: ${order.status}`,
+                        color: [255, 251, 235],
+                        border: [253, 230, 138],
+                        valueColor: [146, 64, 14]
+                    }
+                ]);
+
+                cursorY = ensurePdfSpace(doc, cursorY, 20);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(17, 24, 39);
+                doc.text('Order Items', 14, cursorY);
+
+                const finalY = drawStyledPdfTable(doc, {
+                    head: [['Product', 'Qty', 'Unit Cost', 'Line Total']],
+                    body: [[
+                        order.productName || (product?.name || '-'),
+                        `${order.qty}`,
+                        formatPdfCurrency(order.costPerUnit),
+                        formatPdfCurrency(totalCost)
+                    ]],
+                    startY: cursorY + 2,
+                    columnStyles: {
+                        1: { halign: 'right', cellWidth: 16 },
+                        2: { halign: 'right', cellWidth: 33 },
+                        3: { halign: 'right', cellWidth: 33 }
+                    }
+                });
+
+                let totalY = ensurePdfSpace(doc, finalY + 8, 24);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(71, 85, 105);
+                doc.text(`Created by: ${order.createdBy || 'System'}`, 14, totalY);
+                totalY += 5;
+                if (supplier.contact) {
+                    doc.text(`Contact: ${supplier.contact}`, 14, totalY);
+                    totalY += 5;
+                }
+                if (supplier.phone) {
+                    doc.text(`Phone: ${supplier.phone}`, 14, totalY);
+                    totalY += 5;
+                }
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(17, 24, 39);
+                doc.text(`Total: ${formatPdfCurrency(totalCost)}`, pageWidth - 14, totalY, { align: 'right' });
+
+                finalizeModernPdfDoc(doc, meta);
+                return doc;
+            }
+
+            async function sendPOToWhatsApp(order) {
+                const supplier = suppliers.find(s => s.id === order.supplierId) || {};
+                const phone = String(supplier.phone || '').replace(/\D/g, '');
+                if (!phone) {
+                    showToast('Supplier has no phone number', 'error');
+                    return;
+                }
+
+                const totalCost = Number(order.qty || 0) * Number(order.costPerUnit || 0);
+                const message = `Hello ${supplier.name || 'Supplier'},\n\nPurchase Order: ${order.id}\nFrom: ${shopBrand?.name || 'Profit Point'}\n\nProduct: ${order.productName}\nQuantity: ${order.qty} units\nUnit cost: ${formatPdfCurrency(order.costPerUnit)}\nTotal: ${formatPdfCurrency(totalCost)}\n\nPlease confirm and arrange delivery.\nThank you.`;
+
+                try {
+                    const doc = buildPurchaseOrderPDF(order);
+                    const blob = doc.output('blob');
+                    const file = new File([blob], `PO-${order.id}.pdf`, { type: 'application/pdf' });
+
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'Purchase Order',
+                            text: message,
+                            files: [file]
+                        });
+                        showToast('Order sent to supplier');
+                        return;
+                    }
+                } catch (err) {
+                    // Fallback below
+                }
+
+                const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                window.open(waUrl, '_blank');
+                showToast('Opening WhatsApp...');
             }
 
             function receivePurchaseOrder(orderId) {
@@ -7761,7 +7876,9 @@
                                                 <span class="analytics-expense-subtle">${order.status}</span>
                                             </div>
                                         </div>
-                                        <div class="analytics-expense-side">
+                                        <div class="analytics-expense-side" style="display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center;">
+                                            <button class="btn-small analytics-ghost-btn po-invoice-btn" data-id="${order.id}" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-file-pdf"></i> Invoice</button>
+                                            ${order.supplierId ? `<button class="btn-small po-whatsapp-btn" data-id="${order.id}" style="padding:0.55rem 0.9rem; min-height:auto; background:#16a34a; color:#fff; border-color:#16a34a;"><i class="fab fa-whatsapp"></i> Send</button>` : ''}
                                             ${order.status !== 'received' ? `<button class="btn-small receive-po-btn" data-id="${order.id}" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-box-open"></i> Receive</button>` : `<span class="analytics-mini-chip">Received</span>`}
                                         </div>
                                     </div>
@@ -7886,6 +8003,27 @@
                         receivePurchaseOrder(button.dataset.id);
                         renderAlertsMobile();
                         showToast('Purchase order received');
+                    });
+                });
+
+                document.querySelectorAll('.po-invoice-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const order = purchaseOrders.find(o => o.id === button.dataset.id);
+                        if (!order) return;
+                        try {
+                            buildPurchaseOrderPDF(order).save(`PO-${order.id}.pdf`);
+                            showToast('Invoice downloaded');
+                        } catch (e) {
+                            showToast('PDF generation failed: ' + e.message, 'error');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.po-whatsapp-btn').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const order = purchaseOrders.find(o => o.id === button.dataset.id);
+                        if (!order) return;
+                        await sendPOToWhatsApp(order);
                     });
                 });
 
