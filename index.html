@@ -3338,10 +3338,11 @@
 
                 document.getElementById('voiceConfirm').addEventListener('click', () => {
                     overlay.remove();
-                    searchTerm = transcript;
-                    renderPosContent();
-                    const newInput = document.getElementById('mobileSearch');
-                    if (newInput) newInput.value = transcript;
+                    const searchInput = document.getElementById('mobileSearch');
+                    if (searchInput) {
+                        searchInput.value = transcript;
+                        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                     showToast(`Searched: "${transcript}"`, 'success');
                 });
 
