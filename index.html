@@ -1,25 +1,3 @@
-                // Audit log view modal
-                document.querySelectorAll('.audit-details-btn').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const idx = Number(button.dataset.idx);
-                        const entry = auditLogs[idx];
-                        if (!entry) return;
-                        showEnhancedModal({
-                            title: 'Audit Log Entry',
-                            html: `
-                                <div style="margin-bottom:0.7rem;font-size:0.98rem;font-weight:700;color:#0f172a;">${entry.detail}</div>
-                                <div style="margin-bottom:0.5rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
-                                    <span class='al-chip accent'><i class='fas fa-user'></i> ${entry.userName || ''}</span>
-                                    <span class='al-chip'><i class='fas fa-clock'></i> ${new Date(entry.date).toLocaleString()}</span>
-                                    <span class='al-chip'><i class='fas fa-bolt'></i> ${entry.action}</span>
-                                </div>
-                                <div style='font-size:0.92rem;color:#475569;margin-bottom:0.5rem;'><b>Meta:</b> <pre style='white-space:pre-wrap;font-size:0.88rem;background:#f1f5f9;padding:0.5em 0.7em;border-radius:8px;margin:0;'>${entry.meta ? JSON.stringify(entry.meta, null, 2) : '—'}</pre></div>
-                            `,
-                            confirmText: 'Close',
-                            showCancel: false
-                        });
-                    });
-                });
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8239,31 +8217,31 @@
                                     <button class="al-btn" id="exportAuditLogBtn"><i class="fas fa-download"></i> Export</button>
                                 </div>
                             </div>
-                            // Export Audit Log as CSV
-                            function exportAuditLog() {
-                                if (!auditLogs || !auditLogs.length) {
-                                    showToast('No audit log entries to export', 'error');
-                                    return;
-                                }
-                                const header = ['Date', 'User', 'Action', 'Detail', 'Meta'];
-                                const rows = auditLogs.map(e => [
-                                    new Date(e.date).toLocaleString(),
-                                    e.userName || '',
-                                    e.action || '',
-                                    (e.detail || '').replace(/\n/g, ' '),
-                                    e.meta ? JSON.stringify(e.meta) : ''
-                                ]);
-                                const csv = [header, ...rows].map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
-                                const blob = new Blob([csv], { type: 'text/csv' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `AuditLog-${new Date().toISOString().slice(0,10)}.csv`;
-                                document.body.appendChild(a);
-                                a.click();
-                                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
-                                showToast('Audit log exported');
-                            }
+// Export Audit Log as CSV
+function exportAuditLog() {
+    if (!auditLogs || !auditLogs.length) {
+        showToast('No audit log entries to export', 'error');
+        return;
+    }
+    const header = ['Date', 'User', 'Action', 'Detail', 'Meta'];
+    const rows = auditLogs.map(e => [
+        new Date(e.date).toLocaleString(),
+        e.userName || '',
+        e.action || '',
+        (e.detail || '').replace(/\n/g, ' '),
+        e.meta ? JSON.stringify(e.meta) : ''
+    ]);
+    const csv = [header, ...rows].map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `AuditLog-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    showToast('Audit log exported');
+}
                             ${auditLogs.length === 0 ? `<div class="al-empty"><i class="fas fa-clipboard-list"></i>No audit entries yet</div>` : auditLogs.slice(0, 12).map((entry, idx) => `
                                 <div class="al-item">
                                     <div class="al-icon"><i class="fas fa-clock-rotate-left"></i></div>
