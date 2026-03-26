@@ -8142,9 +8142,9 @@
                                         </div>
                                     </div>
                                     <div class="al-actions">
-                                        <button class="al-btn po-invoice-btn" data-id="${order.id}"><i class="fas fa-file-pdf"></i></button>
-                                        ${order.supplierId ? `<button class="al-btn whatsapp po-whatsapp-btn" data-id="${order.id}"><i class="fab fa-whatsapp"></i></button>` : ''}
-                                        ${order.status !== 'received' ? `<button class="al-btn primary receive-po-btn" data-id="${order.id}"><i class="fas fa-box-open"></i></button>` : `<span class="al-received"><i class="fas fa-check"></i> Done</span>`}
+                                        <button class="al-btn po-invoice-btn" data-id="${order.id}"><i class="fas fa-file-pdf"></i> Invoice</button>
+                                        ${order.supplierId ? `<button class="al-btn whatsapp po-whatsapp-btn" data-id="${order.id}"><i class="fab fa-whatsapp"></i> Send</button>` : ''}
+                                        ${order.status !== 'received' ? `<button class="al-btn primary receive-po-btn" data-id="${order.id}"><i class="fas fa-box-open"></i> Receive</button>` : `<span class="al-received"><i class="fas fa-check"></i> Done</span>`}
                                     </div>
                                 </div>
                             `).join('')}
