@@ -840,6 +840,80 @@
             box-shadow: 0 6px 16px rgba(6,198,212,0.18);
         }
         .chip:active { transform: scale(0.93); }
+
+        /* ── Product Management Page ── */
+        .pm-header {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 0.8rem; margin-bottom: 1.2rem; flex-wrap: wrap;
+        }
+        .pm-header h3 { margin: 0; font-size: 1.15rem; color: #0f172a; }
+        .pm-header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .pm-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.2rem;
+        }
+        .pm-stat-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd; border-radius: 16px;
+            padding: 0.7rem 0.8rem; text-align: center;
+        }
+        .pm-stat-card.profit { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #bbf7d0; }
+        .pm-stat-card.warning { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #fde68a; }
+        .pm-stat-value { font-size: 1.1rem; font-weight: 800; color: #0f172a; line-height: 1.2; }
+        .pm-stat-label { font-size: 0.65rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+        .pm-search {
+            display: flex; align-items: center; gap: 0.5rem;
+            background: #f1f5f9; border-radius: 60px; padding: 0.15rem 0.5rem 0.15rem 1rem; margin-bottom: 1rem;
+            border: 1.5px solid transparent; transition: border-color 0.2s;
+        }
+        .pm-search:focus-within { border-color: rgba(6,198,212,0.4); }
+        .pm-search input { border: none; background: transparent; padding: 0.7rem 0; width: 100%; outline: none; font-size: 0.88rem; }
+        .pm-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 20px;
+            padding: 0.9rem; margin-bottom: 0.7rem;
+            transition: all 0.2s ease; position: relative;
+        }
+        .pm-card:hover { border-color: rgba(6,198,212,0.35); box-shadow: 0 4px 16px rgba(6,198,212,0.08); }
+        .pm-card-top { display: flex; align-items: center; gap: 0.75rem; }
+        .pm-card-img {
+            width: 52px; height: 52px; border-radius: 14px; overflow: hidden; flex-shrink: 0;
+            background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+            display: flex; align-items: center; justify-content: center;
+            border: 1.5px solid #e2e8f0;
+        }
+        .pm-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .pm-card-body { flex: 1; min-width: 0; }
+        .pm-card-name {
+            font-weight: 700; font-size: 0.9rem; color: #0f172a;
+            display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;
+        }
+        .pm-card-name .fa-star { color: #f59e0b; font-size: 0.7rem; }
+        .pm-card-meta { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+        .pm-card-pricing {
+            display: flex; align-items: baseline; gap: 0.6rem; margin-top: 0.4rem; flex-wrap: wrap;
+        }
+        .pm-card-sell { font-weight: 800; font-size: 1rem; color: #0f172a; }
+        .pm-card-buy { font-size: 0.72rem; color: #94a3b8; }
+        .pm-card-profit {
+            font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 6px;
+            background: rgba(34,197,94,0.1); color: #16a34a;
+        }
+        .pm-card-profit.negative { background: rgba(239,68,68,0.1); color: #dc2626; }
+        .pm-card-bottom {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 0.65rem; padding-top: 0.6rem; border-top: 1px solid #f1f5f9;
+            gap: 0.5rem; flex-wrap: wrap;
+        }
+        .pm-stock-pill {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            padding: 0.2rem 0.6rem; border-radius: 8px;
+            font-size: 0.7rem; font-weight: 700;
+            background: rgba(6,198,212,0.08); color: #0891b2;
+        }
+        .pm-stock-pill.low { background: rgba(245,158,11,0.1); color: #d97706; }
+        .pm-stock-pill.out { background: rgba(239,68,68,0.08); color: #dc2626; }
+        .pm-card-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+        .chip:active { transform: scale(0.93); }
         .chip.active {
             background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
             color: white;
@@ -6845,51 +6919,104 @@
 
                 const supplierOptions = [{ value: '', label: 'No supplier' }, ...suppliers.map(supplier => ({ value: supplier.id, label: supplier.name }))];
                 
+                const totalProducts = products.length;
+                const totalStockValue = products.reduce((sum, p) => sum + (Number(p.sellPrice || 0) * Number(p.stock || 0)), 0);
+                const lowStockCount = products.filter(p => Number(p.stock || 0) <= Number(p.minStock || 0) && Number(p.stock || 0) > 0).length;
+                const outOfStockCount = products.filter(p => Number(p.stock || 0) <= 0).length;
+
                 let html = `
-                    <div style="background:white; border-radius:40px; padding:1.4rem;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.7rem; margin-bottom:1rem; flex-wrap:wrap;">
+                    <div style="padding: 0.2rem 0;">
+                        <div class="pm-header">
                             <h3><i class="fas fa-cubes icon-one"></i> ${__('productTitle')}</h3>
-                            <button class="btn-small analytics-ghost-btn" id="addSupplierBtn" style="min-height:auto; padding:0.7rem 1rem;"><i class="fas fa-truck"></i> Supplier</button>
+                            <div class="pm-header-actions">
+                                <button class="btn-small analytics-ghost-btn" id="addSupplierBtn" style="min-height:auto; padding:0.6rem 0.9rem;"><i class="fas fa-truck"></i> Supplier</button>
+                                <button class="btn-small" id="addProdBtn" style="min-height:auto; padding:0.6rem 0.9rem;"><i class="fas fa-plus"></i> ${__('addProduct')}</button>
+                            </div>
                         </div>
+
+                        <div class="pm-stats">
+                            <div class="pm-stat-card">
+                                <div class="pm-stat-value">${totalProducts}</div>
+                                <div class="pm-stat-label">Products</div>
+                            </div>
+                            <div class="pm-stat-card profit">
+                                <div class="pm-stat-value">${formatMoney(totalStockValue)}</div>
+                                <div class="pm-stat-label">Stock Value</div>
+                            </div>
+                            <div class="pm-stat-card warning">
+                                <div class="pm-stat-value">${lowStockCount + outOfStockCount}</div>
+                                <div class="pm-stat-label">Low / Out</div>
+                            </div>
+                        </div>
+
+                        <div class="pm-search">
+                            <i class="fas fa-search" style="color:#94a3b8;"></i>
+                            <input type="text" id="pmSearchInput" placeholder="Search products...">
+                        </div>
+
+                        <div id="pmProductList">
                 `;
                 
                 products.forEach(p => {
-                    let imgHtml = p.image ? 
-                        `<img src="${p.image}" style="width:40px; height:40px; border-radius:12px; object-fit:cover;">` : 
-                        '<i class="fas fa-box" style="font-size:2rem; color:#06c6d4;"></i>';
+                    const imgHtml = p.image ? 
+                        `<img src="${p.image}">` : 
+                        '<i class="fas fa-box" style="font-size:1.4rem; color:#06c6d4;"></i>';
                     
-                    let profit = p.sellPrice - p.buyPrice;
+                    const profit = Number(p.sellPrice || 0) - Number(p.buyPrice || 0);
+                    const profitClass = profit < 0 ? 'negative' : '';
+                    const stock = Number(p.stock || 0);
+                    const minStock = Number(p.minStock || 0);
+                    const stockClass = stock <= 0 ? 'out' : stock <= minStock ? 'low' : '';
+                    const stockLabel = stock <= 0 ? 'Out of stock' : `${stock} in stock`;
                     
                     html += `
-                        <div style="display:flex; align-items:center; gap:0.8rem; padding:12px 0; border-bottom:1px solid #e2edff;">
-                            <div style="min-width:40px;">${imgHtml}</div>
-                            <div style="flex:1;">
-                                <div style="font-weight:600; display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap;">${p.name} ${p.favorite ? '<i class="fas fa-star icon-one"></i>' : ''}</div>
-                                <div style="font-size:0.8rem; color:#64748b;">${p.category}${p.barcode ? ` · ${p.barcode}` : ''}</div>
-                                <div style="font-size:0.75rem; color:#06c6d4;">${p.supplierName || 'No supplier'}${p.variants?.length ? ` · ${p.variants.join(', ')}` : ''}</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div><small>B: TSh ${p.buyPrice}</small></div>
-                                <div><strong>S: TSh ${p.sellPrice}</strong> <span style="color:#27ae60;">+${profit}</span></div>
-                                <div style="font-size:0.8rem;">Stock: ${p.stock} · Min ${p.minStock || 0}</div>
-                                <div style="display:flex; gap:0.35rem; justify-content:flex-end; margin-top:0.45rem; flex-wrap:wrap;">
-                                    <button class="analytics-ghost-btn btn-small stock-intake-btn" data-id="${p.id}" style="padding:0.6rem 1rem; min-height:38px;" aria-label="Add stock for ${p.name}"><i class="fas fa-plus"></i> Stock</button>
-                                    <button class="analytics-ghost-btn btn-small create-po-btn" data-id="${p.id}" style="padding:0.6rem 1rem; min-height:38px;" aria-label="Create purchase order for ${p.name}"><i class="fas fa-file-invoice"></i> PO</button>
+                        <div class="pm-card" data-name="${(p.name || '').toLowerCase()}" data-cat="${(p.category || '').toLowerCase()}">
+                            <div class="pm-card-top">
+                                <div class="pm-card-img">${imgHtml}</div>
+                                <div class="pm-card-body">
+                                    <div class="pm-card-name">${p.name} ${p.favorite ? '<i class="fas fa-star"></i>' : ''}</div>
+                                    <div class="pm-card-meta">${p.category || 'General'}${p.barcode ? ` · ${p.barcode}` : ''}${p.supplierName ? ` · ${p.supplierName}` : ''}</div>
+                                    <div class="pm-card-pricing">
+                                        <span class="pm-card-sell">${formatMoney(p.sellPrice)}</span>
+                                        <span class="pm-card-buy">Cost ${formatMoney(p.buyPrice)}</span>
+                                        <span class="pm-card-profit ${profitClass}">${profit >= 0 ? '+' : ''}${formatMoney(profit)}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <button class="analytics-ghost-btn btn-small product-edit-btn" data-id="${p.id}" style="margin-left:8px; min-height:38px; padding:0.6rem 1rem;" aria-label="Edit ${p.name}"><i class="fas fa-edit"></i> Edit</button>
+                            <div class="pm-card-bottom">
+                                <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                                    <span class="pm-stock-pill ${stockClass}"><i class="fas ${stock <= 0 ? 'fa-exclamation-circle' : stock <= minStock ? 'fa-exclamation-triangle' : 'fa-cubes'}"></i> ${stockLabel}</span>
+                                    ${minStock > 0 ? `<span style="font-size:0.65rem; color:#94a3b8;">Min: ${minStock}</span>` : ''}
+                                    ${p.variants?.length ? `<span style="font-size:0.65rem; color:#94a3b8;">${p.variants.length} variant${p.variants.length > 1 ? 's' : ''}</span>` : ''}
+                                </div>
+                                <div class="pm-card-actions">
+                                    <button class="analytics-ghost-btn btn-small stock-intake-btn" data-id="${p.id}" style="padding:0.5rem 0.7rem; min-height:auto; font-size:0.7rem;"><i class="fas fa-plus"></i> Stock</button>
+                                    <button class="analytics-ghost-btn btn-small create-po-btn" data-id="${p.id}" style="padding:0.5rem 0.7rem; min-height:auto; font-size:0.7rem;"><i class="fas fa-file-invoice"></i> PO</button>
+                                    <button class="analytics-ghost-btn btn-small product-edit-btn" data-id="${p.id}" style="padding:0.5rem 0.7rem; min-height:auto; font-size:0.7rem;"><i class="fas fa-pen"></i> Edit</button>
+                                </div>
+                            </div>
                         </div>
                     `;
                 });
                 
                 html += `
-                        <button class="btn-small" id="addProdBtn" style="width:100%; margin-top:1rem;">
-                            <i class="fas fa-plus"></i> ${__('addProduct')}
-                        </button>
+                        </div>
                     </div>
                 `;
                 
                 document.getElementById('mobileContent').innerHTML = html;
+
+                // Product search filter
+                const pmSearch = document.getElementById('pmSearchInput');
+                if (pmSearch) {
+                    pmSearch.addEventListener('input', () => {
+                        const q = pmSearch.value.toLowerCase();
+                        document.querySelectorAll('.pm-card').forEach(card => {
+                            const match = card.dataset.name.includes(q) || card.dataset.cat.includes(q);
+                            card.style.display = match ? '' : 'none';
+                        });
+                    });
+                }
 
                 document.getElementById('addSupplierBtn')?.addEventListener('click', () => {
                     showEnhancedModal({
