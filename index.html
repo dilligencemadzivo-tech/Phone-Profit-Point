@@ -4796,7 +4796,9 @@
                 `;
                 document.body.appendChild(overlay);
                 setTimeout(() => { const input = document.getElementById('productKeyInput'); if (input) input.focus(); }, 50);
+                let activated = false;
                 const handleActivate = () => {
+                    if (activated) return;
                     const inp = document.getElementById('productKeyInput');
                     const rawKey = inp ? inp.value : '';
                     const key = normalizeProductKey(rawKey);
@@ -4804,6 +4806,7 @@
                     const validFormat = key.length >= 8 && /[A-Z]/.test(key) && /\d/.test(key);
                     const isAccepted = key && (validKeys.has(key) || validFormat);
                     if (isAccepted) {
+                        activated = true;
                         saveLicense({ type: 'full', start: Date.now(), duration: MONTH_DURATION });
                         localStorage.setItem('profitpoint_last_activated_key', key);
                         trialExpiredNotified = false;
@@ -4821,12 +4824,6 @@
                 document.getElementById('submitKey')?.addEventListener('click', (e) => {
                     e.preventDefault();
                     handleActivate();
-                });
-                overlay.addEventListener('click', (e) => {
-                    if (e.target && e.target.id === 'submitKey') {
-                        e.preventDefault();
-                        handleActivate();
-                    }
                 });
                 document.getElementById('productKeyInput')?.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
@@ -6309,7 +6306,11 @@
                         });
                     });
 
-                    overlay.querySelector('#closeCartModal')?.addEventListener('click', () => overlay.remove());
+                    overlay.querySelector('#closeCartModal')?.addEventListener('click', () => {
+                        overlay.remove();
+                        const badge = document.getElementById('cartItemCount');
+                        if (badge) badge.textContent = cart.reduce((a, i) => a + i.qty, 0);
+                    });
 
                     overlay.querySelectorAll('.cart-item-remove-btn').forEach(button => {
                         button.addEventListener('click', event => {
@@ -6318,7 +6319,10 @@
                             if (!Number.isNaN(idx)) {
                                 cart.splice(idx, 1);
                                 saveCart();
+                                amountPaidDraft = null;
                                 renderCartOverlay();
+                                const badge = document.getElementById('cartItemCount');
+                                if (badge) badge.textContent = cart.reduce((a, i) => a + i.qty, 0);
                             }
                         });
                     });
