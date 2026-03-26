@@ -8212,37 +8212,9 @@
                                     <h4><i class="fas fa-clipboard-list" style="color:#64748b;"></i> Audit Log</h4>
                                     <p>Recent operational activity</p>
                                 </div>
-                                <div style="display:flex;gap:0.4rem;align-items:center;">
-                                    <span class="al-count">${auditLogs.length} entries</span>
-                                    <button class="al-btn" id="exportAuditLogBtn"><i class="fas fa-download"></i> Export</button>
-                                </div>
+                                <span class="al-count">${auditLogs.length} entries</span>
                             </div>
-                            // Export Audit Log as CSV
-                            function exportAuditLog() {
-                                if (!auditLogs || !auditLogs.length) {
-                                    showToast('No audit log entries to export', 'error');
-                                    return;
-                                }
-                                const header = ['Date', 'User', 'Action', 'Detail', 'Meta'];
-                                const rows = auditLogs.map(e => [
-                                    new Date(e.date).toLocaleString(),
-                                    e.userName || '',
-                                    e.action || '',
-                                    (e.detail || '').replace(/\n/g, ' '),
-                                    e.meta ? JSON.stringify(e.meta) : ''
-                                ]);
-                                const csv = [header, ...rows].map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
-                                const blob = new Blob([csv], { type: 'text/csv' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `AuditLog-${new Date().toISOString().slice(0,10)}.csv`;
-                                document.body.appendChild(a);
-                                a.click();
-                                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
-                                showToast('Audit log exported');
-                            }
-                            ${auditLogs.length === 0 ? `<div class="al-empty"><i class="fas fa-clipboard-list"></i>No audit entries yet</div>` : auditLogs.slice(0, 12).map((entry, idx) => `
+                            ${auditLogs.length === 0 ? `<div class="al-empty"><i class="fas fa-clipboard-list"></i>No audit entries yet</div>` : auditLogs.slice(0, 12).map(entry => `
                                 <div class="al-item">
                                     <div class="al-icon"><i class="fas fa-clock-rotate-left"></i></div>
                                     <div class="al-body">
@@ -8253,18 +8225,13 @@
                                             <span class="al-chip">${new Date(entry.date).toLocaleString()}</span>
                                         </div>
                                     </div>
-                                    <div class="al-actions">
-                                        <button class="al-btn audit-details-btn" data-idx="${idx}"><i class="fas fa-eye"></i> View</button>
-                                    </div>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
                 `;
 
-
                 document.getElementById('mobileContent').innerHTML = html;
-                document.getElementById('exportAuditLogBtn')?.addEventListener('click', exportAuditLog);
 
                 document.querySelectorAll('.create-po-alert-btn').forEach(button => {
                     button.addEventListener('click', () => {
