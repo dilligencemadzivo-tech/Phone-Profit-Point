@@ -913,6 +913,137 @@
         .pm-stock-pill.out { background: rgba(239,68,68,0.08); color: #dc2626; }
         .pm-card-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
 
+        /* ===== ALERTS PAGE ===== */
+        .al-page { padding: 0.5rem; }
+        .al-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 22px; padding: 1.3rem 1.1rem 1rem; margin-bottom: 1rem;
+            color: #fff; position: relative; overflow: hidden;
+        }
+        .al-hero::after {
+            content: ''; position: absolute; top: -40%; right: -20%; width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(6,198,212,0.15) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none;
+        }
+        .al-hero-title { font-size: 1.15rem; font-weight: 800; margin: 0 0 0.15rem; }
+        .al-hero-sub { font-size: 0.75rem; color: #94a3b8; margin: 0 0 0.9rem; }
+        .al-stats {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.55rem;
+        }
+        .al-stat {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 0.65rem 0.7rem; backdrop-filter: blur(8px);
+        }
+        .al-stat-val { font-size: 1.05rem; font-weight: 800; line-height: 1.2; }
+        .al-stat-lbl { font-size: 0.62rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+        .al-stat.warn .al-stat-val { color: #fbbf24; }
+        .al-stat.danger .al-stat-val { color: #f87171; }
+        .al-stat.accent .al-stat-val { color: #22d3ee; }
+        .al-stat.ok .al-stat-val { color: #4ade80; }
+
+        .al-section {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 20px;
+            padding: 1rem; margin-bottom: 0.75rem;
+        }
+        .al-section-head {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 0.6rem; margin-bottom: 0.7rem; flex-wrap: wrap;
+        }
+        .al-section-head h4 {
+            margin: 0; font-size: 0.92rem; font-weight: 800; color: #0f172a;
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .al-section-head p { margin: 0.15rem 0 0; font-size: 0.7rem; color: #94a3b8; }
+        .al-count {
+            background: rgba(6,198,212,0.1); color: #0891b2; font-size: 0.65rem;
+            font-weight: 800; padding: 2px 8px; border-radius: 20px;
+        }
+
+        .al-item {
+            display: flex; align-items: flex-start; gap: 0.7rem;
+            padding: 0.7rem; border-radius: 14px; margin-bottom: 0.45rem;
+            border: 1px solid #f1f5f9; background: #fafbfc;
+            transition: all 0.2s ease;
+        }
+        .al-item:last-child { margin-bottom: 0; }
+        .al-item:hover { border-color: rgba(6,198,212,0.2); }
+        .al-item.warn {
+            background: linear-gradient(135deg, #fffbeb, #fef9f0);
+            border-color: #fde68a; border-left: 4px solid #f59e0b;
+        }
+        .al-item.danger {
+            background: linear-gradient(135deg, #fef2f2, #fef5f5);
+            border-color: #fecaca; border-left: 4px solid #ef4444;
+        }
+        .al-item.success {
+            background: linear-gradient(135deg, #f0fdf4, #f5fdf8);
+            border-color: #bbf7d0; border-left: 4px solid #22c55e;
+        }
+        .al-item.info {
+            background: linear-gradient(135deg, #eff6ff, #f0f7ff);
+            border-color: #bfdbfe; border-left: 4px solid #3b82f6;
+        }
+        .al-icon {
+            width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; background: #f1f5f9; color: #64748b;
+        }
+        .al-icon.warn { background: rgba(245,158,11,0.12); color: #d97706; }
+        .al-icon.danger { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .al-icon.accent { background: rgba(6,198,212,0.1); color: #0891b2; }
+        .al-icon.green { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .al-icon.blue { background: rgba(59,130,246,0.1); color: #3b82f6; }
+        .al-body { flex: 1; min-width: 0; }
+        .al-title { font-weight: 700; font-size: 0.85rem; color: #0f172a; margin-bottom: 2px; }
+        .al-meta {
+            display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-top: 3px;
+        }
+        .al-chip {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 2px 8px; border-radius: 6px; font-size: 0.67rem; font-weight: 700;
+            background: #f1f5f9; color: #64748b;
+        }
+        .al-chip.warn { background: rgba(245,158,11,0.1); color: #b45309; }
+        .al-chip.danger { background: rgba(239,68,68,0.08); color: #dc2626; }
+        .al-chip.green { background: rgba(34,197,94,0.08); color: #16a34a; }
+        .al-chip.accent { background: rgba(6,198,212,0.08); color: #0891b2; }
+        .al-chip.blue { background: rgba(59,130,246,0.08); color: #2563eb; }
+        .al-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; flex-shrink: 0; }
+        .al-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 0.4rem 0.75rem; border-radius: 10px; border: 1.5px solid #e2e8f0;
+            background: #fff; color: #334155; font-size: 0.72rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .al-btn:active { transform: scale(0.95); }
+        .al-btn:hover { border-color: rgba(6,198,212,0.3); color: #0891b2; }
+        .al-btn.primary { background: #0f172a; color: #fff; border-color: #0f172a; }
+        .al-btn.primary:hover { background: #1e293b; }
+        .al-btn.green { background: #16a34a; color: #fff; border-color: #16a34a; }
+        .al-btn.green:hover { background: #15803d; }
+        .al-btn.red { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .al-btn.red:hover { background: #dc2626; }
+        .al-btn.whatsapp { background: #25d366; color: #fff; border-color: #25d366; }
+        .al-btn.whatsapp:hover { background: #1da851; }
+        .al-received {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 8px; font-size: 0.67rem; font-weight: 700;
+            background: rgba(34,197,94,0.1); color: #16a34a;
+        }
+        .al-amount { font-weight: 800; font-size: 0.95rem; color: #0f172a; white-space: nowrap; }
+        .al-empty {
+            text-align: center; padding: 1.5rem 1rem; color: #94a3b8;
+            font-size: 0.82rem; font-weight: 500;
+        }
+        .al-empty i { font-size: 1.6rem; display: block; margin-bottom: 0.5rem; opacity: 0.4; }
+        .al-notif-body { font-size: 0.78rem; color: #475569; margin-top: 4px; line-height: 1.45; }
+        .al-shift-status {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 800;
+        }
+        .al-shift-status.open { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .al-shift-status.closed { background: rgba(239,68,68,0.08); color: #dc2626; }
+
         .chip:active { transform: scale(0.93); }
         .chip.active {
             background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
@@ -7891,200 +8022,212 @@
                 const balances = getCustomerBalances();
                 const activeShift = getActiveShift();
 
-                let html = `
-                    <div class="analytics-page">
-                        <section class="analytics-card analytics-hero">
-                            <div class="analytics-hero-top">
-                                <div class="analytics-hero-copy">
-                                    <span class="analytics-eyebrow">Operations</span>
-                                    <h2>Store control</h2>
-                                    <p>Low stock, purchase orders, balances, shifts, notifications, and audit trail.</p>
-                                </div>
-                                <span class="analytics-hero-chip"><i class="fas fa-bell"></i> ${getUnreadNotificationCount()} unread</span>
-                            </div>
-                            <div class="analytics-hero-grid">
-                                <div class="analytics-hero-metric">
-                                    <span class="analytics-hero-label">Low stock</span>
-                                    <strong>${lowStock.length}</strong>
-                                </div>
-                                <div class="analytics-hero-metric">
-                                    <span class="analytics-hero-label">Balances due</span>
-                                    <strong>${formatMoney(balances.reduce((sum, item) => sum + item.outstanding, 0))}</strong>
-                                </div>
-                            </div>
-                            <div class="analytics-hero-strip">
-                                <span class="analytics-hero-chip"><i class="fas fa-truck"></i> ${suppliers.length} suppliers</span>
-                                <span class="analytics-hero-chip"><i class="fas fa-file-invoice"></i> ${purchaseOrders.filter(item => item.status !== 'received').length} open POs</span>
-                                <span class="analytics-hero-chip"><i class="fas fa-cash-register"></i> ${activeShift ? 'Shift open' : 'No shift open'}</span>
-                            </div>
-                        </section>
+                const openPOs = purchaseOrders.filter(item => item.status !== 'received').length;
+                const totalBalanceDue = balances.reduce((sum, item) => sum + item.outstanding, 0);
+                const unreadCount = getUnreadNotificationCount();
 
-                        <section class="analytics-card">
-                            <div class="analytics-section-head">
-                                <div>
-                                    <h4><i class="fas fa-bell icon-one"></i> Dashboard alerts</h4>
-                                    <p>Priority actions for today</p>
+                let html = `
+                    <div class="al-page">
+                        <!-- Hero -->
+                        <div class="al-hero">
+                            <h2 class="al-hero-title"><i class="fas fa-shield-halved" style="margin-right:0.4rem;opacity:0.7;"></i> Store Control</h2>
+                            <p class="al-hero-sub">Low stock, orders, balances, shifts & audit trail</p>
+                            <div class="al-stats">
+                                <div class="al-stat ${lowStock.length > 0 ? 'warn' : 'ok'}">
+                                    <div class="al-stat-val">${lowStock.length}</div>
+                                    <div class="al-stat-lbl">Low Stock</div>
                                 </div>
-                                ${lowStock.length > 0 || balances.length > 0 ? `<button class="btn-small" id="clearAlertsBtn" style="flex-shrink:0;"><i class="fas fa-times"></i> Clear</button>` : ''}
+                                <div class="al-stat ${totalBalanceDue > 0 ? 'danger' : 'ok'}">
+                                    <div class="al-stat-val">${formatMoney(totalBalanceDue)}</div>
+                                    <div class="al-stat-lbl">Balances Due</div>
+                                </div>
+                                <div class="al-stat accent">
+                                    <div class="al-stat-val">${openPOs}</div>
+                                    <div class="al-stat-lbl">Open POs</div>
+                                </div>
+                                <div class="al-stat ${activeShift ? 'ok' : 'danger'}">
+                                    <div class="al-stat-val">${activeShift ? '<i class="fas fa-circle" style="font-size:0.6rem;"></i> Open' : 'Closed'}</div>
+                                    <div class="al-stat-lbl">Shift</div>
+                                </div>
                             </div>
-                            ${lowStock.length === 0 && balances.length === 0 ? `<div class="analytics-empty-state">No urgent actions right now.</div>` : ''}
+                        </div>
+
+                        <!-- Dashboard Alerts -->
+                        <div class="al-section">
+                            <div class="al-section-head">
+                                <div>
+                                    <h4><i class="fas fa-bell" style="color:#f59e0b;"></i> Priority Alerts</h4>
+                                    <p>Actions that need attention today</p>
+                                </div>
+                                <div style="display:flex;gap:0.35rem;align-items:center;">
+                                    ${unreadCount > 0 ? `<span class="al-count">${unreadCount} unread</span>` : ''}
+                                    ${lowStock.length > 0 || balances.length > 0 ? `<button class="al-btn" id="clearAlertsBtn"><i class="fas fa-check-double"></i> Clear</button>` : ''}
+                                </div>
+                            </div>
+                            ${lowStock.length === 0 && balances.length === 0 ? `<div class="al-empty"><i class="fas fa-circle-check"></i>No urgent actions right now</div>` : ''}
                             ${lowStock.slice(0, 5).map(product => `
-                                <div class="analytics-expense-item alert-card-warn">
-                                    <div class="analytics-expense-head">
-                                        <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title"><i class="fas fa-triangle-exclamation" style="color:#f59e0b; margin-right:0.45rem;"></i>${product.name}</div>
-                                            <div class="analytics-expense-meta">
-                                                <span class="analytics-expense-chip">Stock ${product.stock} / Min ${product.minStock}</span>
-                                                <span class="analytics-expense-subtle">${product.supplierName || 'No supplier assigned'}</span>
-                                            </div>
+                                <div class="al-item warn">
+                                    <div class="al-icon warn"><i class="fas fa-triangle-exclamation"></i></div>
+                                    <div class="al-body">
+                                        <div class="al-title">${product.name}</div>
+                                        <div class="al-meta">
+                                            <span class="al-chip warn"><i class="fas fa-cubes"></i> ${product.stock} / ${product.minStock}</span>
+                                            <span class="al-chip">${product.supplierName || 'No supplier'}</span>
                                         </div>
-                                        <div class="analytics-expense-side">
-                                            <button class="btn-small action-chip create-po-alert-btn" data-id="${product.id}"><i class="fas fa-file-invoice icon-one"></i> Reorder</button>
-                                        </div>
+                                    </div>
+                                    <div class="al-actions">
+                                        <button class="al-btn primary create-po-alert-btn" data-id="${product.id}"><i class="fas fa-file-invoice"></i> Reorder</button>
                                     </div>
                                 </div>
                             `).join('')}
                             ${balances.slice(0, 5).map(balance => `
-                                <div class="analytics-expense-item alert-card-danger">
-                                    <div class="analytics-expense-head">
-                                        <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title"><i class="fas fa-user-clock" style="color:#ef4444; margin-right:0.45rem;"></i>${balance.customerName}</div>
-                                            <div class="analytics-expense-meta">
-                                                <span class="analytics-expense-chip">${balance.count} open sale(s)</span>
-                                                <span class="analytics-expense-subtle">Layaway ${formatMoney(balance.layaway)}</span>
-                                            </div>
+                                <div class="al-item danger">
+                                    <div class="al-icon danger"><i class="fas fa-user-clock"></i></div>
+                                    <div class="al-body">
+                                        <div class="al-title">${balance.customerName}</div>
+                                        <div class="al-meta">
+                                            <span class="al-chip danger">${balance.count} open sale(s)</span>
+                                            <span class="al-chip">Layaway ${formatMoney(balance.layaway)}</span>
                                         </div>
-                                        <div class="analytics-expense-side" style="flex-direction:column;align-items:flex-end;gap:0.4rem;">
-                                            <div class="analytics-expense-amount">${formatMoney(balance.outstanding)}</div>
-                                            <button class="btn-small action-chip record-payment-btn" style="background:#16a34a;color:#fff;border-color:#16a34a;white-space:nowrap;" data-customer-id="${balance.customerId}" data-outstanding="${balance.outstanding}" data-name="${balance.customerName}"><i class="fas fa-money-bill-wave"></i> Pay</button>
-                                        </div>
+                                    </div>
+                                    <div class="al-actions" style="flex-direction:column;align-items:flex-end;gap:0.35rem;">
+                                        <div class="al-amount">${formatMoney(balance.outstanding)}</div>
+                                        <button class="al-btn green record-payment-btn" data-customer-id="${balance.customerId}" data-outstanding="${balance.outstanding}" data-name="${balance.customerName}"><i class="fas fa-money-bill-wave"></i> Pay</button>
                                     </div>
                                 </div>
                             `).join('')}
-                        </section>
+                        </div>
 
-                        <section class="analytics-card">
-                            <div class="analytics-section-head">
+                        <!-- Suppliers -->
+                        <div class="al-section">
+                            <div class="al-section-head">
                                 <div>
-                                    <h4><i class="fas fa-truck icon-one"></i> Suppliers</h4>
-                                    <p>Supplier contacts and linked inventory</p>
+                                    <h4><i class="fas fa-truck" style="color:#0891b2;"></i> Suppliers</h4>
+                                    <p>Contacts and linked inventory</p>
                                 </div>
+                                <span class="al-count">${suppliers.length}</span>
                             </div>
-                            ${suppliers.length === 0 ? `<div class="analytics-empty-state">No suppliers added yet.</div>` : suppliers.map(supplier => `
-                                <div class="analytics-expense-item">
-                                    <div class="analytics-expense-head">
-                                        <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title">${supplier.name}</div>
-                                            <div class="analytics-expense-meta">
-                                                <span class="analytics-expense-chip">${supplier.contact || 'No contact'}</span>
-                                                <span class="analytics-expense-subtle">${supplier.phone || 'No phone'}</span>
-                                            </div>
+                            ${suppliers.length === 0 ? `<div class="al-empty"><i class="fas fa-truck"></i>No suppliers added yet</div>` : suppliers.map(supplier => `
+                                <div class="al-item">
+                                    <div class="al-icon accent"><i class="fas fa-building"></i></div>
+                                    <div class="al-body">
+                                        <div class="al-title">${supplier.name}</div>
+                                        <div class="al-meta">
+                                            <span class="al-chip accent"><i class="fas fa-envelope"></i> ${supplier.contact || 'No contact'}</span>
+                                            <span class="al-chip"><i class="fas fa-phone"></i> ${supplier.phone || 'No phone'}</span>
                                         </div>
                                     </div>
                                 </div>
                             `).join('')}
-                        </section>
+                        </div>
 
-                        <section class="analytics-card">
-                            <div class="analytics-section-head">
+                        <!-- Purchase Orders -->
+                        <div class="al-section">
+                            <div class="al-section-head">
                                 <div>
-                                    <h4><i class="fas fa-file-invoice icon-one"></i> Purchase Orders</h4>
+                                    <h4><i class="fas fa-file-invoice" style="color:#6366f1;"></i> Purchase Orders</h4>
                                     <p>Restock workflow and goods received</p>
                                 </div>
+                                <span class="al-count">${purchaseOrders.length} total</span>
                             </div>
-                            ${purchaseOrders.length === 0 ? `<div class="analytics-empty-state">No purchase orders yet.</div>` : purchaseOrders.slice(0, 8).map(order => `
-                                <div class="analytics-expense-item">
-                                    <div class="analytics-expense-head">
-                                        <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title">${order.productName}</div>
-                                            <div class="analytics-expense-meta">
-                                                <span class="analytics-expense-chip">${order.qty} units</span>
-                                                <span class="analytics-expense-subtle">${order.supplierName || 'No supplier'}</span>
-                                                <span class="analytics-expense-subtle">${order.status}</span>
-                                            </div>
+                            ${purchaseOrders.length === 0 ? `<div class="al-empty"><i class="fas fa-file-invoice"></i>No purchase orders yet</div>` : purchaseOrders.slice(0, 8).map(order => `
+                                <div class="al-item ${order.status === 'received' ? 'success' : ''}">
+                                    <div class="al-icon ${order.status === 'received' ? 'green' : 'blue'}"><i class="fas ${order.status === 'received' ? 'fa-circle-check' : 'fa-box'}"></i></div>
+                                    <div class="al-body">
+                                        <div class="al-title">${order.productName}</div>
+                                        <div class="al-meta">
+                                            <span class="al-chip accent">${order.qty} units</span>
+                                            <span class="al-chip">${order.supplierName || 'No supplier'}</span>
+                                            <span class="al-chip ${order.status === 'received' ? 'green' : 'warn'}">${order.status}</span>
                                         </div>
-                                        <div class="analytics-expense-side" style="display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center;">
-                                            <button class="btn-small analytics-ghost-btn po-invoice-btn" data-id="${order.id}" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-file-pdf"></i> Invoice</button>
-                                            ${order.supplierId ? `<button class="btn-small po-whatsapp-btn" data-id="${order.id}" style="padding:0.55rem 0.9rem; min-height:auto; background:#16a34a; color:#fff; border-color:#16a34a;"><i class="fab fa-whatsapp"></i> Send</button>` : ''}
-                                            ${order.status !== 'received' ? `<button class="btn-small receive-po-btn" data-id="${order.id}" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-box-open"></i> Receive</button>` : `<span class="analytics-mini-chip">Received</span>`}
-                                        </div>
+                                    </div>
+                                    <div class="al-actions">
+                                        <button class="al-btn po-invoice-btn" data-id="${order.id}"><i class="fas fa-file-pdf"></i></button>
+                                        ${order.supplierId ? `<button class="al-btn whatsapp po-whatsapp-btn" data-id="${order.id}"><i class="fab fa-whatsapp"></i></button>` : ''}
+                                        ${order.status !== 'received' ? `<button class="al-btn primary receive-po-btn" data-id="${order.id}"><i class="fas fa-box-open"></i></button>` : `<span class="al-received"><i class="fas fa-check"></i> Done</span>`}
                                     </div>
                                 </div>
                             `).join('')}
-                        </section>
+                        </div>
 
-                        <section class="analytics-card">
-                            <div class="analytics-section-head">
+                        <!-- Shift Control -->
+                        <div class="al-section">
+                            <div class="al-section-head">
                                 <div>
-                                    <h4><i class="fas fa-cash-register icon-one"></i> Shift Control</h4>
-                                    <p>Open and close daily cash shifts</p>
+                                    <h4><i class="fas fa-cash-register" style="color:#8b5cf6;"></i> Shift Control</h4>
+                                    <p>Daily cash management</p>
                                 </div>
+                                <span class="al-shift-status ${activeShift ? 'open' : 'closed'}"><i class="fas fa-circle" style="font-size:0.45rem;"></i> ${activeShift ? 'Active' : 'Inactive'}</span>
                             </div>
-                            <div class="analytics-expense-item">
-                                <div class="analytics-expense-head">
-                                    <div class="analytics-expense-main">
-                                        <div class="analytics-expense-title">${activeShift ? `Opened by ${activeShift.openedBy}` : 'No active shift'}</div>
-                                        <div class="analytics-expense-meta">
-                                            <span class="analytics-expense-chip">${activeShift ? new Date(activeShift.openedAt).toLocaleString() : 'Open a shift to track cash-up'}</span>
-                                            ${activeShift ? `<span class="analytics-expense-subtle">Opening ${formatMoney(activeShift.openingCash)}</span>` : ''}
-                                        </div>
-                                    </div>
-                                    <div class="analytics-expense-side">
-                                        ${activeShift ? `<button class="btn-small" id="closeShiftBtn" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-lock"></i> Close shift</button>` : `<button class="btn-small" id="openShiftBtn" style="padding:0.55rem 0.9rem; min-height:auto;"><i class="fas fa-unlock"></i> Open shift</button>`}
+                            <div class="al-item">
+                                <div class="al-icon ${activeShift ? 'green' : 'danger'}"><i class="fas ${activeShift ? 'fa-unlock' : 'fa-lock'}"></i></div>
+                                <div class="al-body">
+                                    <div class="al-title">${activeShift ? 'Opened by ' + activeShift.openedBy : 'No active shift'}</div>
+                                    <div class="al-meta">
+                                        <span class="al-chip">${activeShift ? new Date(activeShift.openedAt).toLocaleString() : 'Open a shift to track cash-up'}</span>
+                                        ${activeShift ? `<span class="al-chip green">Opening ${formatMoney(activeShift.openingCash)}</span>` : ''}
                                     </div>
                                 </div>
+                                <div class="al-actions">
+                                    ${activeShift ? `<button class="al-btn red" id="closeShiftBtn"><i class="fas fa-lock"></i> Close</button>` : `<button class="al-btn green" id="openShiftBtn"><i class="fas fa-unlock"></i> Open</button>`}
+                                </div>
                             </div>
-                        </section>
+                        </div>
 
-                        <section class="analytics-card">
-                            <div class="analytics-section-head">
+                        <!-- Notifications -->
+                        <div class="al-section">
+                            <div class="al-section-head">
                                 <div>
-                                    <h4><i class="fas fa-message icon-one"></i> Notifications</h4>
+                                    <h4><i class="fas fa-message" style="color:#0ea5e9;"></i> Notifications</h4>
                                     <p>System and workflow events</p>
                                 </div>
-                                <div style="display:flex;gap:0.4rem;">
-                                    <button class="btn-small analytics-ghost-btn" id="markNotificationsReadBtn" style="padding:0.55rem 0.9rem; min-height:auto;">Mark all read</button>
-                                    ${notifications.length > 0 ? `<button class="btn-small" id="clearNotificationsBtn" style="padding:0.55rem 0.9rem; min-height:auto; background:#ef4444; color:#fff; border-color:#ef4444;"><i class="fas fa-trash"></i> Clear all</button>` : ''}
+                                <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                                    <button class="al-btn" id="markNotificationsReadBtn"><i class="fas fa-check-double"></i> Read all</button>
+                                    ${notifications.length > 0 ? `<button class="al-btn red" id="clearNotificationsBtn"><i class="fas fa-trash"></i> Clear</button>` : ''}
                                 </div>
                             </div>
-                            ${notifications.length === 0 ? `<div class="analytics-empty-state">No notifications yet.</div>` : notifications.slice(0, 10).map(item => `
-                                <div class="analytics-expense-item alert-card-${item.type === 'warning' ? 'warn' : item.type === 'error' ? 'danger' : item.type === 'success' ? 'success' : 'info'}">
-                                    <div class="analytics-expense-head">
-                                        <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title"><i class="fas ${item.type === 'warning' ? 'fa-triangle-exclamation' : item.type === 'error' ? 'fa-circle-exclamation' : item.type === 'success' ? 'fa-circle-check' : 'fa-circle-info'}" style="margin-right:0.4rem;"></i>${item.title}</div>
-                                            <div class="analytics-expense-meta">
-                                                <span class="notif-type-badge type-${item.type || 'info'}">${item.type || 'info'}</span>
-                                                <span class="analytics-expense-subtle">${new Date(item.date).toLocaleString()}</span>
-                                            </div>
-                                            <div style="margin-top:0.5rem; color:#475569; font-size:0.85rem;">${item.body}</div>
+                            ${notifications.length === 0 ? `<div class="al-empty"><i class="fas fa-bell-slash"></i>No notifications yet</div>` : notifications.slice(0, 10).map(item => {
+                                const t = item.type || 'info';
+                                const colorClass = t === 'warning' ? 'warn' : t === 'error' ? 'danger' : t === 'success' ? 'success' : 'info';
+                                const iconName = t === 'warning' ? 'fa-triangle-exclamation' : t === 'error' ? 'fa-circle-exclamation' : t === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+                                return `
+                                <div class="al-item ${colorClass}">
+                                    <div class="al-icon ${colorClass === 'warn' ? 'warn' : colorClass === 'danger' ? 'danger' : colorClass === 'success' ? 'green' : 'blue'}"><i class="fas ${iconName}"></i></div>
+                                    <div class="al-body">
+                                        <div class="al-title">${item.title}</div>
+                                        <div class="al-meta">
+                                            <span class="al-chip ${colorClass === 'warn' ? 'warn' : colorClass === 'danger' ? 'danger' : colorClass === 'success' ? 'green' : 'blue'}">${t}</span>
+                                            <span class="al-chip">${new Date(item.date).toLocaleString()}</span>
                                         </div>
+                                        <div class="al-notif-body">${item.body}</div>
                                     </div>
-                                </div>
-                            `).join('')}
-                        </section>
+                                </div>`;
+                            }).join('')}
+                        </div>
 
-                        <section class="analytics-card">
-                            <div class="analytics-section-head">
+                        <!-- Audit Log -->
+                        <div class="al-section">
+                            <div class="al-section-head">
                                 <div>
-                                    <h4><i class="fas fa-clipboard-list icon-one"></i> Audit Log</h4>
+                                    <h4><i class="fas fa-clipboard-list" style="color:#64748b;"></i> Audit Log</h4>
                                     <p>Recent operational activity</p>
                                 </div>
+                                <span class="al-count">${auditLogs.length} entries</span>
                             </div>
-                            ${auditLogs.length === 0 ? `<div class="analytics-empty-state">No audit entries yet.</div>` : auditLogs.slice(0, 12).map(entry => `
-                                <div class="analytics-expense-item">
-                                    <div class="analytics-expense-head">
-                                        <div class="analytics-expense-main">
-                                            <div class="analytics-expense-title">${entry.detail}</div>
-                                            <div class="analytics-expense-meta">
-                                                <span class="analytics-expense-chip">${entry.action}</span>
-                                                <span class="analytics-expense-subtle">${entry.userName}</span>
-                                                <span class="analytics-expense-subtle">${new Date(entry.date).toLocaleString()}</span>
-                                            </div>
+                            ${auditLogs.length === 0 ? `<div class="al-empty"><i class="fas fa-clipboard-list"></i>No audit entries yet</div>` : auditLogs.slice(0, 12).map(entry => `
+                                <div class="al-item">
+                                    <div class="al-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                                    <div class="al-body">
+                                        <div class="al-title">${entry.detail}</div>
+                                        <div class="al-meta">
+                                            <span class="al-chip accent">${entry.action}</span>
+                                            <span class="al-chip">${entry.userName}</span>
+                                            <span class="al-chip">${new Date(entry.date).toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </div>
                             `).join('')}
-                        </section>
+                        </div>
                     </div>
                 `;
 
