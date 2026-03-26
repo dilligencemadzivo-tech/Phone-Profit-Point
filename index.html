@@ -8214,7 +8214,7 @@
                                 </div>
                                 <span class="al-count">${auditLogs.length} entries</span>
                             </div>
-                            ${auditLogs.length === 0 ? `<div class="al-empty"><i class="fas fa-clipboard-list"></i>No audit entries yet</div>` : auditLogs.slice(0, 12).map(entry => `
+                            ${auditLogs.length === 0 ? `<div class="al-empty"><i class="fas fa-clipboard-list"></i>No audit entries yet</div>` : auditLogs.slice(0, 12).map((entry, idx) => `
                                 <div class="al-item">
                                     <div class="al-icon"><i class="fas fa-clock-rotate-left"></i></div>
                                     <div class="al-body">
@@ -8224,6 +8224,9 @@
                                             <span class="al-chip">${entry.userName}</span>
                                             <span class="al-chip">${new Date(entry.date).toLocaleString()}</span>
                                         </div>
+                                    </div>
+                                    <div class="al-actions">
+                                        <button class="al-btn audit-details-btn" data-idx="${idx}"><i class="fas fa-eye"></i> View</button>
                                     </div>
                                 </div>
                             `).join('')}
